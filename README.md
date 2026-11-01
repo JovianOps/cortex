@@ -21,7 +21,6 @@
 
 ```powershell
 hermes skills tap add JovianOps/cortex
-hermes skills install JovianOps/cortex/skills/academic-assistant
 ```
 
 ## Requirements
