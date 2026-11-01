@@ -4,31 +4,28 @@ Thank you for contributing to the Cortex skills collection!
 
 ## Adding a New Skill
 
-1. **Choose the right tier:**
-   - `skills/` — Bundled: daily-driver, broadly useful, low footprint
-   - `optional-skills/` — Niche, vertical-specific, or heavy
+1. **Brainstorming what the skill will be
+i mean brainstorming is like you find what new skills you want to make category coding uhh i mean anything?
 
-2. **Create the skill directory:**
+3. **Create the skill directory:**
    ```
    skills/<category>/<skill-name>/
    ├── SKILL.md          # Required: skill definition with frontmatter
-   ├── scripts/          # Optional: implementation scripts
-   ├── templates/        # Optional: templates
-   └── references/       # Optional: reference docs
+
    ```
 
-3. **Follow the skill authoring standards:**
+4. **Follow the skill authoring standards:**
    - Frontmatter with all required fields
    - Description ≤ 60 chars, one sentence, ends with period
    - Author credits human first: `Name (github-handle), Hermes Agent`
    - `platforms:` audited against actual code
    - All `related_skills` exist in-repo
 
-4. **Add tests** at `tests/skills/test_<name>_skill.py`
+5. **Add tests** at `tests/skills/test_<name>_skill.py`
 
-5. **Regenerate docs:** `python website/scripts/generate-skill-docs.py`
+6. **Regenerate docs:** `python website/scripts/generate-skill-docs.py`
 
-6. **Submit PR** with clean commit history
+7. **Submit PR** with clean commit history
 
 ## Skill Template
 
