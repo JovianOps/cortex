@@ -20,7 +20,7 @@
 ## Installation
 
 **Install all 10 skills at once (recommended):**
-
+You need to install https://github.com/jqlang/jq for this to work.
 ```bash
 hermes skills tap add JovianOps/cortex && hermes skills list --source JovianOps/cortex --json | jq -r '.[].name' | xargs -I {} hermes skills install "JovianOps/cortex/skills/{}" --yes
 ```
