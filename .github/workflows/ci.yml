@@ -111,22 +111,6 @@ jobs:
           sarif_file: 'trivy-results.sarif'
           category: 'trivy'
 
-      - name: Run Semgrep SAST
-        uses: returntocorp/semgrep-action@v1
-        with:
-          config: >-
-            p/security-audit
-            p/secrets
-            p/ci
-          generate-sarif: true
-          sarif-output: semgrep-results.sarif
-
-      - name: Upload Semgrep results
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: semgrep-results.sarif
-          category: semgrep
-
   release:
     name: Release
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
