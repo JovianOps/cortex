@@ -1,15 +1,3 @@
----
-name: academic-assistant
-description: Multi-purpose academic assistant for coding, report cards, 3D modeling with anti-hallucination and persistent memory.
-version: 0.1.0
-author: Your Name (github-handle), Hermes Agent
-license: MIT
-platforms: [linux, macos, windows]
-metadata:
-  hermes:
-    tags: [education, coding, 3d-modeling, report-cards, anti-hallucination, memory]
-    related_skills: []
----
 # Academic Assistant Skill
 
 A comprehensive academic assistant for coding, college report cards, and 3D modeling with built-in anti-hallucination measures and persistent memory management.

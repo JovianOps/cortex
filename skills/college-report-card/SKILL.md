@@ -1,15 +1,3 @@
----
-name: college-report-card
-description: Generate college report cards with AI assistance, reducing hallucinations and maintaining context.
-version: 0.1.0
-author: Your Name (github-handle), Hermes Agent
-license: MIT
-platforms: [linux, macos, windows]
-metadata:
-  hermes:
-    tags: [education, report-cards, college, grading, memory]
-    related_skills: []
----
 # College Report Card Skill
 
 Generate accurate college report cards with AI assistance, reducing hallucinations and maintaining persistent context across sessions.
