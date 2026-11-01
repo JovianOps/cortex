@@ -19,10 +19,14 @@
 
 ## Installation
 
-```powershell
+```terminal
 hermes skills tap add JovianOps/cortex
 ```
+Then after you put that command in your terminal, enter this one
 
+```terminal
+for s in $(hermes skills search --source JovianOps/cortex --json | jq -r '.[].name'); do hermes skills install "JovianOps/cortex/skills/$s" --yes done
+```
 ## Requirements
 
 - Hermes Agent installed
