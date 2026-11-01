@@ -19,7 +19,7 @@
 
 ## Installation
 
-```bash
+```powershell
 # Install a single skill
 hermes skills install JovianOps/cortex/skills/academic-assistant
 
