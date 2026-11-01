@@ -4,7 +4,7 @@ Thank you for contributing to the Cortex skills collection!
 
 ## Adding a New Skill
 
-1. **Brainstorming what the skill will be
+1. **Brainstorming what the skill** will be
 i mean brainstorming is like you find what new skills you want to make category coding uhh i mean anything?
 
 3. **Create the skill directory:**
