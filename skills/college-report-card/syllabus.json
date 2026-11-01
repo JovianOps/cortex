@@ -1,0 +1,30 @@
+{
+  "Course": "CS101 - Introduction to Computer Science",
+  "Term": "Fall 2024",
+  "Instructor": "Prof. Smith",
+  "Weights": {
+    "Assignments": 0.30,
+    "Midterm": 0.25,
+    "Final": 0.35,
+    "Attendance": 0.10
+  },
+  "Rubric": {
+    "A": { "min": 93, "desc": "Exceptional mastery" },
+    "A-": { "min": 90, "desc": "Excellent" },
+    "B+": { "min": 87, "desc": "Very good" },
+    "B": { "min": 83, "desc": "Good" },
+    "B-": { "min": 80, "desc": "Good" },
+    "C+": { "min": 77, "desc": "Above average" },
+    "C": { "min": 73, "desc": "Average" },
+    "C-": { "min": 70, "desc": "Below average" },
+    "D+": { "min": 67, "desc": "Below average" },
+    "D": { "min": 63, "desc": "Poor" },
+    "D-": { "min": 60, "desc": "Minimum passing" },
+    "F": { "min": 0, "desc": "Failing" }
+  },
+  "AttendancePolicy": {
+    "Minimum": 75,
+    "Warning": 85,
+    "Excellent": 95
+  }
+}

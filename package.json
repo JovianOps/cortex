@@ -1,0 +1,28 @@
+{
+  "name": "my-skills",
+  "version": "0.1.0",
+  "description": "A collection of 10 Hermes skills",
+  "keywords": ["hermes", "skills", "automation", "productivity"],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/my-skills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/my-skills/issues"
+  },
+  "homepage": "https://github.com/your-org/my-skills#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "files": [
+    "skills/",
+    "scripts/",
+    "templates/",
+    "references/"
+  ]
+}
