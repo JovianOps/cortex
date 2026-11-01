@@ -20,10 +20,6 @@
 ## Installation
 
 ```powershell
-# Install a single skill
-hermes skills install JovianOps/cortex/skills/academic-assistant
-
-# Or add the entire tap
 hermes skills tap add JovianOps/cortex
 hermes skills install JovianOps/cortex/skills/academic-assistant
 ```
