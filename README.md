@@ -19,14 +19,19 @@
 
 ## Installation
 
-```terminal
-hermes skills tap add JovianOps/cortex
-```
-Then after you put that command in your terminal, enter this one
+**Install all 10 skills at once (recommended):**
 
-```terminal
-for s in $(hermes skills search --source JovianOps/cortex --json | jq -r '.[].name'); do hermes skills install "JovianOps/cortex/skills/$s" --yes done
+```bash
+hermes skills tap add JovianOps/cortex && hermes skills list --source JovianOps/cortex --json | jq -r '.[].name' | xargs -I {} hermes skills install "JovianOps/cortex/skills/{}" --yes
 ```
+
+**Or install individually:**
+
+```bash
+hermes skills tap add JovianOps/cortex
+hermes skills install JovianOps/cortex/skills/academic-assistant
+```
+
 ## Requirements
 
 - Hermes Agent installed
