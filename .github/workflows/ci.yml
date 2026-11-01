@@ -62,7 +62,7 @@ for skill_file in glob.glob('skills/**/SKILL.md', recursive=True):
         
         # Description length check
         if 'description' in fm and len(fm['description']) > 60:
-            warnings.append(f'{skill_file}: Description > 60 chars ({len(fm[\"description\"])} chars)')
+            warnings.append(f'{skill_file}: Description > 60 chars ({len(fm["description"])} chars)')
         
         if 'description' in fm and not fm['description'].endswith('.'):
             warnings.append(f'{skill_file}: Description should end with period')
@@ -132,8 +132,7 @@ print('All SKILL.md files validated successfully!')
         run: npm install -g markdownlint-cli
       
       - name: Lint markdown files
-        run: |
-          markdownlint '**/*.md' --config .markdownlint.json || true
+        run: markdownlint '**/*.md' --config .markdownlint.json || true
 
   validate-yaml:
     name: Validate YAML
@@ -164,3 +163,17 @@ if errors:
     sys.exit(1)
   print('All YAML files valid')
 "
+
+  release:
+    name: Release
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          draft: false
+          prerelease: false
