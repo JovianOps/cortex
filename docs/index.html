@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cortex — 10 Hermes Skills</title>
+  <meta name="description" content="10 Hermes skills for academic assistance, report cards, 3D modeling, coding, and more">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0b;
+      --fg: #fafafa;
+      --muted: #71717a;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --card: #18181b;
+      --border: #27272a;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *::selection { background: #10b981; color: #0a0a0b; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a { color: inherit; text-decoration: none; }
+    .container { max-width: 800px; margin: 0 auto; padding: 60px 24px; width: 100%; flex: 1; }
+    header { text-align: center; padding: 60px 0 40px; }
+    .logo { font-family: 'JetBrains Mono', monospace; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; letter-spacing: -0.03em; background: linear-gradient(135deg, #10b981 0%, #34d399 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; }
+    .tagline { color: var(--muted); font-size: clamp(1rem, 2.5vw, 1.25rem); font-weight: 400; max-width: 600px; margin: 12px auto 0; line-height: 1.5; }
+    .cta-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 40px; gap: 12px; }
+    .btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; border-radius: 10px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 15px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease; border: none; text-decoration: none; white-space: nowrap; }
+    .btn-primary { background: #10b981; color: #0a0a0b; box-shadow: 0 4px 24px rgba(16, 185, 129, 0.35); }
+    .btn-primary:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(16, 185, 129, 0.45); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-secondary { background: var(--card); color: var(--fg); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border); transform: translateY(-2px); }
+    .btn:focus-visible { outline: 2px solid #10b981; outline-offset: 3px; }
+    .btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 60px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+    .card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(16, 185, 129, 0.15); }
+    .card-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+    .card-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .card-icon svg { width: 22px; height: 22px; color: var(--accent); }
+    .card-title { font-weight: 600; font-size: 16px; color: var(--fg); line-height: 1.3; }
+    .card-desc { color: var(--muted); font-size: 14px; line-height: 1.5; font-weight: 400; }
+    footer { margin-top: 80px; padding: 40px 0 40px; text-align: center; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; }
+    .footer-links { display: flex; justify-content: center; gap: 24px; margin-top: 16px; flex-wrap: wrap; }
+    .footer-links a { color: var(--muted); font-size: 13px; transition: color 0.15s; }
+    .footer-links a:hover { color: var(--accent); }
+    @media (max-width: 640px) {
+      .container { padding: 40px 16px; }
+      header { padding: 40px 0 30px; }
+      .cta-row { flex-direction: column; align-items: stretch; }
+      .btn { width: 100%; justify-content: center; }
+      .skills-grid { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 class="logo">cortex</h1>
+      <p class="tagline">10 Hermes skills — report cards, coding, 3D modeling, anti-hallucination, memory, and more.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/JovianOps/cortex/archive/refs/heads/main.zip" id="downloadBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Download ZIP</span>
+        </a>
+        <a class="btn btn-secondary" href="https://github.com/JovianOps/cortex" target="_blank" rel="noopener noreferrer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-33.817-11.312-42.457-19.707-42.457-19.707C7.793 44.881 7.177 39.461 7.177 39.461c-2.141-1.022-4.632-1.704-.927-1.761.887-.408 2.09-.486 2.09-.486 2.471 1.82 4.548 1.443 6.001 1.585.083-.892.252-1.634.42-1.98-1.492-.075-3.018-1.404-5.022-3.472-.671-1.071-1.57-4.495-.868-4.755-.029-.068.588-.269.868-.332.023-.026.205-.105.351-.041C9.986 8.57 12 7.771 12 7.771s.978 1.44 1.975 2.416c.42.382.93.251.95.204.486-.436 1.253-.77 2.03-.77C22.51 3.77 24 6.77 24 12c0 6.627-5.373 12-12 12z"/></svg>
+          <span>View on GitHub</span>
+        </a>
+      </div>
+    </header>
+
+    <main>
+      <section class="skills-grid" id="skills">
+        <article class="card">
+          <div class="card-header">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+            <h3 class="card-title">academic-assistant</h3>
+          </div>
+          <p>Core academic assistant: report cards, coding, 3D modeling, anti-hallucination, persistent memory</p>
+        </article>
+
+        <article class="card">
+          <div class="card-header">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+            <h3 class="card-title">college-report-card</h3>
+          </div>
+          <p>Deterministic report card generator from structured grade data with HTML/PDF export.</
