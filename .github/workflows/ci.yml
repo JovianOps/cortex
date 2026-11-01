@@ -19,8 +19,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install validation deps
-        run: |
-          pip install pyyaml ruff
+        run: pip install pyyaml ruff
 
       - name: Validate all SKILL.md files
         run: python scripts/validate_skills.py
@@ -33,7 +32,7 @@ jobs:
               exit 1
             fi
           done
-        echo "All skill directories have SKILL.md"
+          echo "All skill directories have SKILL.md"
 
   validate-scripts:
     name: Validate Scripts
@@ -79,24 +78,11 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install pyyaml
+        run: pip install pyyaml
+
       - name: Validate YAML files
-        run: |
-          pip install pyyaml
-          python -c "
-import yaml, sys, glob, os
-errors = []
-for yaml_file in glob.glob('**/*.yaml', recursive=True) + glob.glob('**/*.yml', recursive=True):
-    try:
-        with open(yaml_file, 'r') as f:
-            yaml.safe_load(f)
-    except yaml.YAMLError as e:
-        errors.append(f'{yaml_file}: {e}')
-if errors:
-    for e in errors:
-        print(f'::error::{e}')
-    sys.exit(1)
-  print('All YAML files valid')
-"
+        run: python scripts/validate_yaml.py
 
   security-scan:
     name: Security Scan
@@ -118,7 +104,6 @@ if errors:
           exit-code: '1'
           ignore-unfixed: true
           vuln-type: 'os,library'
-          ignore-unfixed: true
 
       - name: Upload Trivy results to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
