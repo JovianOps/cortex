@@ -25,7 +25,7 @@ Web scraping with validation, rate limiting, and anti-hallucination extraction.
 
 ## How to Run
 ```bash
-hermes skills install owner/repo/skills/web-scraper
+hermes skills install JovianOps/cortex/skills/web-scraper
 hermes chat -q "Scrape product data from example.com with validation"
 ```
 

@@ -28,7 +28,7 @@ A comprehensive academic assistant for coding, college report cards, and 3D mode
 
 ## How to Run
 ```bash
-hermes skills install owner/repo/skills/academic-assistant
+hermes skills install JovianOps/cortex/skills/academic-assistant
 hermes chat -q "Generate report cards for CS101 Fall 2024 from grades.csv"
 hermes chat -q "Help me write a Python script for data analysis"
 hermes chat -q "Guide me through creating a 3D model of a chair in Blender"

@@ -22,7 +22,7 @@ Code review with anti-hallucination checks, style enforcement, and deterministic
 
 ## How to Run
 ```bash
-hermes skills install owner/repo/skills/code-review-assistant
+hermes skills install JovianOps/cortex/skills/code-review-assistant
 hermes chat -q "Review PR #42 for security issues and style violations"
 ```
 

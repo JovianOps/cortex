@@ -22,7 +22,7 @@ Automated documentation generation from code and specifications with validation.
 
 ## How to Run
 ```bash
-hermes skills install owner/repo/skills/documentation-generator
+hermes skills install JovianOps/cortex/skills/documentation-generator
 hermes chat -q "Generate API docs from my FastAPI code"
 ```
 

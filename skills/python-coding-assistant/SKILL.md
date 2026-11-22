@@ -22,7 +22,7 @@ Python coding assistance with validation, type hints, and anti-hallucination mea
 
 ## How to Run
 ```bash
-hermes skills install owner/repo/skills/python-coding-assistant
+hermes skills install JovianOps/cortex/skills/python-coding-assistant
 hermes chat -q "Write a Python script to process CSV data with validation"
 ```
 

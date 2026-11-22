@@ -22,7 +22,7 @@ Test automation with pytest, coverage, and CI/CD integration.
 
 ## How to Run
 ```bash
-hermes skills install owner/repo/skills/testing-automation
+hermes skills install JovianOps/cortex/skills/testing-automation
 hermes chat -q "Set up pytest with coverage for my project"
 ```
 

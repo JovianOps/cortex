@@ -22,7 +22,7 @@ Validation framework and anti-hallucination measures for AI outputs.
 
 ## How to Run
 ```bash
-hermes skills install owner/repo/skills/anti-hallucination
+hermes skills install JovianOps/cortex/skills/anti-hallucination
 hermes chat -q "Validate this code snippet for hallucinations"
 ```
 

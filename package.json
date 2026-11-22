@@ -1,23 +1,28 @@
 {
-  "name": "my-skills",
+  "name": "@jovianops/cortex",
   "version": "0.1.0",
-  "description": "A collection of 10 Hermes skills",
-  "keywords": ["hermes", "skills", "automation", "productivity"],
+  "description": "A collection of 10 core and 10 premium Hermes skills",
+  "keywords": [
+    "hermes",
+    "skills",
+    "automation",
+    "productivity"
+  ],
   "author": "Athalla Jovian",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/my-skills.git"
+    "url": "https://github.com/JovianOps/cortex.git"
   },
   "bugs": {
-    "url": "https://github.com/your-org/my-skills/issues"
+    "url": "https://github.com/JovianOps/cortex/issues"
   },
-  "homepage": "https://github.com/your-org/my-skills#readme",
+  "homepage": "https://github.com/JovianOps/cortex#readme",
   "engines": {
     "node": ">=14.0.0"
   },
   "scripts": {
-    "test": "echo \"No tests specified\" && exit 0"
+    "test": "python scripts/package_skills.py --check && python scripts/validate_skills.py"
   },
   "files": [
     "skills/",

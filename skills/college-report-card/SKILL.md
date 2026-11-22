@@ -26,7 +26,7 @@ Generate accurate college report cards with AI assistance, reducing hallucinatio
 
 ## How to Run
 ```bash
-hermes skills install owner/repo/skills/college-report-card
+hermes skills install JovianOps/cortex/skills/college-report-card
 hermes chat -q "Generate report cards for CS101 Fall 2024 from grades.csv"
 ```
 

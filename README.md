@@ -19,18 +19,60 @@
 
 ## Installation
 
-**Install all 10 skills at once (recommended):**
-You need to install https://github.com/jqlang/jq for this to work.
-```bash
-hermes skills tap add JovianOps/cortex && hermes skills list --source JovianOps/cortex --json | jq -r '.[].name' | xargs -I {} hermes skills install "JovianOps/cortex/skills/{}" --yes
-```
+Cortex contains **10 core skills** in `skills/` and **10 premium/extended skills** in `premium-skills/`. Install the core collection, the premium collection, or one skill at a time. Run these commands in a Bash shell or PowerShell; no `jq` or `xargs` is needed.
 
-**Or install individually:**
+### Install all 10 core skills
+
+Bash:
 
 ```bash
 hermes skills tap add JovianOps/cortex
-hermes skills install JovianOps/cortex/skills/academic-assistant
+for skill in academic-assistant college-report-card anti-hallucination blender-3d-modeling code-review-assistant documentation-generator memory-manager python-coding-assistant testing-automation web-scraper; do
+  hermes skills install "JovianOps/cortex/skills/$skill" --yes
+done
 ```
+
+PowerShell:
+
+```powershell
+hermes skills tap add JovianOps/cortex
+$skills = @('academic-assistant', 'college-report-card', 'anti-hallucination', 'blender-3d-modeling', 'code-review-assistant', 'documentation-generator', 'memory-manager', 'python-coding-assistant', 'testing-automation', 'web-scraper')
+foreach ($skill in $skills) {
+    hermes skills install "JovianOps/cortex/skills/$skill" --yes
+}
+```
+
+### Install all 10 premium/extended skills
+
+Bash:
+
+```bash
+hermes skills tap add JovianOps/cortex
+for skill in api-designer code-migration db-optimizer devops-pipeline docker-generator performance-profiler refactoring-assistant security-auditor terraform-generator unit-test-generator; do
+  hermes skills install "JovianOps/cortex/premium-skills/$skill" --yes
+done
+```
+
+PowerShell:
+
+```powershell
+hermes skills tap add JovianOps/cortex
+$skills = @('api-designer', 'code-migration', 'db-optimizer', 'devops-pipeline', 'docker-generator', 'performance-profiler', 'refactoring-assistant', 'security-auditor', 'terraform-generator', 'unit-test-generator')
+foreach ($skill in $skills) {
+    hermes skills install "JovianOps/cortex/premium-skills/$skill" --yes
+}
+```
+
+### Install one skill
+
+Add the tap once, then use the skill's name and collection path. For example, install `academic-assistant`:
+
+```bash
+hermes skills tap add JovianOps/cortex
+hermes skills install JovianOps/cortex/skills/academic-assistant --yes
+```
+
+PowerShell uses the same commands. For a premium skill, use `JovianOps/cortex/premium-skills/<skill-name>`.
 
 ## Requirements
 

@@ -26,7 +26,7 @@ metadata:
 
 ## How to Run
 ```bash
-hermes skills install owner/repo/skills/blender-3d-modeling
+hermes skills install JovianOps/cortex/skills/blender-3d-modeling
 hermes chat -q "Guide me through creating a low-poly chair in Blender"
 ```
 

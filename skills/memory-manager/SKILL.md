@@ -22,7 +22,7 @@ Persistent memory and context management across sessions with anti-forgetting me
 
 ## How to Run
 ```bash
-hermes skills install owner/repo/skills/memory-manager
+hermes skills install JovianOps/cortex/skills/memory-manager
 hermes chat -q "Save my current project context and restore it next session"
 ```
 
