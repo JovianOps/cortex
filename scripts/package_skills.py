@@ -37,8 +37,13 @@ def verify_archive(path: Path, name: str, source: Path) -> list[str]:
                 problems.append(
                     f"{path.relative_to(ROOT)}: expected only {expected}, found {archive.namelist()}"
                 )
-            elif archive.read(expected) != source.read_bytes():
-                problems.append(f"{path.relative_to(ROOT)}: content differs from {source.relative_to(ROOT)}")
+            else:
+                archive_content = archive.read(expected).replace(b"\r\n", b"\n")
+                source_content = source.read_bytes().replace(b"\r\n", b"\n")
+                if archive_content != source_content:
+                    problems.append(
+                        f"{path.relative_to(ROOT)}: content differs from {source.relative_to(ROOT)}"
+                    )
     except (OSError, zipfile.BadZipFile, RuntimeError) as exc:
         problems.append(f"{path.relative_to(ROOT)}: invalid ZIP archive ({exc})")
     return problems
@@ -66,7 +71,8 @@ def package(check: bool) -> int:
             for name, source in sources.items():
                 destination = output / f"{name}.zip"
                 with zipfile.ZipFile(destination, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-                    archive.write(source, expected_member(name))
+                    normalized = source.read_bytes().replace(b"\r\n", b"\n")
+                    archive.writestr(expected_member(name), normalized)
                 print(f"Created {destination.relative_to(ROOT)}")
     if problems:
         for problem in problems:
