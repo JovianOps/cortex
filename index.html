@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cortex — Modular Skills for Hermes Agent</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #F6F5F0;
+      --surface: #FFFFFF;
+      --surface-subtle: #EFECE5;
+      --border: #DFDDD4;
+      --border-strong: #C9C6BA;
+      --text: #161614;
+      --text-muted: #5C5A52;
+      --text-faint: #848177;
+      --accent: #B8421B;
+      --accent-soft: #F9EAE4;
+      --code-bg: #171715;
+      --code-text: #ECEBE4;
+      --code-muted: #9C9A90;
+      --badge-core-bg: #EBE9E1;
+      --badge-core-text: #2C2B28;
+      --badge-ext-bg: #F9EAE4;
+      --badge-ext-text: #993514;
+    }
+
+    html[data-theme="dark"] {
+      --bg: #111110;
+      --surface: #181816;
+      --surface-subtle: #20201D;
+      --border: #2B2B27;
+      --border-strong: #3E3E38;
+      --text: #F2F1EC;
+      --text-muted: #A4A29A;
+      --text-faint: #706E67;
+      --accent: #E26D43;
+      --accent-soft: #2D1C16;
+      --code-bg: #0B0B0A;
+      --code-text: #ECEBE4;
+      --code-muted: #8C8A80;
+      --badge-core-bg: #262622;
+      --badge-core-text: #D7D5CD;
+      --badge-ext-bg: #2D1C16;
+      --badge-ext-text: #F09B7A;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-mono-code {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .surface {
+      background-color: var(--surface);
+      border-color: var(--border);
+    }
+
+    .surface-subtle {
+      background-color: var(--surface-subtle);
+      border-color: var(--border);
+    }
+
+    .border-hairline {
+      border-color: var(--border);
+    }
+
+    .text-muted {
+      color: var(--text-muted);
+    }
+
+    .text-faint {
+      color: var(--text-faint);
+    }
+
+    .accent-text {
+      color: var(--accent);
+    }
+
+    .accent-btn {
+      background-color: var(--text);
+      color: var(--bg);
+    }
+
+    .accent-btn:hover {
+      opacity: 0.88;
+    }
+
+    .code-block {
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      border: 1px solid var(--border);
+    }
+
+    .badge-core {
+      background-color: var(--badge-core-bg);
+      color: var(--badge-core-text);
+    }
+
+    .badge-ext {
+      background-color: var(--badge-ext-bg);
+      color: var(--badge-ext-text);
+    }
+
+    .seg-active {
+      background-color: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+
+    .seg-inactive {
+      color: var(--text-muted);
+    }
+
+    .seg-inactive:hover {
+      color: var(--text);
+    }
+
+    .skill-row {
+      transition: background-color 120ms ease;
+    }
+
+    .skill-row:hover {
+      background-color: var(--surface-subtle);
+    }
+
+    .skill-row-selected {
+      background-color: var(--accent-soft);
+    }
+
+    .skill-row-selected:hover {
+      background-color: var(--accent-soft);
+    }
+
+    .toast-enter {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-leave {
+      transform: translateY(12px);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    pre {
+      scrollbar-width: thin;
+      scrollbar-color: #444 transparent;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Top Navigation -->
+  <header class="sticky top-0 z-30 border-b border-hairline" style="background-color: var(--bg);">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+      <a href="#top" class="flex items-center gap-2.5 font-semibold tracking-tight text-sm shrink-0" style="color: var(--text);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="2" y="2" width="20" height="20" rx="4" stroke="currentColor" stroke-width="2" />
+          <path d="M8 8H16V11H11V13H16V16H8V8Z" fill="currentColor" />
+        </svg>
+        <span>JovianOps<span class="text-faint font-normal">/</span>cortex</span>
+      </a>
+
+      <nav class="hidden sm:flex items-center gap-6 text-sm text-muted">
+        <a href="#skills" class="hover:underline underline-offset-4">Skills</a>
+        <a href="#install" class="hover:underline underline-offset-4">Install</a>
+        <a href="#requirements" class="hover:underline underline-offset-4">Requirements</a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <button id="themeToggleBtn" type="button" aria-label="Toggle color theme"
+          class="h-8 px-2.5 rounded-md border border-hairline surface text-xs font-medium text-muted hover:opacity-80 flex items-center gap-1.5 cursor-pointer">
+          <span id="themeToggleIcon" aria-hidden="true"></span>
+          <span id="themeToggleLabel" class="hidden sm:inline">Dark</span>
+        </button>
+        <a href="https://github.com/JovianOps/cortex" target="_blank" rel="noopener noreferrer"
+          class="h-8 px-3 rounded-md border border-hairline surface text-xs font-medium flex items-center gap-1.5 hover:opacity-80" style="color: var(--text);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11.02 11.02 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.8 1.19 1.83 1.19 3.08 0 4.41-2.69 5.39-5.25 5.67.41.36.78 1.06.78 2.13 0 1.54-.01 2.78-.01 3.16 0 .31.21.66.79.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top" class="flex-1">
+    <!-- Hero Section -->
+    <section class="border-b border-hairline">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+          <div class="lg:col-span-6 space-y-5">
+            <div class="inline-flex items-center gap-2 text-xs font-mono-code uppercase tracking-wider text-muted">
+              <span class="w-2 h-2 rounded-full" style="background-color: var(--accent);"></span>
+              <span>Hermes Agent Skill Tap</span>
+              <span class="text-faint">/</span>
+              <span>MIT License</span>
+            </div>
+
+            <h1 class="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">
+              Cortex
+            </h1>
+
+            <p class="text-base sm:text-lg text-muted leading-relaxed max-w-xl">
+              20 modular skills for Hermes Agent — 10 core skills in <code class="font-mono-code text-sm px-1.5 py-0.5 rounded surface-subtle">skills/</code> and 10 extended engineering skills in <code class="font-mono-code text-sm px-1.5 py-0.5 rounded surface-subtle">premium-skills/</code>. Native shell install, no <code class="font-mono-code text-sm">jq</code> or <code class="font-mono-code text-sm">xargs</code> required.
+            </p>
+
+            <div class="flex flex-wrap items-center gap-3 pt-1">
+              <a href="#skills" class="accent-btn h-10 px-4 rounded-md text-sm font-medium inline-flex items-center gap-2 transition">
+                <span>Browse 20 skills</span>
+                <span aria-hidden="true">&darr;</span>
+              </a>
+              <a href="https://github.com/JovianOps/cortex" target="_blank" rel="noopener noreferrer"
+                class="h-10 px-4 rounded-md border border-hairline surface text-sm font-medium inline-flex items-center gap-2 hover:opacity-80" style="color: var(--text);">
+                <span>View source on GitHub</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+              </a>
+            </div>
+
+            <div class="pt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-mono-code text-faint">
+              <span>10 core skills</span>
+              <span>&middot;</span>
+              <span>10 extended skills</span>
+              <span>&middot;</span>
+              <span>Bash &amp; PowerShell</span>
+              <span>&middot;</span>
+              <span>MIT</span>
+            </div>
+          </div>
+
+          <!-- Quick Install Terminal Card -->
+          <div class="lg:col-span-6">
+            <div class="rounded-lg border border-hairline surface overflow-hidden">
+              <div class="px-3.5 py-2.5 border-b border-hairline flex flex-wrap items-center justify-between gap-2 surface-subtle">
+                <div class="flex items-center gap-1 p-0.5 rounded-md border border-hairline" style="background-color: var(--bg);">
+                  <button type="button" data-hero-scope="core" class="hero-scope-btn px-2.5 py-1 rounded text-xs font-medium cursor-pointer">
+                    Core 10
+                  </button>
+                  <button type="button" data-hero-scope="extended" class="hero-scope-btn px-2.5 py-1 rounded text-xs font-medium cursor-pointer">
+                    Extended 10
+                  </button>
+                </div>
+
+                <div class="flex items-center gap-1 p-0.5 rounded-md border border-hairline" style="background-color: var(--bg);">
+                  <button type="button" data-shell="bash" class="shell-btn px-2.5 py-1 rounded text-xs font-mono-code cursor-pointer">
+                    Bash
+                  </button>
+                  <button type="button" data-shell="powershell" class="shell-btn px-2.5 py-1 rounded text-xs font-mono-code cursor-pointer">
+                    PowerShell
+                  </button>
+                </div>
+              </div>
+
+              <div class="code-block border-0 p-4 relative">
+                <pre id="heroCommandCode" class="font-mono-code text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap break-words m-0 pr-2"></pre>
+              </div>
+
+              <div class="px-3.5 py-2.5 border-t border-hairline flex items-center justify-between gap-3 text-xs">
+                <span id="heroCommandNote" class="text-muted">Linux / macOS — native Bash loop</span>
+                <button id="copyHeroBtn" type="button"
+                  class="px-3 py-1.5 rounded-md border border-hairline surface font-medium hover:opacity-80 cursor-pointer shrink-0" style="color: var(--text);">
+                  Copy command
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills Catalog + Live Command Builder -->
+    <section id="skills" class="border-b border-hairline">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-14 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <p class="text-xs font-mono-code uppercase tracking-wider text-faint mb-1">Catalog</p>
+            <h2 class="text-2xl font-bold tracking-tight">Skills &amp; Command Builder</h2>
+            <p class="text-sm text-muted mt-1">Select individual skills to assemble a custom install command, or expand any row to inspect its path.</p>
+          </div>
+          <div id="catalogCount" class="text-xs font-mono-code text-muted shrink-0">Showing 20 of 20</div>
+        </div>
+
+        <!-- Filter & Search Controls -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div class="inline-flex p-1 rounded-md border border-hairline surface-subtle self-start">
+            <button type="button" data-tier="all" class="tier-btn px-3 py-1.5 rounded text-xs font-medium cursor-pointer">
+              All (20)
+            </button>
+            <button type="button" data-tier="core" class="tier-btn px-3 py-1.5 rounded text-xs font-medium cursor-pointer">
+              Core (10)
+            </button>
+            <button type="button" data-tier="extended" class="tier-btn px-3 py-1.5 rounded text-xs font-medium cursor-pointer">
+              Extended (10)
+            </button>
+          </div>
+
+          <div class="relative flex-1 sm:max-w-xs">
+            <input id="skillSearchInput" type="search" placeholder="Filter by slug or capability..."
+              class="w-full h-9 pl-3 pr-8 rounded-md border border-hairline surface text-sm focus:outline-none"
+              style="color: var(--text);" />
+            <button id="clearSearchBtn" type="button" aria-label="Clear search"
+              class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-xs text-faint hover:opacity-80 px-1 cursor-pointer">
+              &times;
+            </button>
+          </div>
+        </div>
+
+        <!-- Skill Table/List -->
+        <div class="rounded-lg border border-hairline surface overflow-hidden">
+          <div class="hidden md:grid grid-cols-12 gap-3 px-4 py-2.5 border-b border-hairline surface-subtle text-xs font-mono-code uppercase tracking-wider text-faint">
+            <div class="col-span-1">Pick</div>
+            <div class="col-span-4">Skill</div>
+            <div class="col-span-5">Scope</div>
+            <div class="col-span-2 text-right">Action</div>
+          </div>
+          <div id="skillsList" class="divide-y" style="border-color: var(--border);"></div>
+          <div id="emptyState" class="hidden px-6 py-10 text-center space-y-2">
+            <p class="text-sm font-medium">No skills match that filter.</p>
+            <button id="resetFiltersBtn" type="button" class="text-xs underline underline-offset-4 accent-text cursor-pointer">
+              Reset filters
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Custom Install Builder -->
+        <div class="rounded-lg border border-hairline surface overflow-hidden">
+          <div class="px-4 py-3 border-b border-hairline surface-subtle flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xs font-mono-code uppercase tracking-wider text-faint">Custom Command</span>
+              <span id="selectedBadge" class="text-xs font-mono-code px-2 py-0.5 rounded badge-core">0 selected</span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <button id="selectCorePresetBtn" type="button" class="px-2.5 py-1 rounded border border-hairline surface hover:opacity-80 cursor-pointer" style="color: var(--text);">
+                Select Core 10
+              </button>
+              <button id="selectExtendedPresetBtn" type="button" class="px-2.5 py-1 rounded border border-hairline surface hover:opacity-80 cursor-pointer" style="color: var(--text);">
+                Select Extended 10
+              </button>
+              <button id="clearSelectionBtn" type="button" class="px-2.5 py-1 rounded border border-hairline surface text-muted hover:opacity-80 cursor-pointer">
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <div class="code-block border-0 p-4">
+            <pre id="customBuilderCode" class="font-mono-code text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap break-words m-0"></pre>
+          </div>
+
+          <div class="px-4 py-2.5 border-t border-hairline flex flex-wrap items-center justify-between gap-3 text-xs">
+            <span id="builderMeta" class="text-muted">Check skills above to build a tailored install command.</span>
+            <button id="copyBuilderBtn" type="button"
+              class="accent-btn px-3 py-1.5 rounded-md font-medium cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+              Copy custom command
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Installation Guide -->
+    <section id="install" class="border-b border-hairline">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-14 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <p class="text-xs font-mono-code uppercase tracking-wider text-faint mb-1">Setup</p>
+            <h2 class="text-2xl font-bold tracking-tight">Installation Reference</h2>
+            <p class="text-sm text-muted mt-1">Add the tap once, then install a single skill or batch-install an entire collection.</p>
+          </div>
+
+          <div class="inline-flex p-1 rounded-md border border-hairline surface-subtle self-start">
+            <button type="button" data-shell="bash" class="shell-btn px-3 py-1.5 rounded text-xs font-mono-code cursor-pointer">
+              Linux / macOS (Bash)
+            </button>
+            <button type="button" data-shell="powershell" class="shell-btn px-3 py-1.5 rounded text-xs font-mono-code cursor-pointer">
+              Windows (PowerShell)
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <!-- Step 1: Single Skill -->
+          <div class="rounded-lg border border-hairline surface overflow-hidden flex flex-col">
+            <div class="px-4 py-3 border-b border-hairline flex items-center justify-between gap-2">
+              <span class="text-sm font-semibold">1. Install one skill</span>
+              <button id="copySingleGuideBtn" type="button" class="text-xs font-medium px-2.5 py-1 rounded border border-hairline surface-subtle hover:opacity-80 cursor-pointer" style="color: var(--text);">
+                Copy
+              </button>
+            </div>
+            <div class="code-block border-0 p-4 flex-1">
+              <pre id="singleGuideCode" class="font-mono-code text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap break-words m-0"></pre>
+            </div>
+            <div class="px-4 py-2.5 border-t border-hairline text-xs text-muted">
+              For an extended skill, replace <code class="font-mono-code">skills/</code> with <code class="font-mono-code">premium-skills/</code>.
+            </div>
+          </div>
+
+          <!-- Step 2: Batch Install -->
+          <div class="rounded-lg border border-hairline surface overflow-hidden flex flex-col">
+            <div class="px-4 py-3 border-b border-hairline flex items-center justify-between gap-2">
+              <span id="batchGuideTitle" class="text-sm font-semibold">2. Install all 10 core skills</span>
+              <button id="copyBatchGuideBtn" type="button" class="text-xs font-medium px-2.5 py-1 rounded border border-hairline surface-subtle hover:opacity-80 cursor-pointer" style="color: var(--text);">
+                Copy
+              </button>
+            </div>
+            <div class="code-block border-0 p-4 flex-1">
+              <pre id="batchGuideCode" class="font-mono-code text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap break-words m-0"></pre>
+            </div>
+            <div class="px-4 py-2.5 border-t border-hairline text-xs text-muted">
+              Uses native shell loops only — no <code class="font-mono-code">jq</code> or <code class="font-mono-code">xargs</code> needed.
+            </div>
+          </div>
+        </div>
+
+        <!-- Shell Warning Callout -->
+        <div class="rounded-lg border border-hairline surface-subtle px-4 py-3 text-xs sm:text-sm text-muted flex items-start gap-3">
+          <span class="font-mono-code font-semibold accent-text shrink-0">NOTE</span>
+          <p class="m-0 leading-relaxed">
+            On Windows, use the <strong style="color: var(--text);">PowerShell</strong> commands (<code class="font-mono-code">ForEach-Object</code>) rather than pasting Bash <code class="font-mono-code">for ...; do ... done</code> loops into PowerShell.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Requirements & Repo Layout -->
+    <section id="requirements">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-14">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+          <div class="md:col-span-6 space-y-4">
+            <div>
+              <p class="text-xs font-mono-code uppercase tracking-wider text-faint mb-1">Environment</p>
+              <h2 class="text-xl font-bold tracking-tight">Requirements</h2>
+            </div>
+
+            <div class="rounded-lg border border-hairline surface divide-y" style="border-color: var(--border);">
+              <div class="p-4 flex items-start justify-between gap-4">
+                <div>
+                  <div class="text-sm font-medium">Hermes Agent</div>
+                  <div class="text-xs text-muted mt-0.5">Required to register the tap and run <code class="font-mono-code">hermes skills install</code>.</div>
+                </div>
+                <span class="text-xs font-mono-code px-2 py-0.5 rounded badge-core shrink-0">Required</span>
+              </div>
+
+              <div class="p-4 flex items-start justify-between gap-4">
+                <div>
+                  <div class="text-sm font-medium">PowerShell 5.1+ / 7+ or Bash</div>
+                  <div class="text-xs text-muted mt-0.5">Native shell support on Windows, Linux, and macOS.</div>
+                </div>
+                <span class="text-xs font-mono-code px-2 py-0.5 rounded badge-core shrink-0">Required</span>
+              </div>
+
+              <div class="p-4 flex items-start justify-between gap-4">
+                <div>
+                  <div class="text-sm font-medium">Python</div>
+                  <div class="text-xs text-muted mt-0.5">Optional — used for PDF export in <code class="font-mono-code">college-report-card</code>.</div>
+                </div>
+                <span class="text-xs font-mono-code px-2 py-0.5 rounded badge-ext shrink-0">Optional</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="md:col-span-6 space-y-4">
+            <div>
+              <p class="text-xs font-mono-code uppercase tracking-wider text-faint mb-1">Repository</p>
+              <h2 class="text-xl font-bold tracking-tight">Structure</h2>
+            </div>
+
+            <div class="rounded-lg border border-hairline surface p-4 font-mono-code text-xs leading-6">
+              <div class="text-faint mb-1">JovianOps/cortex (main)</div>
+              <div class="space-y-0.5">
+                <div><span class="accent-text">skills/</span> <span class="text-faint">— 10 core Hermes skills</span></div>
+                <div><span class="accent-text">premium-skills/</span> <span class="text-faint">— 10 extended skills</span></div>
+                <div><span>docs/</span> <span class="text-faint">— documentation</span></div>
+                <div><span>scripts/</span> <span class="text-faint">— helper scripts</span></div>
+                <div><span>zips/ &amp; premium-zips/</span> <span class="text-faint">— packaged archives</span></div>
+                <div><span>CONTRIBUTING.md</span> <span class="text-faint">— contribution guide</span></div>
+                <div><span>LICENSE</span> <span class="text-faint">— MIT License</span></div>
+                <div><span>README.md</span> <span class="text-faint">— full install reference</span></div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-hairline flex items-center justify-between">
+                <span class="text-muted">Public repository</span>
+                <a href="https://github.com/JovianOps/cortex" target="_blank" rel="noopener noreferrer" class="accent-text hover:underline underline-offset-4">
+                  github.com/JovianOps/cortex <span class="inline-block align-middle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg></span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-hairline">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted">
+      <div class="flex items-center gap-3 font-mono-code">
+        <span>JovianOps/cortex</span>
+        <span class="text-faint">&middot;</span>
+        <span>MIT License</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="#skills" class="hover:underline underline-offset-4">Skills</a>
+        <a href="#install" class="hover:underline underline-offset-4">Install</a>
+        <a href="https://github.com/JovianOps/cortex" target="_blank" rel="noopener noreferrer" class="hover:underline underline-offset-4">
+          GitHub <span class="inline-block align-middle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg></span>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div id="toast" role="status" aria-live="polite"
+    class="fixed bottom-5 right-5 z-50 px-3.5 py-2 rounded-md text-xs font-mono-code shadow-lg transition-all duration-150 toast-leave"
+    style="background-color: var(--text); color: var(--bg);">
+    Copied to clipboard
+  </div>
+
+  <script>
+    const SKILLS = [
+      {
+        slug: 'academic-assistant',
+        dir: 'skills',
+        tier: 'core',
+        description: 'Core academic assistant: report cards, coding, 3D modeling, anti-hallucination, persistent memory'
+      },
+      {
+        slug: 'college-report-card',
+        dir: 'skills',
+        tier: 'core',
+        description: 'Deterministic report card generator from structured grade data (optional Python for PDF export)'
+      },
+      {
+        slug: 'anti-hallucination',
+        dir: 'skills',
+        tier: 'core',
+        description: 'Anti-hallucination measures and validation'
+      },
+      {
+        slug: 'blender-3d-modeling',
+        dir: 'skills',
+        tier: 'core',
+        description: 'Blender 3D modeling guidance with validation'
+      },
+      {
+        slug: 'code-review-assistant',
+        dir: 'skills',
+        tier: 'core',
+        description: 'Automated code review with deterministic checks'
+      },
+      {
+        slug: 'documentation-generator',
+        dir: 'skills',
+        tier: 'core',
+        description: 'Automated documentation generation'
+      },
+      {
+        slug: 'memory-manager',
+        dir: 'skills',
+        tier: 'core',
+        description: 'Persistent memory management across sessions'
+      },
+      {
+        slug: 'python-coding-assistant',
+        dir: 'skills',
+        tier: 'core',
+        description: 'Python coding with validation and type hints'
+      },
+      {
+        slug: 'testing-automation',
+        dir: 'skills',
+        tier: 'core',
+        description: 'Test automation with pytest and CI/CD'
+      },
+      {
+        slug: 'web-scraper',
+        dir: 'skills',
+        tier: 'core',
+        description: 'Web scraping with validation and rate limiting'
+      },
+      {
+        slug: 'api-designer',
+        dir: 'premium-skills',
+        tier: 'extended',
+        description: 'Extended skill in premium-skills/api-designer'
+      },
+      {
+        slug: 'code-migration',
+        dir: 'premium-skills',
+        tier: 'extended',
+        description: 'Extended skill in premium-skills/code-migration'
+      },
+      {
+        slug: 'db-optimizer',
+        dir: 'premium-skills',
+        tier: 'extended',
+        description: 'Extended skill in premium-skills/db-optimizer'
+      },
+      {
+        slug: 'devops-pipeline',
+        dir: 'premium-skills',
+        tier: 'extended',
+        description: 'Extended skill in premium-skills/devops-pipeline'
+      },
+      {
+        slug: 'docker-generator',
+        dir: 'premium-skills',
+        tier: 'extended',
+        description: 'Extended skill in premium-skills/docker-generator'
+      },
+      {
+        slug: 'performance-profiler',
+        dir: 'premium-skills',
+        tier: 'extended',
+        description: 'Extended skill in premium-skills/performance-profiler'
+      },
+      {
+        slug: 'refactoring-assistant',
+        dir: 'premium-skills',
+        tier: 'extended',
+        description: 'Extended skill in premium-skills/refactoring-assistant'
+      },
+      {
+        slug: 'security-auditor',
+        dir: 'premium-skills',
+        tier: 'extended',
+        description: 'Extended skill in premium-skills/security-auditor'
+      },
+      {
+        slug: 'terraform-generator',
+        dir: 'premium-skills',
+        tier: 'extended',
+        description: 'Extended skill in premium-skills/terraform-generator'
+      },
+      {
+        slug: 'unit-test-generator',
+        dir: 'premium-skills',
+        tier: 'extended',
+        description: 'Extended skill in premium-skills/unit-test-generator'
+      }
+    ];
+
+    const CORE_SLUGS = SKILLS.filter(s => s.tier === 'core').map(s => s.slug);
+    const EXTENDED_SLUGS = SKILLS.filter(s => s.tier === 'extended').map(s => s.slug);
+
+    const state = {
+      theme: 'light',
+      shell: 'bash',
+      heroScope: 'core',
+      filterTier: 'all',
+      searchQuery: '',
+      selectedSlugs: new Set(),
+      expandedSlug: null
+    };
+
+    try {
+      const savedTheme = localStorage.getItem('cortex-theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        state.theme = savedTheme;
+      }
+    } catch (_) {}
+
+    let toastTimer = null;
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.remove('toast-leave');
+      toast.classList.add('toast-enter');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('toast-enter');
+        toast.classList.add('toast-leave');
+      }, 1800);
+    }
+
+    function copyText(text, label) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(label || 'Copied to clipboard');
+        }).catch(() => {
+          fallbackCopy(text, label);
+        });
+      } else {
+        fallbackCopy(text, label);
+      }
+    }
+
+    function fallbackCopy(text, label) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast(label || 'Copied to clipboard');
+      } catch (_) {
+        showToast('Copy failed — select manually');
+      }
+      document.body.removeChild(ta);
+    }
+
+    function buildBatchCommand(dir, slugs, shell) {
+      if (shell === 'powershell') {
+        const list = slugs.map(s => `'${s}'`).join(',');
+        return `hermes skills tap add JovianOps/cortex; ${list} | ForEach-Object { hermes skills install "JovianOps/cortex/${dir}/$_" --yes }`;
+      }
+      return [
+        'hermes skills tap add JovianOps/cortex',
+        `for skill in ${slugs.join(' ')}; do`,
+        `  hermes skills install "JovianOps/cortex/${dir}/$skill" --yes`,
+        'done'
+      ].join('\n');
+    }
+
+    function buildCustomCommand(selectedSet, shell) {
+      const chosen = SKILLS.filter(s => selectedSet.has(s.slug));
+      if (chosen.length === 0) {
+        return '# Select one or more skills above to generate a native install command.';
+      }
+      if (chosen.length === 1) {
+        const item = chosen[0];
+        if (shell === 'powershell') {
+          return `hermes skills tap add JovianOps/cortex; hermes skills install JovianOps/cortex/${item.dir}/${item.slug} --yes`;
+        }
+        return [
+          'hermes skills tap add JovianOps/cortex',
+          `hermes skills install JovianOps/cortex/${item.dir}/${item.slug} --yes`
+        ].join('\n');
+      }
+      const allCore = chosen.every(s => s.dir === 'skills');
+      const allExt = chosen.every(s => s.dir === 'premium-skills');
+      if (allCore) {
+        return buildBatchCommand('skills', chosen.map(s => s.slug), shell);
+      }
+      if (allExt) {
+        return buildBatchCommand('premium-skills', chosen.map(s => s.slug), shell);
+      }
+      const paths = chosen.map(s => `${s.dir}/${s.slug}`);
+      if (shell === 'powershell') {
+        const list = paths.map(p => `'${p}'`).join(',');
+        return `hermes skills tap add JovianOps/cortex; ${list} | ForEach-Object { hermes skills install "JovianOps/cortex/$_" --yes }`;
+      }
+      return [
+        'hermes skills tap add JovianOps/cortex',
+        `for path in ${paths.join(' ')}; do`,
+        '  hermes skills install "JovianOps/cortex/$path" --yes',
+        'done'
+      ].join('\n');
+    }
+
+    function singleSkillCommand(skill) {
+      return `hermes skills tap add JovianOps/cortex\nhermes skills install JovianOps/cortex/${skill.dir}/${skill.slug} --yes`;
+    }
+
+    function applyTheme() {
+      document.documentElement.setAttribute('data-theme', state.theme);
+      const iconEl = document.getElementById('themeToggleIcon');
+      const labelEl = document.getElementById('themeToggleLabel');
+      if (state.theme === 'dark') {
+        iconEl.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+        labelEl.textContent = 'Light';
+      } else {
+        iconEl.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+        labelEl.textContent = 'Dark';
+      }
+      try {
+        localStorage.setItem('cortex-theme', state.theme);
+      } catch (_) {}
+    }
+
+    function renderHeroCommand() {
+      const dir = state.heroScope === 'core' ? 'skills' : 'premium-skills';
+      const slugs = state.heroScope === 'core' ? CORE_SLUGS : EXTENDED_SLUGS;
+      const cmd = buildBatchCommand(dir, slugs, state.shell);
+      document.getElementById('heroCommandCode').textContent = cmd;
+      document.getElementById('heroCommandNote').textContent = state.shell === 'powershell'
+        ? 'Windows — PowerShell 5.1+ / 7+ (recommended)'
+        : 'Linux / macOS — native Bash loop';
+
+      document.querySelectorAll('.hero-scope-btn').forEach(btn => {
+        const active = btn.dataset.heroScope === state.heroScope;
+        btn.classList.toggle('seg-active', active);
+        btn.classList.toggle('seg-inactive', !active);
+      });
+
+      document.querySelectorAll('.shell-btn').forEach(btn => {
+        const active = btn.dataset.shell === state.shell;
+        btn.classList.toggle('seg-active', active);
+        btn.classList.toggle('seg-inactive', !active);
+      });
+    }
+
+    function renderInstallGuide() {
+      const singleCmd = [
+        'hermes skills tap add JovianOps/cortex',
+        'hermes skills install JovianOps/cortex/skills/academic-assistant --yes'
+      ].join('\n');
+      document.getElementById('singleGuideCode').textContent = singleCmd;
+
+      const batchCmd = buildBatchCommand('skills', CORE_SLUGS, state.shell);
+      document.getElementById('batchGuideCode').textContent = batchCmd;
+      document.getElementById('batchGuideTitle').textContent = state.shell === 'powershell'
+        ? '2. Batch install all 10 core skills (PowerShell)'
+        : '2. Batch install all 10 core skills (Bash)';
+    }
+
+    function renderBuilder() {
+      const count = state.selectedSlugs.size;
+      const badge = document.getElementById('selectedBadge');
+      const codeEl = document.getElementById('customBuilderCode');
+      const metaEl = document.getElementById('builderMeta');
+      const copyBtn = document.getElementById('copyBuilderBtn');
+
+      badge.textContent = `${count} selected`;
+      codeEl.textContent = buildCustomCommand(state.selectedSlugs, state.shell);
+
+      if (count === 0) {
+        metaEl.textContent = 'Check skills above or use a preset to generate a command.';
+        copyBtn.disabled = true;
+      } else {
+        const shellName = state.shell === 'powershell' ? 'PowerShell' : 'Bash';
+        metaEl.textContent = `Ready for ${shellName} — ${count} skill${count === 1 ? '' : 's'} queued.`;
+        copyBtn.disabled = false;
+      }
+    }
+
+    function renderSkills() {
+      const listEl = document.getElementById('skillsList');
+      const emptyEl = document.getElementById('emptyState');
+      const countEl = document.getElementById('catalogCount');
+      const clearBtn = document.getElementById('clearSearchBtn');
+
+      const q = state.searchQuery.trim().toLowerCase();
+      clearBtn.classList.toggle('hidden', q.length === 0);
+
+      document.querySelectorAll('.tier-btn').forEach(btn => {
+        const active = btn.dataset.tier === state.filterTier;
+        btn.classList.toggle('seg-active', active);
+        btn.classList.toggle('seg-inactive', !active);
+      });
+
+      const filtered = SKILLS.filter(skill => {
+        if (state.filterTier !== 'all' && skill.tier !== state.filterTier) return false;
+        if (q) {
+          const hay = `${skill.slug} ${skill.dir} ${skill.description}`.toLowerCase();
+          return hay.includes(q);
+        }
+        return true;
+      });
+
+      countEl.textContent = `Showing ${filtered.length} of ${SKILLS.length}`;
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = '';
+        emptyEl.classList.remove('hidden');
+        return;
+      }
+
+      emptyEl.classList.add('hidden');
+      listEl.innerHTML = filtered.map(skill => {
+        const isSelected = state.selectedSlugs.has(skill.slug);
+        const isExpanded = state.expandedSlug === skill.slug;
+        const badgeClass = skill.tier === 'core' ? 'badge-core' : 'badge-ext';
+        const badgeText = skill.tier === 'core' ? 'skills/' : 'premium-skills/';
+
+        return `
+          <div class="skill-row ${isSelected ? 'skill-row-selected' : ''}" data-slug="${skill.slug}">
+            <div class="grid grid-cols-12 gap-3 px-4 py-3.5 items-center">
+              <div class="col-span-2 sm:col-span-1 flex items-center">
+                <input type="checkbox"
+                  class="skill-checkbox h-4 w-4 rounded cursor-pointer accent-[#B8421B]"
+                  data-slug="${skill.slug}"
+                  aria-label="Select ${skill.slug}"
+                  ${isSelected ? 'checked' : ''} />
+              </div>
+
+              <div class="col-span-10 md:col-span-4 flex flex-wrap items-center gap-2 min-w-0">
+                <button type="button" class="expand-btn text-left font-mono-code text-sm font-medium hover:underline underline-offset-4 truncate cursor-pointer" data-slug="${skill.slug}" style="color: var(--text);">
+                  ${skill.slug}
+                </button>
+                <span class="text-[11px] font-mono-code px-1.5 py-0.5 rounded ${badgeClass}">${badgeText}</span>
+              </div>
+
+              <div class="col-span-12 md:col-span-5 text-xs sm:text-sm text-muted leading-snug">
+                ${skill.description}
+              </div>
+
+              <div class="col-span-12 md:col-span-2 flex items-center md:justify-end gap-2">
+                <button type="button" class="copy-one-btn text-xs font-mono-code px-2.5 py-1 rounded border border-hairline surface hover:opacity-80 cursor-pointer" data-slug="${skill.slug}" style="color: var(--text);">
+                  Copy
+                </button>
+                <button type="button" class="expand-btn text-xs px-2 py-1 rounded text-muted hover:opacity-80 cursor-pointer" data-slug="${skill.slug}" aria-expanded="${isExpanded}">
+                  ${isExpanded ? 'Hide' : 'Cmd'}
+                </button>
+              </div>
+            </div>
+
+            ${isExpanded ? `
+              <div class="px-4 pb-4 pt-1">
+                <div class="code-block rounded-md p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <pre class="font-mono-code text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap break-words m-0">${singleSkillCommand(skill)}</pre>
+                  <button type="button" class="copy-one-btn text-xs font-mono-code px-2.5 py-1.5 rounded border border-[#3A3A35] text-[#ECEBE4] hover:opacity-80 shrink-0 self-start sm:self-center cursor-pointer" data-slug="${skill.slug}">
+                    Copy install
+                  </button>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAll() {
+      applyTheme();
+      renderHeroCommand();
+      renderInstallGuide();
+      renderSkills();
+      renderBuilder();
+    }
+
+    // Event bindings
+    document.getElementById('themeToggleBtn').addEventListener('click', () => {
+      state.theme = state.theme === 'light' ? 'dark' : 'light';
+      applyTheme();
+    });
+
+    document.querySelectorAll('.hero-scope-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.heroScope = btn.dataset.heroScope;
+        renderHeroCommand();
+      });
+    });
+
+    document.querySelectorAll('.shell-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.shell = btn.dataset.shell;
+        renderHeroCommand();
+        renderInstallGuide();
+        renderBuilder();
+      });
+    });
+
+    document.getElementById('copyHeroBtn').addEventListener('click', () => {
+      const cmd = document.getElementById('heroCommandCode').textContent;
+      copyText(cmd, `Copied ${state.heroScope === 'core' ? 'Core 10' : 'Extended 10'} (${state.shell})`);
+    });
+
+    document.querySelectorAll('.tier-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.filterTier = btn.dataset.tier;
+        renderSkills();
+      });
+    });
+
+    document.getElementById('skillSearchInput').addEventListener('input', e => {
+      state.searchQuery = e.target.value;
+      renderSkills();
+    });
+
+    document.getElementById('clearSearchBtn').addEventListener('click', () => {
+      state.searchQuery = '';
+      document.getElementById('skillSearchInput').value = '';
+      renderSkills();
+    });
+
+    document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+      state.filterTier = 'all';
+      state.searchQuery = '';
+      document.getElementById('skillSearchInput').value = '';
+      renderSkills();
+    });
+
+    document.getElementById('skillsList').addEventListener('change', e => {
+      if (e.target.classList.contains('skill-checkbox')) {
+        const slug = e.target.dataset.slug;
+        if (e.target.checked) {
+          state.selectedSlugs.add(slug);
+        } else {
+          state.selectedSlugs.delete(slug);
+        }
+        renderSkills();
+        renderBuilder();
+      }
+    });
+
+    document.getElementById('skillsList').addEventListener('click', e => {
+      const copyBtn = e.target.closest('.copy-one-btn');
+      if (copyBtn) {
+        const skill = SKILLS.find(s => s.slug === copyBtn.dataset.slug);
+        if (skill) {
+          copyText(singleSkillCommand(skill), `Copied ${skill.slug}`);
+        }
+        return;
+      }
+
+      const expandBtn = e.target.closest('.expand-btn');
+      if (expandBtn) {
+        const slug = expandBtn.dataset.slug;
+        state.expandedSlug = state.expandedSlug === slug ? null : slug;
+        renderSkills();
+      }
+    });
+
+    document.getElementById('selectCorePresetBtn').addEventListener('click', () => {
+      state.selectedSlugs = new Set(CORE_SLUGS);
+      renderSkills();
+      renderBuilder();
+    });
+
+    document.getElementById('selectExtendedPresetBtn').addEventListener('click', () => {
+      state.selectedSlugs = new Set(EXTENDED_SLUGS);
+      renderSkills();
+      renderBuilder();
+    });
+
+    document.getElementById('clearSelectionBtn').addEventListener('click', () => {
+      state.selectedSlugs.clear();
+      renderSkills();
+      renderBuilder();
+    });
+
+    document.getElementById('copyBuilderBtn').addEventListener('click', () => {
+      if (state.selectedSlugs.size === 0) return;
+      const cmd = document.getElementById('customBuilderCode').textContent;
+      copyText(cmd, `Copied ${state.selectedSlugs.size} skill command`);
+    });
+
+    document.getElementById('copySingleGuideBtn').addEventListener('click', () => {
+      const cmd = document.getElementById('singleGuideCode').textContent;
+      copyText(cmd, 'Copied single-skill install');
+    });
+
+    document.getElementById('copyBatchGuideBtn').addEventListener('click', () => {
+      const cmd = document.getElementById('batchGuideCode').textContent;
+      copyText(cmd, `Copied batch install (${state.shell})`);
+    });
+
+    renderAll();
+  </script>
+</body>
+</html>
