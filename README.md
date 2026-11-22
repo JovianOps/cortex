@@ -1,6 +1,6 @@
 # Cortex
 
-**11 Hermes Skills** — Academic assistant, college report cards, anti-hallucination, 3D modeling, code review, documentation, memory management, testing automation, web scraping, Blender 3D modeling, and modern web guidance.
+**10 Hermes Skills** — Academic assistant, college report cards, anti-hallucination, 3D modeling, code review, documentation, memory management, testing automation, web scraping, and Blender 3D modeling.
 
 ## Skills
 
@@ -16,20 +16,19 @@
 | [python-coding-assistant](skills/python-coding-assistant) | Python coding with validation and type hints |
 | [testing-automation](skills/testing-automation) | Test automation with pytest and CI/CD |
 | [web-scraper](skills/web-scraper) | Web scraping with validation and rate limiting |
-| [modern-web-guidance](skills/modern-web-guidance) | Current web platform guidance for UI and client-side JavaScript |
 
 ## Installation
 
-Cortex contains **11 core skills** in `skills/` and **10 premium/extended skills** in `premium-skills/`. Install the core collection, the premium collection, or one skill at a time. These instructions use native shell features; no `jq` or `xargs` is required. **On Windows, use the PowerShell commands below. Do not paste the Bash loops into PowerShell.**
+Cortex contains **10 core skills** in `skills/` and **10 premium/extended skills** in `premium-skills/`. Install the core collection, the premium collection, or one skill at a time. These instructions use native shell features; no `jq` or `xargs` is required. **On Windows, use the PowerShell commands below. Do not paste the Bash loops into PowerShell.**
 
-### Install all 11 core skills
+### Install all 10 core skills
 
 #### Windows — PowerShell (recommended)
 
 Copy and run this entire line in PowerShell:
 
 ```powershell
-hermes skills tap add JovianOps/cortex; 'academic-assistant','college-report-card','anti-hallucination','blender-3d-modeling','code-review-assistant','documentation-generator','memory-manager','python-coding-assistant','testing-automation','web-scraper','modern-web-guidance' | ForEach-Object { hermes skills install "JovianOps/cortex/skills/$_" --yes }
+hermes skills tap add JovianOps/cortex; 'academic-assistant','college-report-card','anti-hallucination','blender-3d-modeling','code-review-assistant','documentation-generator','memory-manager','python-coding-assistant','testing-automation','web-scraper' | ForEach-Object { hermes skills install "JovianOps/cortex/skills/$_" --yes }
 ```
 
 #### Linux / macOS — Bash only
@@ -38,7 +37,7 @@ Run this in Bash (for example, Terminal). This `for ...; do ... done` syntax is 
 
 ```bash
 hermes skills tap add JovianOps/cortex
-for skill in academic-assistant college-report-card anti-hallucination blender-3d-modeling code-review-assistant documentation-generator memory-manager python-coding-assistant testing-automation web-scraper modern-web-guidance; do
+for skill in academic-assistant college-report-card anti-hallucination blender-3d-modeling code-review-assistant documentation-generator memory-manager python-coding-assistant testing-automation web-scraper; do
   hermes skills install "JovianOps/cortex/skills/$skill" --yes
 done
 ```
