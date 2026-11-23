@@ -5,57 +5,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>cortex — deterministic agent skills (v0.3.0)</title>
   <meta name="description" content="24 versioned SKILL.md playbooks, 10 zero-dependency Python helper scripts, 6 role packs, and SHA-256 verification for Claude, Codex, Gemini CLI, Cursor, Copilot, and more." />
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23111110'/%3E%3Cpath d='M9 11l6 5-6 5M17 21h6' stroke='%23f97316' stroke-width='2.5' stroke-linecap='square' fill='none'/%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230e0e0d'/%3E%3Crect x='22' y='6' width='4' height='4' fill='%23d92b1c'/%3E%3Cpath d='M7 11l6 5-6 5M15 21h10' stroke='%23f6f5f0' stroke-width='2.5' stroke-linecap='square' fill='none'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script>
     (function () {
       try {
         var saved = localStorage.getItem('cortex:theme');
-        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        var theme = saved || (prefersDark ? 'dark' : 'light');
-        document.documentElement.dataset.theme = theme;
-      } catch (e) {}
+        document.documentElement.dataset.theme = saved === 'dark' ? 'dark' : 'light';
+      } catch (e) {
+        document.documentElement.dataset.theme = 'light';
+      }
     })();
   </script>
   <style>
     :root {
-      --bg: #fafaf8;
+      --bg: #f6f5f0;
       --surface: #ffffff;
-      --surface-alt: #f3f3ee;
-      --code-bg: #141413;
-      --code-fg: #e8e8e3;
-      --code-muted: #8a8a82;
-      --ink: #111110;
-      --muted: #5c5c56;
-      --faint: #8a8a82;
-      --border: #e3e3dc;
-      --border-strong: #c9c9be;
-      --accent: #c9410e;
-      --accent-soft: rgba(201, 65, 14, 0.08);
-      --ok: #15803d;
-      --ok-soft: rgba(21, 128, 61, 0.09);
-      --sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --surface-alt: #eeece4;
+      --code-bg: #ffffff;
+      --code-fg: #0e0e0d;
+      --code-muted: #6e6c64;
+      --code-bar: #eeece4;
+      --ink: #0e0e0d;
+      --muted: #52514b;
+      --faint: #7a7870;
+      --border: #d8d5cb;
+      --border-strong: #9e9b90;
+      --rule: #0e0e0d;
+      --accent: #d92b1c;
+      --accent-soft: rgba(217, 43, 28, 0.08);
+      --ok: #126b36;
+      --ok-soft: rgba(18, 107, 54, 0.09);
+      --sans: 'IBM Plex Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      --radius: 4px;
-      --max: 1120px;
+      --radius: 0px;
+      --max: 1160px;
     }
 
     [data-theme="dark"] {
-      --bg: #0c0c0b;
-      --surface: #121210;
-      --surface-alt: #181816;
-      --code-bg: #080807;
-      --code-fg: #ecece6;
-      --code-muted: #7d7d75;
-      --ink: #f2f2ec;
-      --muted: #9b9b92;
-      --faint: #6c6c64;
-      --border: #232320;
-      --border-strong: #353530;
-      --accent: #f97316;
-      --accent-soft: rgba(249, 115, 22, 0.12);
+      --bg: #0b0b0a;
+      --surface: #121211;
+      --surface-alt: #1a1a18;
+      --code-bg: #0f0f0e;
+      --code-fg: #f3f2ed;
+      --code-muted: #7d7c74;
+      --code-bar: #181816;
+      --ink: #f3f2ed;
+      --muted: #a19f96;
+      --faint: #6f6d65;
+      --border: #2a2a26;
+      --border-strong: #46463f;
+      --rule: #f3f2ed;
+      --accent: #ff4d3d;
+      --accent-soft: rgba(255, 77, 61, 0.13);
       --ok: #4ade80;
       --ok-soft: rgba(74, 222, 128, 0.10);
     }
@@ -94,13 +98,13 @@
       position: sticky;
       top: 0;
       z-index: 30;
-      background: color-mix(in srgb, var(--bg) 92%, transparent);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--bg) 95%, transparent);
+      backdrop-filter: blur(6px);
+      border-bottom: 2px solid var(--rule);
     }
 
     .bar {
-      height: 52px;
+      height: 56px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -109,29 +113,37 @@
 
     .brand {
       display: inline-flex;
-      align-items: baseline;
-      gap: 10px;
+      align-items: center;
+      gap: 9px;
       font-family: var(--mono);
       font-weight: 600;
       font-size: 14px;
-      letter-spacing: -0.02em;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
     }
 
     .brand-mark {
-      color: var(--accent);
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: var(--accent);
     }
 
     .ver {
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 400;
       color: var(--faint);
+      text-transform: none;
     }
 
     nav {
       display: flex;
       align-items: center;
-      gap: 20px;
-      font-size: 13px;
+      gap: 22px;
+      font-family: var(--mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       color: var(--muted);
     }
 
@@ -145,54 +157,86 @@
       font-size: 12px;
     }
 
+    .theme-switch {
+      display: inline-flex;
+      border: 1.5px solid var(--rule);
+      background: var(--surface);
+    }
+
+    .theme-switch button {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      padding: 5px 10px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .theme-switch button + button {
+      border-left: 1.5px solid var(--rule);
+    }
+
+    .theme-switch button:hover {
+      color: var(--ink);
+    }
+
+    .theme-switch button[aria-pressed="true"] {
+      background: var(--ink);
+      color: var(--bg);
+    }
+
     .text-link {
       color: var(--muted);
       padding: 4px 8px;
       border: 1px solid transparent;
-      border-radius: var(--radius);
     }
 
     .text-link:hover {
-      color: var(--ink);
-      border-color: var(--border);
-      background: var(--surface);
-    }
-
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 4px 10px;
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--muted);
-      cursor: pointer;
-    }
-
-    .btn-ghost:hover {
       color: var(--ink);
       border-color: var(--border-strong);
       background: var(--surface);
     }
 
+    .btn-ghost {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      padding: 4px 10px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .btn-ghost:hover {
+      background: var(--ink);
+      color: var(--bg);
+    }
+
     /* Hero */
     .hero {
-      padding: 56px 0 40px;
-      border-bottom: 1px solid var(--border);
+      padding: 52px 0 44px;
+      border-bottom: 2px solid var(--rule);
     }
 
     .hero-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
-      gap: 40px;
+      grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
+      gap: 44px;
       align-items: start;
     }
 
     .kicker {
       font-family: var(--mono);
-      font-size: 12px;
+      font-size: 11.5px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
       color: var(--muted);
-      margin: 0 0 14px;
+      margin: 0 0 16px;
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
@@ -201,31 +245,32 @@
 
     .kicker a {
       color: var(--accent);
-      border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+      font-weight: 500;
+      border-bottom: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
     }
 
     .kicker a:hover { border-bottom-color: var(--accent); }
 
     h1 {
       margin: 0;
-      font-size: clamp(30px, 4.2vw, 44px);
-      line-height: 1.08;
-      letter-spacing: -0.03em;
-      font-weight: 600;
+      font-size: clamp(34px, 4.6vw, 52px);
+      line-height: 1.03;
+      letter-spacing: -0.04em;
+      font-weight: 700;
     }
 
     .lead {
-      margin: 18px 0 26px;
+      margin: 20px 0 28px;
       color: var(--muted);
       font-size: 15.5px;
-      max-width: 56ch;
+      line-height: 1.6;
+      max-width: 54ch;
     }
 
     /* Quick install widget */
     .quick-box {
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--rule);
       background: var(--surface);
-      border-radius: var(--radius);
       overflow: hidden;
     }
 
@@ -312,23 +357,24 @@
 
     .copy-btn {
       flex-shrink: 0;
-      background: transparent;
-      border: 1px solid #30302b;
-      border-radius: var(--radius);
-      color: #d6d6ce;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      color: var(--ink);
       padding: 4px 10px;
       font-family: var(--mono);
       font-size: 11.5px;
+      font-weight: 500;
       cursor: pointer;
     }
 
     .copy-btn:hover {
-      border-color: #55554d;
-      color: #ffffff;
+      background: var(--ink);
+      color: var(--bg);
     }
 
     .copy-btn.copied {
       border-color: var(--ok);
+      background: var(--ok-soft);
       color: var(--ok);
     }
 
@@ -344,10 +390,9 @@
       flex-wrap: wrap;
     }
 
-    /* Terminal Preview */
+    /* Terminal Specimen Plate */
     .term {
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border: 1.5px solid var(--rule);
       background: var(--code-bg);
       color: var(--code-fg);
       overflow: hidden;
@@ -355,16 +400,16 @@
 
     .term-tabs {
       display: flex;
-      border-bottom: 1px solid #22221e;
-      background: #10100e;
+      border-bottom: 1px solid var(--border);
+      background: var(--code-bar);
       overflow-x: auto;
     }
 
     .term-tabs button {
       border: 0;
-      border-right: 1px solid #22221e;
+      border-right: 1px solid var(--border);
       background: transparent;
-      color: #8a8a82;
+      color: var(--muted);
       padding: 9px 13px;
       font-family: var(--mono);
       font-size: 11.5px;
@@ -373,10 +418,11 @@
       position: relative;
     }
 
-    .term-tabs button:hover { color: #e4e4dc; }
+    .term-tabs button:hover { color: var(--ink); }
 
     .term-tabs button[aria-selected="true"] {
-      color: #ffffff;
+      color: var(--ink);
+      font-weight: 600;
       background: var(--code-bg);
     }
 
@@ -389,26 +435,26 @@
     }
 
     .term-body {
-      padding: 14px 16px;
+      padding: 16px 18px;
       margin: 0;
       font-family: var(--mono);
       font-size: 12px;
-      line-height: 1.62;
+      line-height: 1.65;
       min-height: 274px;
       overflow-x: auto;
       white-space: pre;
     }
 
-    .t-dim { color: #76766e; }
-    .t-ok { color: #4ade80; }
-    .t-accent { color: #fb923c; }
-    .t-hi { color: #ffffff; font-weight: 500; }
+    .t-dim { color: var(--code-muted); }
+    .t-ok { color: var(--ok); font-weight: 600; }
+    .t-accent { color: var(--accent); font-weight: 500; }
+    .t-hi { color: var(--ink); font-weight: 600; }
 
     /* Spec strip */
     .specs {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      border-bottom: 1px solid var(--border);
+      border-bottom: 2px solid var(--rule);
     }
 
     .spec {
@@ -421,22 +467,26 @@
 
     .spec-val {
       font-family: var(--mono);
-      font-size: 22px;
+      font-size: 28px;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
     }
 
     .spec-label {
-      margin-top: 2px;
-      font-size: 12.5px;
+      margin-top: 4px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
       color: var(--muted);
     }
 
     /* Sections */
     section {
-      padding: 52px 0;
-      border-bottom: 1px solid var(--border);
+      padding: 56px 0;
+      border-bottom: 2px solid var(--rule);
     }
 
     .sec-head {
@@ -444,23 +494,25 @@
       align-items: flex-end;
       justify-content: space-between;
       gap: 20px;
-      margin-bottom: 22px;
+      margin-bottom: 24px;
       flex-wrap: wrap;
     }
 
     .sec-num {
       font-family: var(--mono);
-      font-size: 11.5px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
       color: var(--accent);
       display: block;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     h2 {
       margin: 0;
-      font-size: 22px;
-      font-weight: 600;
-      letter-spacing: -0.02em;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
     }
 
     .sec-desc {
@@ -538,8 +590,7 @@
 
     /* Skills Table */
     .table-wrap {
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border: 1.5px solid var(--rule);
       background: var(--surface);
       overflow-x: auto;
     }
@@ -554,12 +605,12 @@
       text-align: left;
       font-family: var(--mono);
       font-size: 11px;
-      font-weight: 500;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--faint);
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border);
+      letter-spacing: 0.06em;
+      color: var(--ink);
+      padding: 11px 14px;
+      border-bottom: 1.5px solid var(--rule);
       background: var(--surface-alt);
       white-space: nowrap;
     }
@@ -647,8 +698,7 @@
     .packs-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      border-top: 1px solid var(--border);
-      border-left: 1px solid var(--border);
+      border: 1.5px solid var(--rule);
       background: var(--surface);
     }
 
@@ -725,8 +775,7 @@
 
     /* Builder */
     .builder-box {
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border: 1.5px solid var(--rule);
       background: var(--surface);
       overflow: hidden;
     }
@@ -779,8 +828,7 @@
 
     /* Verify Ledger */
     .ledger {
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border: 1.5px solid var(--rule);
       background: var(--surface);
       overflow: hidden;
     }
@@ -817,8 +865,7 @@
 
     .verify-cmds {
       margin-top: 16px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border: 1.5px solid var(--rule);
       overflow: hidden;
     }
 
@@ -934,7 +981,7 @@
   <header>
     <div class="wrap bar">
       <a href="#top" class="brand">
-        <span class="brand-mark">&gt;_</span>
+        <span class="brand-mark" aria-hidden="true"></span>
         <span>cortex</span>
         <span class="ver">v0.3.0</span>
       </a>
@@ -947,7 +994,16 @@
       <div class="bar-actions">
         <a class="text-link" href="https://www.npmjs.com/package/@jovianops/cortex" target="_blank" rel="noreferrer">npm</a>
         <a class="text-link" href="https://github.com/JovianOps/cortex" target="_blank" rel="noreferrer">github</a>
-        <button id="themeBtn" class="btn-ghost" type="button" aria-label="Toggle color theme">theme</button>
+        <div class="theme-switch" role="group" aria-label="Color theme">
+          <button type="button" data-theme-set="light" aria-pressed="true">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32 1.41-1.41"/></svg>
+            Light
+          </button>
+          <button type="button" data-theme-set="dark" aria-pressed="false">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+            Dark
+          </button>
+        </div>
       </div>
     </div>
   </header>
@@ -2059,17 +2115,18 @@ Next steps:
       renderCommands();
       $('termBody').innerHTML = TERM_VIEWS.doctor;
 
-      // Theme toggle
-      const updateThemeLabel = () => {
-        const cur = document.documentElement.dataset.theme || 'light';
-        $('themeBtn').textContent = cur === 'dark' ? 'light' : 'dark';
-      };
-      updateThemeLabel();
-      $('themeBtn').addEventListener('click', () => {
-        const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      // Explicit Light / Dark segmented theme toggle
+      const applyTheme = (mode) => {
+        const next = mode === 'dark' ? 'dark' : 'light';
         document.documentElement.dataset.theme = next;
+        document.querySelectorAll('[data-theme-set]').forEach((btn) => {
+          btn.setAttribute('aria-pressed', String(btn.dataset.themeSet === next));
+        });
         try { localStorage.setItem('cortex:theme', next); } catch (e) {}
-        updateThemeLabel();
+      };
+      applyTheme(document.documentElement.dataset.theme || 'light');
+      document.querySelectorAll('[data-theme-set]').forEach((btn) => {
+        btn.addEventListener('click', () => applyTheme(btn.dataset.themeSet));
       });
 
       // Shell toggles (synchronized everywhere)
