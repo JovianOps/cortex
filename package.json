@@ -36,6 +36,9 @@
   "bin": {
     "cortex": "./bin/cortex.mjs"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=18.0.0"
   },
@@ -48,6 +51,7 @@
     "skills/",
     "premium-skills/",
     "scripts/",
+    "evals/",
     ".claude-plugin/",
     ".agents/",
     ".cursor-plugin/",

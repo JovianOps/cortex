@@ -205,10 +205,10 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/security-auditor.zip",
-      "zip_sha256": "ce9f268f9eee6bcf0524cebcc61ac0b5443e3bf1b783c7e272939aa18e5e8a07",
+      "zip_sha256": "60a1795c9ebc9effed3cb368774302c94ae5e08b9cbf0f44c194e12ff8a0ce59",
       "files": {
         "SKILL.md": "60d7ca53e917fda9d79c49e54089c6f5536098b7bb403f220ca29fb8efc90ba3",
-        "scripts/secret_scan.py": "2198b7bc5f7a13d67b393316f717a664c3a8534cbf907e36f6fc396810eb38e3"
+        "scripts/secret_scan.py": "306cd4967cdb04ad7562a20e45d594129a32ff449637edf1bc8818cfc9a61305"
       }
     },
     "terraform-generator": {
