@@ -1,7 +1,7 @@
 ---
 name: memory-manager
 description: Persist versioned session memory with staleness checks.
-version: 0.2.0
+version: 0.3.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -26,6 +26,8 @@ Maintain durable, structured, staleness-checked project memory across sessions u
 - Storing secrets, API keys, passwords, or private credentials (never write secrets into memory files)
 
 ## How to Run
+
+> **Bundled Helper Script (`v0.3.0`):** Run `python skills/memory-manager/scripts/memory_store.py init --project <name>` (plus `add-decision`, `add-task`, `complete-task`, `check-stale`, `summary`) for atomic JSON session persistence.
 
 ```bash
 hermes skills tap add JovianOps/cortex

@@ -118,6 +118,24 @@ def main() -> int:
         if isinstance(ctx, str) and not (ROOT / ctx).is_file():
             errors.append(f"{GEMINI_MANIFEST}: contextFileName {ctx!r} does not exist")
 
+    packs_data = load_json("packs.json", errors)
+    if packs_data is not None:
+        if isinstance(packs_data.get("release_version"), str):
+            versions["packs.json"] = packs_data["release_version"]
+        all_slugs = {Path(p).name for p in expected_all}
+        packs_map = packs_data.get("packs")
+        if not isinstance(packs_map, dict) or not packs_map:
+            errors.append("packs.json: packs must be a non-empty mapping")
+        else:
+            for pname, pinfo in packs_map.items():
+                pskills = pinfo.get("skills") if isinstance(pinfo, dict) else None
+                if not isinstance(pskills, list) or not pskills:
+                    errors.append(f"packs.json ({pname}): skills must be a non-empty list")
+                    continue
+                unknown = [s for s in pskills if s not in all_slugs]
+                if unknown:
+                    errors.append(f"packs.json ({pname}): unknown skill slug(s): {unknown}")
+
     if len(set(versions.values())) > 1:
         errors.append(f"Version mismatch across manifests: {versions}")
 

@@ -1,7 +1,7 @@
 ---
 name: api-designer
 description: Design strict OpenAPI and GraphQL specs with contracts.
-version: 0.2.0
+version: 0.3.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Design, validate, and version production-grade REST (OpenAPI 3.1) and GraphQL AP
 - Implementing internal business logic unrelated to HTTP/GraphQL boundary contracts
 
 ## How to Run
+
+> **Bundled Helper Script (`v0.3.0`):** Run `python premium-skills/api-designer/scripts/lint_openapi.py openapi.json` to lint OpenAPI 3.x specs for operationIds, error envelopes, and security schemes.
 
 ```bash
 hermes skills tap add JovianOps/cortex

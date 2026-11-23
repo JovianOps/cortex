@@ -1,7 +1,7 @@
 ---
 name: documentation-generator
 description: Generate code-verified docs, API specs, and diagrams.
-version: 0.2.0
+version: 0.3.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Generate accurate, code-verified READMEs, API references, architecture diagrams,
 - Designing a brand-new API contract before code exists (use `api-designer`)
 
 ## How to Run
+
+> **Bundled Helper Script (`v0.3.0`):** Run `python skills/documentation-generator/scripts/check_docs.py README.md` to verify every relative Markdown link and `#heading` anchor exists.
 
 ```bash
 hermes skills tap add JovianOps/cortex

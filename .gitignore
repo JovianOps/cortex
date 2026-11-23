@@ -77,3 +77,6 @@ pnpm-lock.yaml
 *.tar.gz
 dist/
 build/
+
+# Private local planning & internal notes (never commit or push)
+.private/

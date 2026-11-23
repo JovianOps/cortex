@@ -1,6 +1,6 @@
 {
   "name": "cortex",
-  "version": "0.2.0",
-  "description": "20 modular, deterministic v0.2.0 skill playbooks for Gemini CLI (10 core + 10 extended engineering skills).",
+  "version": "0.3.0",
+  "description": "24 modular, deterministic v0.3.0 skill playbooks for Gemini CLI (10 core + 14 extended engineering skills).",
   "contextFileName": "GEMINI.md"
 }

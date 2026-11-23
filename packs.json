@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0.0",
+  "release_version": "0.3.0",
+  "packs": {
+    "fullstack": {
+      "label": "Full-Stack Web",
+      "description": "End-to-end API, SQL, code review, testing, security, and WCAG 2.2 accessibility playbooks.",
+      "skills": [
+        "code-review-assistant",
+        "api-designer",
+        "db-optimizer",
+        "testing-automation",
+        "security-auditor",
+        "accessibility-auditor"
+      ]
+    },
+    "devops-sre": {
+      "label": "DevOps & SRE",
+      "description": "Hardened CI/CD, Docker, Terraform, observability, release engineering, and incident response.",
+      "skills": [
+        "devops-pipeline",
+        "docker-generator",
+        "terraform-generator",
+        "observability-setup",
+        "release-engineering",
+        "incident-response"
+      ]
+    },
+    "security-hardening": {
+      "label": "Security Hardening",
+      "description": "OWASP audits, anti-hallucination verification, code review, and supply-chain hardening.",
+      "skills": [
+        "security-auditor",
+        "anti-hallucination",
+        "code-review-assistant",
+        "devops-pipeline",
+        "docker-generator",
+        "terraform-generator"
+      ]
+    },
+    "python-pro": {
+      "label": "Python Pro",
+      "description": "Typed Python engineering, branch-tested pytest suites, profiling, refactoring, and docs.",
+      "skills": [
+        "python-coding-assistant",
+        "testing-automation",
+        "unit-test-generator",
+        "performance-profiler",
+        "refactoring-assistant",
+        "documentation-generator"
+      ]
+    },
+    "academic": {
+      "label": "Academic Suite",
+      "description": "Deterministic Decimal grading, Python coding, Blender 3D mesh checks, memory, and fact auditing.",
+      "skills": [
+        "academic-assistant",
+        "college-report-card",
+        "python-coding-assistant",
+        "blender-3d-modeling",
+        "memory-manager",
+        "anti-hallucination"
+      ]
+    },
+    "clean-migration": {
+      "label": "Clean Migration",
+      "description": "Strangler migrations, safe atomic refactoring, parity unit tests, reviews, docs, and releases.",
+      "skills": [
+        "code-migration",
+        "refactoring-assistant",
+        "unit-test-generator",
+        "code-review-assistant",
+        "documentation-generator",
+        "release-engineering"
+      ]
+    }
+  }
+}

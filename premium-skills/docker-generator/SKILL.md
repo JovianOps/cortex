@@ -1,7 +1,7 @@
 ---
 name: docker-generator
 description: Generate hardened multi-stage Docker and Compose setups.
-version: 0.2.0
+version: 0.3.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Generate production-hardened, layer-cached, multi-stage `Dockerfile`, `.dockerig
 - CI/CD pipeline authoring (use `devops-pipeline`) or cloud VPC/cluster provisioning (use `terraform-generator`)
 
 ## How to Run
+
+> **Bundled Helper Script (`v0.3.0`):** Run `python premium-skills/docker-generator/scripts/lint_dockerfile.py Dockerfile` to audit pinned base tags, non-root `USER`, secret `ENV`s, `curl | sh`, and `HEALTHCHECK`.
 
 ```bash
 hermes skills tap add JovianOps/cortex

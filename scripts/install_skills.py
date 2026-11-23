@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
-"""Install Cortex SKILL.md playbooks into any supported AI coding agent.
+"""Cortex v0.3.0 Multi-Agent Skill Manager — install, verify, upgrade, and uninstall SKILL.md playbooks.
 
 Zero external dependencies (Python 3 stdlib only). Works on Linux, macOS, and Windows.
+
+Highlights:
+  - Installs full skill packages (SKILL.md + bundled scripts/, references/, templates/).
+  - Supports --remote zero-clone installation with mandatory SHA-256 checksum verification.
+  - Writes .cortex-lock.json for --status integrity checks, --check-updates, --upgrade, and --uninstall.
 
 Supported agents:
   claude-code  Claude Code (~/.claude/skills or .claude/skills)
@@ -19,9 +24,14 @@ Supported agents:
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import shutil
 import sys
+import urllib.error
+import urllib.request
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,6 +39,10 @@ COLLECTIONS: dict[str, Path] = {
     "core": ROOT / "skills",
     "extended": ROOT / "premium-skills",
 }
+DEFAULT_REPO = "JovianOps/cortex"
+DEFAULT_REF = "main"
+LOCKFILE_NAME = ".cortex-lock.json"
+IGNORED_PARTS = {"__pycache__", ".DS_Store", ".pytest_cache"}
 
 
 @dataclass(frozen=True)
@@ -129,16 +143,74 @@ AGENT_ALIASES: dict[str, str] = {
 }
 
 
-def discover_skills() -> dict[str, tuple[str, Path]]:
-    """Return mapping of skill_slug -> (collection_name, skill_dir)."""
-    found: dict[str, tuple[str, Path]] = {}
-    for collection, base in COLLECTIONS.items():
+def sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def normalized_bytes(path: Path) -> bytes:
+    raw = path.read_bytes()
+    if path.suffix.lower() in {".md", ".py", ".json", ".yaml", ".yml", ".txt", ".sh", ".ps1", ".toml", ".csv"}:
+        return raw.replace(b"\r\n", b"\n")
+    return raw
+
+
+def raw_url(repo: str, ref: str, rel_path: str) -> str:
+    return f"https://raw.githubusercontent.com/{repo}/{ref}/{rel_path}"
+
+
+def fetch_bytes(url: str, timeout: int = 20) -> bytes:
+    req = urllib.request.Request(url, headers={"User-Agent": "cortex-installer/0.3.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return resp.read()
+    except urllib.error.URLError as exc:
+        raise RuntimeError(f"Failed to download {url}: {exc}") from exc
+
+
+def load_local_catalog() -> dict:
+    """Build catalog manifest directly from the local repository checkout."""
+    checksums_path = ROOT / "checksums.json"
+    if checksums_path.is_file():
+        return json.loads(checksums_path.read_text(encoding="utf-8"))
+
+    pkg_version = "0.3.0"
+    pkg_json = ROOT / "package.json"
+    if pkg_json.is_file():
+        pkg_version = json.loads(pkg_json.read_text(encoding="utf-8")).get("version", pkg_version)
+
+    skills_index: dict[str, dict] = {}
+    for col, base in COLLECTIONS.items():
         if not base.is_dir():
             continue
         for entry in sorted(base.iterdir()):
-            if entry.is_dir() and (entry / "SKILL.md").is_file():
-                found[entry.name] = (collection, entry)
-    return found
+            if not (entry.is_dir() and (entry / "SKILL.md").is_file()):
+                continue
+            files_map: dict[str, str] = {}
+            for fp in sorted(entry.rglob("*")):
+                if any(part in IGNORED_PARTS or part.endswith(".pyc") for part in fp.parts):
+                    continue
+                if fp.is_file():
+                    rel = fp.relative_to(entry).as_posix()
+                    files_map[rel] = sha256_bytes(normalized_bytes(fp))
+            skills_index[entry.name] = {
+                "collection": col,
+                "dir": base.name,
+                "files": files_map,
+            }
+    return {
+        "schema_version": "1.0.0",
+        "release_version": pkg_version,
+        "skill_count": len(skills_index),
+        "skills": skills_index,
+    }
+
+
+def load_remote_catalog(repo: str, ref: str) -> dict:
+    url = raw_url(repo, ref, "checksums.json")
+    data = json.loads(fetch_bytes(url).decode("utf-8"))
+    if not isinstance(data, dict) or not isinstance(data.get("skills"), dict):
+        raise RuntimeError(f"Invalid checksums.json received from {url}")
+    return data
 
 
 def resolve_agents(raw_agents: list[str]) -> list[AgentTarget]:
@@ -164,18 +236,42 @@ def resolve_agents(raw_agents: list[str]) -> list[AgentTarget]:
     return resolved
 
 
+def load_packs(remote: bool = False, repo: str = DEFAULT_REPO, ref: str = DEFAULT_REF) -> dict[str, dict]:
+    if remote:
+        data = json.loads(fetch_bytes(raw_url(repo, ref, "packs.json")).decode("utf-8"))
+        return data.get("packs", {})
+    packs_path = ROOT / "packs.json"
+    if packs_path.is_file():
+        return json.loads(packs_path.read_text(encoding="utf-8")).get("packs", {})
+    return {}
+
+
 def select_skills(
-    catalog: dict[str, tuple[str, Path]],
+    catalog: dict,
     collection: str,
     requested: list[str],
-) -> list[tuple[str, str, Path]]:
-    if requested:
-        chosen: list[tuple[str, str, Path]] = []
+    pack_names: list[str] | None = None,
+    packs: dict[str, dict] | None = None,
+) -> list[tuple[str, dict]]:
+    skills_map: dict[str, dict] = catalog["skills"]
+    combined: list[str] = list(requested)
+    if pack_names:
+        available_packs = packs or {}
+        for pname in pack_names:
+            key = pname.strip().lower()
+            if key not in available_packs:
+                valid = ", ".join(sorted(available_packs.keys()))
+                raise SystemExit(f"ERROR: Unknown pack {pname!r}. Available packs: {valid}")
+            for slug in available_packs[key]["skills"]:
+                if slug not in combined:
+                    combined.append(slug)
+
+    if combined:
+        chosen: list[tuple[str, dict]] = []
         missing: list[str] = []
-        for slug in requested:
-            if slug in catalog:
-                col, path = catalog[slug]
-                chosen.append((slug, col, path))
+        for slug in combined:
+            if slug in skills_map:
+                chosen.append((slug, skills_map[slug]))
             else:
                 missing.append(slug)
         if missing:
@@ -183,18 +279,35 @@ def select_skills(
                 f"ERROR: Unknown skill(s): {', '.join(missing)}. Run --list to view available skills."
             )
         return chosen
-
-    selected: list[tuple[str, str, Path]] = []
-    for slug, (col, path) in catalog.items():
-        if collection == "all" or col == collection:
-            selected.append((slug, col, path))
-    return selected
+    return [
+        (slug, meta)
+        for slug, meta in skills_map.items()
+        if collection == "all" or meta.get("collection") == collection
+    ]
 
 
 def destination_dir(target: AgentTarget, scope: str, project_root: Path) -> Path:
     if scope == "global":
         return Path.home() / target.global_rel
     return project_root / target.project_rel
+
+
+def read_lockfile(dest_base: Path) -> dict:
+    lock_path = dest_base / LOCKFILE_NAME
+    if lock_path.is_file():
+        try:
+            data = json.loads(lock_path.read_text(encoding="utf-8"))
+            if isinstance(data, dict) and isinstance(data.get("skills"), dict):
+                return data
+        except json.JSONDecodeError:
+            pass
+    return {"schema_version": "1.0.0", "skills": {}}
+
+
+def write_lockfile(dest_base: Path, lock_data: dict) -> None:
+    dest_base.mkdir(parents=True, exist_ok=True)
+    lock_path = dest_base / LOCKFILE_NAME
+    lock_path.write_text(json.dumps(lock_data, indent=2) + "\n", encoding="utf-8")
 
 
 def update_aider_conf(project_root: Path, installed_files: list[Path], dry_run: bool) -> None:
@@ -213,11 +326,11 @@ def update_aider_conf(project_root: Path, installed_files: list[Path], dry_run: 
     existing_text = "\n".join(existing_lines)
     to_add = [p for p in rel_paths if p not in existing_text]
     if not to_add:
-        print(f"Aider config already references all selected skills: {conf_path}")
+        print(f"  Aider config already references all selected skills: {conf_path}")
         return
 
     if dry_run:
-        print(f"[dry-run] Would append {len(to_add)} read entries to {conf_path}")
+        print(f"  [dry-run] Would append {len(to_add)} read entries to {conf_path}")
         return
 
     if "read:" in existing_lines:
@@ -232,19 +345,196 @@ def update_aider_conf(project_root: Path, installed_files: list[Path], dry_run: 
         new_lines.extend(f"  - {p}" for p in to_add)
 
     conf_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
-    print(f"Updated {conf_path} with {len(to_add)} Cortex skill(s).")
+    print(f"  Updated {conf_path} with {len(to_add)} Cortex skill(s).")
+
+
+def install_single_skill(
+    slug: str,
+    meta: dict,
+    dest_base: Path,
+    *,
+    remote: bool,
+    repo: str,
+    ref: str,
+    dry_run: bool,
+) -> dict[str, str]:
+    files_meta: dict[str, str] = meta["files"]
+    src_dir_name = meta["dir"]
+    dest_skill_dir = dest_base / slug
+    written_hashes: dict[str, str] = {}
+
+    for rel_file, expected_sha in files_meta.items():
+        target_path = dest_skill_dir / rel_file
+        if remote:
+            url = raw_url(repo, ref, f"{src_dir_name}/{slug}/{rel_file}")
+            if dry_run:
+                print(f"  [dry-run] GET {url} -> {target_path} (sha256:{expected_sha[:12]})")
+                written_hashes[rel_file] = expected_sha
+                continue
+            payload = fetch_bytes(url)
+            if target_path.suffix.lower() in {".md", ".py", ".json", ".yaml", ".yml", ".txt", ".sh", ".ps1", ".toml", ".csv"}:
+                payload = payload.replace(b"\r\n", b"\n")
+            actual_sha = sha256_bytes(payload)
+            if actual_sha != expected_sha:
+                raise RuntimeError(
+                    f"SHA-256 verification FAILED for {slug}/{rel_file}: "
+                    f"expected {expected_sha}, got {actual_sha}"
+                )
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+            target_path.write_bytes(payload)
+            written_hashes[rel_file] = actual_sha
+        else:
+            src_path = ROOT / src_dir_name / slug / rel_file
+            if not src_path.is_file():
+                raise RuntimeError(f"Source file missing: {src_path}")
+            payload = normalized_bytes(src_path)
+            actual_sha = sha256_bytes(payload)
+            if dry_run:
+                print(f"  [dry-run] {src_path} -> {target_path}")
+                written_hashes[rel_file] = actual_sha
+                continue
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+            target_path.write_bytes(payload)
+            written_hashes[rel_file] = actual_sha
+
+    if not dry_run:
+        extra = f" (+{len(files_meta) - 1} bundled resource(s))" if len(files_meta) > 1 else ""
+        print(f"  installed {slug} -> {dest_skill_dir / 'SKILL.md'}{extra}")
+    return written_hashes
+
+
+def cmd_status(agents: list[AgentTarget], scope: str, project_root: Path) -> int:
+    any_issues = False
+    for target in agents:
+        dest_base = destination_dir(target, scope, project_root)
+        lock = read_lockfile(dest_base)
+        installed = lock.get("skills", {})
+        print(f"\n==> {target.label} ({scope}: {dest_base})")
+        if not installed:
+            print("  (no Cortex skills recorded in lockfile)")
+            continue
+        for slug, entry in sorted(installed.items()):
+            ver = entry.get("version", "?")
+            files = entry.get("files", {})
+            state = "OK"
+            for rel_file, recorded_sha in files.items():
+                fp = dest_base / slug / rel_file
+                if not fp.is_file():
+                    state = f"MISSING ({rel_file})"
+                    any_issues = True
+                    break
+                if sha256_bytes(normalized_bytes(fp)) != recorded_sha:
+                    state = f"MODIFIED ({rel_file})"
+                    any_issues = True
+                    break
+            print(f"  {slug:<26} v{ver:<8} [{state}]")
+    return 1 if any_issues else 0
+
+
+def cmd_check_updates(
+    agents: list[AgentTarget],
+    scope: str,
+    project_root: Path,
+    catalog: dict,
+    *,
+    do_upgrade: bool,
+    remote: bool,
+    repo: str,
+    ref: str,
+    dry_run: bool,
+) -> int:
+    latest_version = catalog.get("release_version", "0.3.0")
+    skills_map = catalog["skills"]
+    updates_found = 0
+
+    for target in agents:
+        dest_base = destination_dir(target, scope, project_root)
+        lock = read_lockfile(dest_base)
+        installed = lock.get("skills", {})
+        print(f"\n==> {target.label} ({scope}: {dest_base})")
+        if not installed:
+            print("  (no Cortex skills recorded in lockfile)")
+            continue
+        changed = False
+        for slug, entry in sorted(installed.items()):
+            if slug not in skills_map:
+                print(f"  {slug:<26} [REMOVED FROM CATALOG]")
+                continue
+            latest_files = skills_map[slug]["files"]
+            current_files = entry.get("files", {})
+            if current_files == latest_files and entry.get("version") == latest_version:
+                print(f"  {slug:<26} v{latest_version:<8} [UP TO DATE]")
+                continue
+            updates_found += 1
+            if do_upgrade:
+                hashes = install_single_skill(
+                    slug, skills_map[slug], dest_base, remote=remote, repo=repo, ref=ref, dry_run=dry_run
+                )
+                if not dry_run:
+                    installed[slug] = {
+                        "version": latest_version,
+                        "dir": skills_map[slug]["dir"],
+                        "installed_at": datetime.now(timezone.utc).isoformat(),
+                        "files": hashes,
+                    }
+                    changed = True
+            else:
+                print(f"  {slug:<26} v{entry.get('version', '?')} -> v{latest_version} [UPDATE AVAILABLE]")
+        if changed and not dry_run:
+            lock["release_version"] = latest_version
+            write_lockfile(dest_base, lock)
+
+    if not do_upgrade:
+        print(f"\n{updates_found} skill update(s) available." if updates_found else "\nAll installed skills are up to date.")
+    return 0
+
+
+def cmd_uninstall(
+    agents: list[AgentTarget],
+    scope: str,
+    project_root: Path,
+    requested_skills: list[str],
+    remove_all: bool,
+    dry_run: bool,
+) -> int:
+    if not requested_skills and not remove_all:
+        print("ERROR: --uninstall requires --skill <slug> or --all.", file=sys.stderr)
+        return 2
+    for target in agents:
+        dest_base = destination_dir(target, scope, project_root)
+        lock = read_lockfile(dest_base)
+        installed = lock.get("skills", {})
+        to_remove = sorted(installed.keys()) if remove_all else requested_skills
+        print(f"\n==> {target.label} ({scope}: {dest_base})")
+        if not to_remove:
+            print("  (nothing to uninstall)")
+            continue
+        for slug in to_remove:
+            skill_dir = dest_base / slug
+            if dry_run:
+                print(f"  [dry-run] Would remove {skill_dir}")
+                continue
+            if skill_dir.is_dir():
+                shutil.rmtree(skill_dir)
+                print(f"  removed {slug} ({skill_dir})")
+            else:
+                print(f"  skipped {slug} (not found at {skill_dir})")
+            installed.pop(slug, None)
+        if not dry_run:
+            write_lockfile(dest_base, lock)
+    return 0
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Install Cortex SKILL.md playbooks for Claude Code, Codex, Gemini CLI, Cursor, Copilot/VS Code, OpenCode, OpenClaw, Goose, Cline, Aider, and .agents/skills."
+        description="Install, verify, upgrade, and uninstall Cortex v0.3.0 SKILL.md playbooks across 11 AI agents."
     )
     parser.add_argument(
         "--agent",
         "-a",
         action="append",
         default=[],
-        help="Target agent(s): claude-code, codex, gemini-cli, cursor, copilot, opencode, openclaw, goose, cline, aider, agents, or all. Repeat for multiple.",
+        help="Target agent(s): claude-code, codex, gemini-cli, cursor, copilot, opencode, openclaw, goose, cline, aider, agents, or all.",
     )
     parser.add_argument(
         "--collection",
@@ -258,7 +548,14 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "-s",
         action="append",
         default=[],
-        help="Specific skill slug to install (repeatable). Overrides --collection.",
+        help="Specific skill slug to install/uninstall (repeatable). Overrides --collection.",
+    )
+    parser.add_argument(
+        "--pack",
+        "-p",
+        action="append",
+        default=[],
+        help="Install a curated role-based skill pack from packs.json (e.g., fullstack, devops-sre, security-hardening, python-pro, academic, clean-migration).",
     )
     parser.add_argument(
         "--scope",
@@ -273,36 +570,50 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Project root used when --scope project is set (default: current working directory).",
     )
     parser.add_argument(
+        "--remote",
+        action="store_true",
+        help="Fetch skills directly from GitHub with SHA-256 verification (no git clone required).",
+    )
+    parser.add_argument(
+        "--repo",
+        default=DEFAULT_REPO,
+        help=f"GitHub owner/repo used with --remote (default: {DEFAULT_REPO}).",
+    )
+    parser.add_argument(
+        "--ref",
+        default=DEFAULT_REF,
+        help=f"Git branch or tag used with --remote (default: {DEFAULT_REF}).",
+    )
+    parser.add_argument("--status", action="store_true", help="Verify installed skills against .cortex-lock.json SHA-256 hashes.")
+    parser.add_argument("--check-updates", action="store_true", help="Check whether installed skills have newer versions.")
+    parser.add_argument("--upgrade", action="store_true", help="Upgrade installed skills to match the latest catalog.")
+    parser.add_argument("--uninstall", action="store_true", help="Uninstall --skill <slug> or --all Cortex skills.")
+    parser.add_argument("--all", action="store_true", dest="all_flag", help="Used with --uninstall to remove all locked Cortex skills.")
+    parser.add_argument(
         "--write-aider-conf",
         action="store_true",
         help="When installing for aider, append installed SKILL.md paths to .aider.conf.yml in --project-dir.",
     )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Show what would be installed without writing files.",
-    )
-    parser.add_argument(
-        "--list",
-        action="store_true",
-        help="List all supported agents and available Cortex skills, then exit.",
-    )
+    parser.add_argument("--dry-run", action="store_true", help="Preview changes without writing or deleting files.")
+    parser.add_argument("--list", action="store_true", help="List all supported agents and available Cortex skills.")
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv if argv is not None else sys.argv[1:])
-    catalog = discover_skills()
 
     if args.list:
+        catalog = load_remote_catalog(args.repo, args.ref) if args.remote else load_local_catalog()
         print("Supported Agents:")
         for target in AGENT_TARGETS.values():
             print(
                 f"  {target.key:<12} {target.label:<38} global: ~/{target.global_rel}   project: {target.project_rel}"
             )
-        print("\nAvailable Cortex Skills:")
-        for slug, (col, _) in catalog.items():
-            print(f"  {slug:<26} ({col})")
+        print(f"\nAvailable Cortex Skills (v{catalog.get('release_version', '0.3.0')} — {len(catalog['skills'])} total):")
+        for slug, meta in catalog["skills"].items():
+            extras = [f for f in meta.get("files", {}) if f != "SKILL.md"]
+            badge = f"  [+{len(extras)} script(s)]" if extras else ""
+            print(f"  {slug:<26} ({meta.get('collection', 'core')}){badge}")
         return 0
 
     if not args.agent:
@@ -310,23 +621,52 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     agents = resolve_agents(args.agent)
-    skills = select_skills(catalog, args.collection, args.skill)
     project_root = args.project_dir.resolve()
+
+    if args.status:
+        return cmd_status(agents, args.scope, project_root)
+    if args.uninstall:
+        return cmd_uninstall(agents, args.scope, project_root, args.skill, args.all_flag, args.dry_run)
+
+    catalog = load_remote_catalog(args.repo, args.ref) if args.remote else load_local_catalog()
+
+    if args.check_updates or args.upgrade:
+        return cmd_check_updates(
+            agents,
+            args.scope,
+            project_root,
+            catalog,
+            do_upgrade=args.upgrade,
+            remote=args.remote,
+            repo=args.repo,
+            ref=args.ref,
+            dry_run=args.dry_run,
+        )
+
+    packs = load_packs(args.remote, args.repo, args.ref) if args.pack else {}
+    skills = select_skills(catalog, args.collection, args.skill, args.pack, packs)
+    release_ver = catalog.get("release_version", "0.3.0")
 
     for target in agents:
         dest_base = destination_dir(target, args.scope, project_root)
+        lock = read_lockfile(dest_base)
         installed_md: list[Path] = []
         print(f"\n==> {target.label} ({args.scope}: {dest_base})")
-        for slug, _, src_dir in skills:
-            dest_skill_dir = dest_base / slug
-            dest_md = dest_skill_dir / "SKILL.md"
-            if args.dry_run:
-                print(f"  [dry-run] {src_dir / 'SKILL.md'} -> {dest_md}")
-            else:
-                dest_skill_dir.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(src_dir / "SKILL.md", dest_md)
-                print(f"  installed {slug} -> {dest_md}")
-            installed_md.append(dest_md)
+        for slug, meta in skills:
+            hashes = install_single_skill(
+                slug, meta, dest_base, remote=args.remote, repo=args.repo, ref=args.ref, dry_run=args.dry_run
+            )
+            installed_md.append(dest_base / slug / "SKILL.md")
+            if not args.dry_run:
+                lock["skills"][slug] = {
+                    "version": release_ver,
+                    "dir": meta["dir"],
+                    "installed_at": datetime.now(timezone.utc).isoformat(),
+                    "files": hashes,
+                }
+        if not args.dry_run:
+            lock["release_version"] = release_ver
+            write_lockfile(dest_base, lock)
 
         if target.key == "aider":
             sample_flags = " ".join(f'--read "{p}"' for p in installed_md[:3])
@@ -337,7 +677,8 @@ def main(argv: list[str] | None = None) -> int:
         if target.note:
             print(f"  Note: {target.note}")
 
-    print(f"\nDone! Installed {len(skills)} skill(s) across {len(agents)} agent target(s).")
+    source_desc = f"remote ({args.repo}@{args.ref}, SHA-256 verified)" if args.remote else "local checkout"
+    print(f"\nDone! Installed {len(skills)} skill(s) from {source_desc} across {len(agents)} agent target(s).")
     return 0
 
 

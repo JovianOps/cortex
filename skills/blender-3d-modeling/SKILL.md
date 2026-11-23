@@ -1,7 +1,7 @@
 ---
 name: blender-3d-modeling
 description: Build and validate Blender 3D meshes with bmesh checks.
-version: 0.2.0
+version: 0.3.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Guide reproducible Blender 3D modeling workflows (Blender 3.x / 4.x) and run det
 - CAD parametric solid modeling requiring FreeCAD/OpenSCAD/Fusion 360 BREP constraints
 
 ## How to Run
+
+> **Bundled Helper Script (`v0.3.0`):** Run `blender --background scene.blend --python skills/blender-3d-modeling/scripts/bmesh_check.py` for automated manifold, normal, loose-vertex, and scale integrity checks.
 
 ```bash
 hermes skills tap add JovianOps/cortex

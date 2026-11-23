@@ -1,7 +1,7 @@
 ---
 name: college-report-card
 description: Generate exact report cards using Decimal grade scripts.
-version: 0.2.0
+version: 0.3.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Generate deterministic, auditable college report cards from structured CSV/JSON 
 - Unstructured narrative evaluations with no quantitative grade or attendance data
 
 ## How to Run
+
+> **Bundled Helper Script (`v0.3.0`):** Run `python skills/college-report-card/scripts/grade_calc.py grades.csv syllabus.json` for zero-dependency `Decimal` grade computation with mandatory weight-sum and duplicate-ID stop gates.
 
 ```bash
 hermes skills tap add JovianOps/cortex

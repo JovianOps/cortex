@@ -1,7 +1,7 @@
 ---
 name: devops-pipeline
 description: Build hardened, SHA-pinned CI/CD pipelines across tools.
-version: 0.2.0
+version: 0.3.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Design, harden, optimize, and migrate CI/CD pipelines (GitHub Actions, GitLab CI
 - Provisioning underlying cloud networks or compute clusters (use `terraform-generator`)
 
 ## How to Run
+
+> **Bundled Helper Script (`v0.3.0`):** Run `python premium-skills/devops-pipeline/scripts/lint_actions.py .github/workflows` to check 40-char SHA pinning, least-privilege `permissions:`, and script injection risks.
 
 ```bash
 hermes skills tap add JovianOps/cortex

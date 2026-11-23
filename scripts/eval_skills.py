@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -248,15 +251,157 @@ def export_prompts(destination: Path) -> int:
     return 0
 
 
+def call_provider(
+    provider: str,
+    model: str,
+    prompt: str,
+    system: str | None = None,
+    base_url: str | None = None,
+    timeout: int = 90,
+) -> str:
+    """Zero-dependency HTTP caller for OpenAI, Anthropic, Gemini, or OpenAI-compatible endpoints."""
+    if provider in {"openai", "openai-compat"}:
+        api_key = os.environ.get("OPENAI_API_KEY", "")
+        if not api_key and provider == "openai":
+            raise RuntimeError("OPENAI_API_KEY environment variable is required for --provider openai")
+        url = (base_url or "https://api.openai.com/v1").rstrip("/") + "/chat/completions"
+        messages: list[dict[str, str]] = []
+        if system:
+            messages.append({"role": "system", "content": system})
+        messages.append({"role": "user", "content": prompt})
+        body = json.dumps({"model": model, "messages": messages, "temperature": 0.2}).encode("utf-8")
+        headers = {"Content-Type": "application/json"}
+        if api_key:
+            headers["Authorization"] = f"Bearer {api_key}"
+        req = urllib.request.Request(url, data=body, headers=headers)
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+        return str(payload["choices"][0]["message"]["content"])
+
+    if provider == "anthropic":
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        if not api_key:
+            raise RuntimeError("ANTHROPIC_API_KEY environment variable is required for --provider anthropic")
+        url = (base_url or "https://api.anthropic.com/v1").rstrip("/") + "/messages"
+        req_body: dict[str, object] = {
+            "model": model,
+            "max_tokens": 2048,
+            "temperature": 0.2,
+            "messages": [{"role": "user", "content": prompt}],
+        }
+        if system:
+            req_body["system"] = system
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(req_body).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "x-api-key": api_key,
+                "anthropic-version": "2023-06-01",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+        return "".join(block.get("text", "") for block in payload.get("content", []) if block.get("type") == "text")
+
+    if provider == "gemini":
+        api_key = os.environ.get("GEMINI_API_KEY", "")
+        if not api_key:
+            raise RuntimeError("GEMINI_API_KEY environment variable is required for --provider gemini")
+        endpoint = (base_url or "https://generativelanguage.googleapis.com/v1beta").rstrip("/")
+        url = f"{endpoint}/models/{model}:generateContent?key={api_key}"
+        req_body = {
+            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+            "generationConfig": {"temperature": 0.2},
+        }
+        if system:
+            req_body["systemInstruction"] = {"parts": [{"text": system}]}
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(req_body).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+        parts = payload["candidates"][0]["content"]["parts"]
+        return "".join(str(p.get("text", "")) for p in parts)
+
+    raise RuntimeError(f"Unsupported provider: {provider!r}")
+
+
+def run_ab_benchmark(
+    provider: str,
+    model: str,
+    out_dir: Path,
+    selected_skills: list[str],
+    base_url: str | None = None,
+) -> int:
+    data = json.loads(EVALS_PATH.read_text(encoding="utf-8"))
+    skills = discover_skills()
+    base_dir = out_dir / "without-skill"
+    with_dir = out_dir / "with-skill"
+    base_dir.mkdir(parents=True, exist_ok=True)
+    with_dir.mkdir(parents=True, exist_ok=True)
+
+    tasks = data["tasks"]
+    if selected_skills:
+        wanted = set(selected_skills)
+        tasks = [t for t in tasks if t["skill"] in wanted]
+        if not tasks:
+            print(f"ERROR: No matching tasks for skills: {selected_skills}", file=sys.stderr)
+            return 2
+
+    rows: list[tuple[str, int, int]] = []
+    for task in tasks:
+        slug = task["skill"]
+        skill_text = skills[slug].read_text(encoding="utf-8")
+        print(f"Running A/B eval for {slug} ({provider}/{model})...")
+        without_resp = call_provider(provider, model, task["prompt"], system=None, base_url=base_url)
+        with_resp = call_provider(provider, model, task["prompt"], system=skill_text, base_url=base_url)
+        (base_dir / f"{slug}.md").write_text(without_resp, encoding="utf-8")
+        (with_dir / f"{slug}.md").write_text(with_resp, encoding="utf-8")
+        b_score, _ = score_response(without_resp, task["rubric"])
+        s_score, _ = score_response(with_resp, task["rubric"])
+        rows.append((slug, b_score, s_score))
+
+    avg_b = sum(r[1] for r in rows) / len(rows)
+    avg_s = sum(r[2] for r in rows) / len(rows)
+    report_lines = [
+        f"# Cortex A/B Benchmark Scorecard ({provider} / `{model}`)",
+        "",
+        "| Skill | Without Skill | With Skill | Lift |",
+        "| :--- | :---: | :---: | :---: |",
+    ]
+    for slug, b, s in rows:
+        delta = s - b
+        sign = "+" if delta >= 0 else ""
+        report_lines.append(f"| `{slug}` | {b}% | {s}% | {sign}{delta}% |")
+    sign_avg = "+" if (avg_s - avg_b) >= 0 else ""
+    report_lines.extend([
+        "",
+        f"**Average ({len(rows)} skills):** Without `{avg_b:.1f}%` → With `{avg_s:.1f}%` (**{sign_avg}{avg_s - avg_b:.1f}%** lift)",
+    ])
+    scorecard = out_dir / "scorecard.md"
+    scorecard.write_text("\n".join(report_lines) + "\n", encoding="utf-8")
+    print(f"\nWrote scorecard to {scorecard}")
+    return run_compare(base_dir, with_dir)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--audit-skills", action="store_true", help="audit all SKILL.md files for playbook quality")
     parser.add_argument("--validate-evals", action="store_true", help="validate evals/skill_evals.json integrity")
     parser.add_argument("--score", nargs=2, metavar=("BASELINE_DIR", "WITH_SKILL_DIR"), help="score paired A/B response directories")
     parser.add_argument("--export-prompts", type=Path, metavar="OUT_JSON", help="export paired A/B prompts for evaluation runners")
+    parser.add_argument("--run", action="store_true", help="execute live paired A/B benchmark against an LLM provider")
+    parser.add_argument("--provider", choices=("openai", "anthropic", "gemini", "openai-compat"), default="openai")
+    parser.add_argument("--model", default="gpt-4o-mini", help="model identifier used with --run")
+    parser.add_argument("--base-url", default=None, help="optional custom API base URL for --provider")
+    parser.add_argument("--out-dir", type=Path, default=Path("evals/results/latest"), help="output directory for --run")
+    parser.add_argument("--skill", action="append", default=[], help="filter --run to specific skill slug(s)")
     args = parser.parse_args()
 
-    if not any([args.audit_skills, args.validate_evals, args.score, args.export_prompts]):
+    if not any([args.audit_skills, args.validate_evals, args.score, args.export_prompts, args.run]):
         rc1 = run_audit()
         rc2 = validate_evals()
         return 1 if (rc1 or rc2) else 0
@@ -270,6 +415,8 @@ def main() -> int:
         rc |= run_compare(Path(args.score[0]), Path(args.score[1]))
     if args.export_prompts:
         rc |= export_prompts(args.export_prompts)
+    if args.run:
+        rc |= run_ab_benchmark(args.provider, args.model, args.out_dir, args.skill, args.base_url)
     return rc
 
 
