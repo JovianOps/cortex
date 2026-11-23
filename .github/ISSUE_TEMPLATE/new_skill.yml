@@ -1,0 +1,51 @@
+name: New Skill Proposal
+description: Propose a new Core or Extended Hermes skill for Cortex
+title: "[Skill]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea for a new modular Hermes skill? Share the workflow below!
+
+  - type: input
+    id: skill-slug
+    attributes:
+      label: Proposed Skill Slug
+      description: Kebab-case directory name (e.g. `sql-migration-helper`)
+      placeholder: my-new-skill
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tier
+    attributes:
+      label: Target Collection
+      options:
+        - skills/ (Core)
+        - premium-skills/ (Extended)
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Problem & Workflow
+      description: What problem does this skill solve, and when should Hermes invoke it?
+    validations:
+      required: true
+
+  - type: textarea
+    id: validation
+    attributes:
+      label: Deterministic Checks & Safeguards
+      description: How will the skill validate outputs or prevent hallucinations?
+
+  - type: checkboxes
+    id: platforms
+    attributes:
+      label: Target Platforms
+      options:
+        - label: Linux
+        - label: macOS
+        - label: Windows

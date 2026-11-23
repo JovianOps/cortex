@@ -1,0 +1,66 @@
+name: Bug Report
+description: Report a problem with a Cortex skill, installation command, or script
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting an issue in **Cortex**! Please fill out the details below so we can reproduce and fix it quickly.
+
+  - type: dropdown
+    id: collection
+    attributes:
+      label: Skill Collection
+      options:
+        - skills/ (Core)
+        - premium-skills/ (Extended)
+        - Repository / Scripts / Website
+    validations:
+      required: true
+
+  - type: input
+    id: skill-name
+    attributes:
+      label: Skill Name
+      placeholder: e.g. academic-assistant, security-auditor
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Operating System & Shell
+      options:
+        - Windows (PowerShell 7+)
+        - Windows (PowerShell 5.1)
+        - macOS (Bash / Zsh)
+        - Linux (Bash / Zsh)
+    validations:
+      required: true
+
+  - type: input
+    id: hermes-version
+    attributes:
+      label: Hermes Version
+      description: Output of `hermes --version`
+      placeholder: e.g. hermes 0.x.x
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the issue clearly, including expected vs. actual behavior.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Run `hermes skills install ...`
+        2. Execute ...
+        3. Observe error ...
+    validations:
+      required: true
