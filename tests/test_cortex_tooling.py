@@ -355,10 +355,10 @@ class TestUnifiedCortexCLI(unittest.TestCase):
         eval_mod = load_module("cortex_eval_scaffold_test", SCRIPTS / "eval_skills.py")
         with tempfile.TemporaryDirectory() as tmp:
             proj = Path(tmp)
-            # Install fullstack pack into claude-code
+            # Install fullstack pack into claude-code using caller cwd (simulating npx @jovianops/cortex from another repo)
             inst = subprocess.run(
-                [sys.executable, str(cli), "install", "--agent", "claude-code", "--pack", "fullstack", "--scope", "project", "--project-dir", str(proj)],
-                cwd=ROOT,
+                [sys.executable, str(cli), "install", "--agent", "claude-code", "--pack", "fullstack", "--scope", "project"],
+                cwd=proj,
                 capture_output=True,
                 text=True,
             )

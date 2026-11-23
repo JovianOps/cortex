@@ -15,6 +15,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import os
@@ -143,15 +144,38 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     print(f"[{'OK' if git_bin else 'WARN'}] {'git found at ' + git_bin if git_bin else 'git not found on PATH'}")
     print(f"[{'OK' if node_bin else 'INFO'}] {'node found at ' + node_bin if node_bin else 'node not found (optional — Python installer works without Node)'}")
 
-    # 2. Repo integrity checks when inside Cortex checkout
+    # 2. Integrity checks (full ZIP check in repo checkout; direct SHA-256 check in npm package)
     if (ROOT / "checksums.json").is_file() and (ROOT / "packs.json").is_file():
-        pkg_res = subprocess.run([sys.executable, str(SCRIPTS / "package_skills.py"), "--check"], cwd=ROOT, capture_output=True, text=True)
-        man_res = subprocess.run([sys.executable, str(SCRIPTS / "validate_manifests.py")], cwd=ROOT, capture_output=True, text=True)
-        if pkg_res.returncode == 0:
-            print(f"[OK]   {pkg_res.stdout.strip()}")
+        if (ROOT / "zips").is_dir() and (ROOT / "premium-zips").is_dir():
+            pkg_res = subprocess.run([sys.executable, str(SCRIPTS / "package_skills.py"), "--check"], cwd=ROOT, capture_output=True, text=True)
+            if pkg_res.returncode == 0:
+                print(f"[OK]   {pkg_res.stdout.strip()}")
+            else:
+                issues += 1
+                print(f"[FAIL] package_skills --check: {(pkg_res.stderr or pkg_res.stdout).strip()}")
         else:
-            issues += 1
-            print(f"[FAIL] package_skills --check: {(pkg_res.stderr or pkg_res.stdout).strip()}")
+            manifest = json.loads((ROOT / "checksums.json").read_text(encoding="utf-8"))
+            checked_files = 0
+            bad_files: list[str] = []
+            for slug, meta in manifest.get("skills", {}).items():
+                base_dir = ROOT / meta["dir"] / slug
+                for rel, expected in meta.get("files", {}).items():
+                    fp = base_dir / rel
+                    if not fp.is_file():
+                        bad_files.append(f"{slug}/{rel} (missing)")
+                        continue
+                    raw_bytes = fp.read_bytes().replace(b"\r\n", b"\n")
+                    actual = hashlib.sha256(raw_bytes).hexdigest()
+                    if actual != expected:
+                        bad_files.append(f"{slug}/{rel} (sha256 mismatch)")
+                    checked_files += 1
+            if bad_files:
+                issues += 1
+                print(f"[FAIL] Bundled skill SHA-256 verification failed: {', '.join(bad_files)}")
+            else:
+                print(f"[OK]   Verified SHA-256 checksums for {len(manifest.get('skills', {}))} bundled skills ({checked_files} files).")
+
+        man_res = subprocess.run([sys.executable, str(SCRIPTS / "validate_manifests.py")], cwd=ROOT, capture_output=True, text=True)
         if man_res.returncode == 0:
             print(f"[OK]   {man_res.stdout.strip()}")
         else:
@@ -374,8 +398,9 @@ Implement minimal targeted changes, re-run verification checks, and report any r
     return 0
 
 
-def delegate(script_name: str, extra_args: list[str]) -> int:
-    res = subprocess.run([sys.executable, str(SCRIPTS / f"{script_name}.py"), *extra_args], cwd=ROOT)
+def delegate(script_name: str, extra_args: list[str], *, use_root_cwd: bool = False) -> int:
+    run_cwd = ROOT if use_root_cwd else Path.cwd()
+    res = subprocess.run([sys.executable, str(SCRIPTS / f"{script_name}.py"), *extra_args], cwd=run_cwd)
     return res.returncode
 
 
@@ -446,15 +471,17 @@ def main(argv: list[str] | None = None) -> int:
     if cmd == "uninstall":
         return delegate("install_skills", ["--uninstall", *rest])
     if cmd == "audit":
-        return delegate("eval_skills", ["--audit-skills", *rest])
+        return delegate("eval_skills", ["--audit-skills", *rest], use_root_cwd=True)
     if cmd == "eval":
-        return delegate("eval_skills", rest)
+        return delegate("eval_skills", rest, use_root_cwd=True)
     if cmd == "package":
-        return delegate("package_skills", rest)
+        return delegate("package_skills", rest, use_root_cwd=True)
     if cmd == "verify":
-        rc = delegate("package_skills", ["--check"])
-        rc |= delegate("validate_manifests", [])
-        rc |= delegate("eval_skills", [])
+        rc = 0
+        if (ROOT / "zips").is_dir() and (ROOT / "premium-zips").is_dir():
+            rc |= delegate("package_skills", ["--check"], use_root_cwd=True)
+        rc |= delegate("validate_manifests", [], use_root_cwd=True)
+        rc |= delegate("eval_skills", [], use_root_cwd=True)
         return 1 if rc else 0
 
     print(f"ERROR: Unknown cortex subcommand {cmd!r}. Run `cortex --help`.", file=sys.stderr)
