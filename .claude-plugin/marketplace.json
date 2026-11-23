@@ -1,0 +1,142 @@
+{
+  "name": "cortex",
+  "owner": {
+    "name": "Athalla Jovian Maharsa",
+    "url": "https://github.com/JovianOps"
+  },
+  "metadata": {
+    "description": "Cortex \u2014 20 modular, deterministic v0.2.0 skill playbooks across 10 core workflows and 10 extended engineering domains.",
+    "version": "0.2.0",
+    "homepage": "https://jovianops.github.io/cortex/",
+    "repository": "https://github.com/JovianOps/cortex"
+  },
+  "plugins": [
+    {
+      "name": "cortex",
+      "source": "./",
+      "description": "All 20 Cortex v0.2.0 skill playbooks (10 core + 10 extended engineering skills).",
+      "version": "0.2.0",
+      "author": {
+        "name": "Athalla Jovian Maharsa",
+        "url": "https://github.com/JovianOps"
+      },
+      "homepage": "https://jovianops.github.io/cortex/",
+      "repository": "https://github.com/JovianOps/cortex",
+      "license": "MIT",
+      "category": "development",
+      "keywords": [
+        "agent-skills",
+        "skill-md",
+        "claude-code",
+        "claude",
+        "codex",
+        "openai",
+        "chatgpt",
+        "gemini-cli",
+        "cursor",
+        "github-copilot",
+        "vscode",
+        "opencode",
+        "openclaw",
+        "goose",
+        "aider",
+        "cline",
+        "hermes-agent",
+        "cortex"
+      ],
+      "skills": [
+        "./skills/academic-assistant",
+        "./skills/anti-hallucination",
+        "./skills/blender-3d-modeling",
+        "./skills/code-review-assistant",
+        "./skills/college-report-card",
+        "./skills/documentation-generator",
+        "./skills/memory-manager",
+        "./skills/python-coding-assistant",
+        "./skills/testing-automation",
+        "./skills/web-scraper",
+        "./premium-skills/api-designer",
+        "./premium-skills/code-migration",
+        "./premium-skills/db-optimizer",
+        "./premium-skills/devops-pipeline",
+        "./premium-skills/docker-generator",
+        "./premium-skills/performance-profiler",
+        "./premium-skills/refactoring-assistant",
+        "./premium-skills/security-auditor",
+        "./premium-skills/terraform-generator",
+        "./premium-skills/unit-test-generator"
+      ]
+    },
+    {
+      "name": "cortex-core",
+      "source": "./",
+      "strict": false,
+      "description": "10 core Cortex v0.2.0 skills: code review, anti-hallucination, Python, pytest automation, docs, memory, web scraping, academic grading, and Blender 3D.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Athalla Jovian Maharsa",
+        "url": "https://github.com/JovianOps"
+      },
+      "homepage": "https://jovianops.github.io/cortex/",
+      "repository": "https://github.com/JovianOps/cortex",
+      "license": "MIT",
+      "category": "development",
+      "keywords": [
+        "core",
+        "code-review",
+        "anti-hallucination",
+        "python",
+        "testing",
+        "documentation"
+      ],
+      "skills": [
+        "./skills/academic-assistant",
+        "./skills/anti-hallucination",
+        "./skills/blender-3d-modeling",
+        "./skills/code-review-assistant",
+        "./skills/college-report-card",
+        "./skills/documentation-generator",
+        "./skills/memory-manager",
+        "./skills/python-coding-assistant",
+        "./skills/testing-automation",
+        "./skills/web-scraper"
+      ]
+    },
+    {
+      "name": "cortex-extended",
+      "source": "./",
+      "strict": false,
+      "description": "10 extended engineering Cortex v0.2.0 skills: API design, code migration, SQL optimization, CI/CD, Docker, profiling, refactoring, OWASP security, Terraform, and unit tests.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Athalla Jovian Maharsa",
+        "url": "https://github.com/JovianOps"
+      },
+      "homepage": "https://jovianops.github.io/cortex/",
+      "repository": "https://github.com/JovianOps/cortex",
+      "license": "MIT",
+      "category": "engineering",
+      "keywords": [
+        "api",
+        "database",
+        "devops",
+        "docker",
+        "security",
+        "terraform",
+        "performance"
+      ],
+      "skills": [
+        "./premium-skills/api-designer",
+        "./premium-skills/code-migration",
+        "./premium-skills/db-optimizer",
+        "./premium-skills/devops-pipeline",
+        "./premium-skills/docker-generator",
+        "./premium-skills/performance-profiler",
+        "./premium-skills/refactoring-assistant",
+        "./premium-skills/security-auditor",
+        "./premium-skills/terraform-generator",
+        "./premium-skills/unit-test-generator"
+      ]
+    }
+  ]
+}

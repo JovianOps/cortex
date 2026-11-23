@@ -27,6 +27,9 @@ jobs:
       - name: Validate all SKILL.md files
         run: python scripts/validate_skills.py
 
+      - name: Validate multi-agent plugin & extension manifests
+        run: python scripts/validate_manifests.py
+
       - name: Check for empty skill directories
         run: |
           for dir in skills/*/; do
