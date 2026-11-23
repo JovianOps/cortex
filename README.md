@@ -14,6 +14,12 @@
     <a href="https://github.com/JovianOps/cortex/actions/workflows/ci.yml">
       <img src="https://github.com/JovianOps/cortex/actions/workflows/ci.yml/badge.svg" alt="CI Status" />
     </a>
+    <a href="https://www.npmjs.com/package/@jovianops/cortex">
+      <img src="https://img.shields.io/npm/v/%40jovianops%2Fcortex?style=flat&color=CB3837&label=npm" alt="npm @jovianops/cortex" />
+    </a>
+    <a href="https://www.npmjs.com/package/@jovianops/cortex">
+      <img src="https://img.shields.io/npm/dt/%40jovianops%2Fcortex?style=flat&color=CB3837&label=npm%20downloads" alt="npm downloads" />
+    </a>
     <a href="CHANGELOG.md">
       <img src="https://img.shields.io/badge/release-v0.3.0-EA580C?style=flat" alt="Release v0.3.0" />
     </a>
@@ -61,7 +67,7 @@ Built on the open **`SKILL.md`** standard, Cortex works natively across **Claude
 
 ## What's New in `v0.3.0`
 
-- **Unified `cortex` Developer CLI (`scripts/cortex.py` + `bin/cortex.mjs`)**: Run `python scripts/cortex.py <command>` (or `npx cortex <command>`) to auto-detect installed AI agents (`cortex detect`), run integrity & drift checks (`cortex doctor`), filter the catalog (`cortex search --has-script`), inspect packs (`cortex packs`), or scaffold a 100/100 audit-ready skill (`cortex new my-skill --with-script`).
+- **Unified `cortex` Developer CLI (`@jovianops/cortex`)**: Published on npm — run `npx @jovianops/cortex <command>` (or `npm i -g @jovianops/cortex` / `python scripts/cortex.py <command>`) to auto-detect installed AI agents (`detect`), run SHA-256 integrity & drift checks (`doctor`), filter the catalog (`search --has-script`), inspect packs (`packs`), or scaffold a 100/100 audit-ready skill (`new my-skill --with-script`).
 - **6 Curated Role-Based Skill Packs (`packs.json`)**: Install tailored workflows in one command with `--pack`: `fullstack`, `devops-sre`, `security-hardening`, `python-pro`, `academic`, and `clean-migration`.
 - **20 → 24 Deterministic Skills**: Added `incident-response`, `release-engineering`, `observability-setup`, and `accessibility-auditor` — all scoring **100/100** on the Cortex structural audit with paired 100-point A/B eval rubrics.
 - **10 Bundled Executable Helper Scripts**: Real, zero-dependency Python tools packaged directly inside skill folders and ZIPs — `grade_calc.py`, `bmesh_check.py`, `memory_store.py`, `check_docs.py`, `secret_scan.py`, `lint_openapi.py`, `a11y_scan.py`, `lint_dockerfile.py`, `lint_actions.py`, and `semver_bump.py`.
@@ -75,14 +81,16 @@ Built on the open **`SKILL.md`** standard, Cortex works natively across **Claude
 Install into any agent in one command using the **Cortex CLI**, universal **Agent Skills CLI (`npx skills`)**, zero-clone **Python `--remote`** (with SHA-256 verification), or your agent's native plugin marketplace / tap:
 
 ```bash
-# Cortex Unified CLI (detect agents, verify integrity, install role packs, scaffold new skills)
-python scripts/cortex.py detect
-python scripts/cortex.py doctor
-python scripts/cortex.py packs
-python scripts/cortex.py install --agent claude-code --pack fullstack
-python scripts/cortex.py new my-new-skill --with-script
+# Cortex Unified CLI via npm (no git clone needed — detect agents, verify SHA-256, install role packs)
+npx @jovianops/cortex detect
+npx @jovianops/cortex doctor
+npx @jovianops/cortex packs
+npx @jovianops/cortex install --agent claude-code --pack fullstack
+npx @jovianops/cortex new my-new-skill --with-script
 
-# Universal CLI (Claude Code, Codex, Gemini CLI, Cursor, Copilot, OpenCode, OpenClaw, Goose, Cline...)
+# Or install globally: npm install -g @jovianops/cortex  (then run `cortex detect`, `cortex packs`, ...)
+
+# Universal Agent Skills CLI (Claude Code, Codex, Gemini CLI, Cursor, Copilot, OpenCode, OpenClaw, Goose, Cline...)
 npx skills add JovianOps/cortex
 
 # Install a single skill globally for specific agents
