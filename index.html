@@ -3,201 +3,1618 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Cortex — 20 modular, deterministic skills for Hermes Agent (10 core skills and 10 extended engineering skills)." />
+  <meta name="color-scheme" content="light dark" />
+  <script>
+    try {
+      var savedScheme = localStorage.getItem("color-scheme");
+      if (savedScheme === "light" || savedScheme === "dark") {
+        document.querySelector('meta[name="color-scheme"]').content = savedScheme;
+      }
+    } catch (_) {}
+  </script>
+  <meta name="description" content="Cortex — 20 modular, deterministic v0.2.0 skill playbooks for Hermes Agent (10 core skills, 10 extended engineering skills, and a 20-task A/B eval suite)." />
   <meta property="og:title" content="Cortex — Modular Skills for Hermes Agent" />
   <meta property="og:description" content="10 core skills and 10 extended engineering skills for Hermes Agent across Linux, macOS, and Windows." />
   <meta property="og:type" content="website" />
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161614'/%3E%3Cpath d='M9 9H23V13.5H13.5V18.5H23V23H9V9Z' fill='%23F6F5F0'/%3E%3Crect x='19' y='14.5' width='4' height='3' rx='0.6' fill='%23E26D43'/%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230F172A'/%3E%3Cpath d='M9 9H23V13.5H13.5V18.5H23V23H9V9Z' fill='%23F8FAFC'/%3E%3Crect x='19' y='14.5' width='4' height='3' rx='0.8' fill='%23F97316'/%3E%3C/svg%3E" />
   <title>Cortex — Modular Skills for Hermes Agent</title>
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
+    /* ==========================================================================
+       1. Color Tokens & Scheme Mapping (dark-mode-toggle + color + component theme)
+       ========================================================================== */
     :root {
-      --bg: #F6F5F0;
-      --surface: #FFFFFF;
-      --surface-subtle: #EFECE5;
-      --border: #DFDDD4;
-      --border-strong: #C9C6BA;
-      --text: #161614;
-      --text-muted: #5C5A52;
-      --text-faint: #848177;
-      --accent: #B8421B;
-      --accent-soft: #F9EAE4;
-      --code-bg: #171715;
-      --code-text: #ECEBE4;
-      --code-muted: #9C9A90;
-      --badge-core-bg: #EBE9E1;
-      --badge-core-text: #2C2B28;
-      --badge-ext-bg: #F9EAE4;
-      --badge-ext-text: #993514;
+      color-scheme: light dark;
+
+      /* Predefined light & dark design tokens (WCAG AA 4.5:1+ text, 3:1+ UI boundaries) */
+      --bg-light: #f8fafc;
+      --bg-dark: #090c14;
+
+      --surface-light: #ffffff;
+      --surface-dark: #111827;
+
+      --surface-elevated-light: #ffffff;
+      --surface-elevated-dark: #172033;
+
+      --surface-subtle-light: #f1f5f9;
+      --surface-subtle-dark: #182235;
+
+      --border-light: #cbd5e1;
+      --border-dark: #2c3a54;
+
+      --border-soft-light: #e2e8f0;
+      --border-soft-dark: #1f2b42;
+
+      --text-light: #0f172a;
+      --text-dark: #f1f5f9;
+
+      --text-muted-light: #475569;
+      --text-muted-dark: #94a3b8;
+
+      --accent-light: #c2410c;
+      --accent-dark: #fb923c;
+
+      --accent-hover-light: #9a3412;
+      --accent-hover-dark: #fdba74;
+
+      --accent-contrast-light: #ffffff;
+      --accent-contrast-dark: #090c14;
+
+      --accent-soft-light: #fff1eb;
+      --accent-soft-dark: #2f180e;
+
+      --accent-border-light: #fdba74;
+      --accent-border-dark: #7c2d12;
+
+      --core-bg-light: #eef2ff;
+      --core-bg-dark: #1e2545;
+      --core-text-light: #3730a3;
+      --core-text-dark: #c7d2fe;
+
+      --ext-bg-light: #fff1eb;
+      --ext-bg-dark: #33190f;
+      --ext-text-light: #9a3412;
+      --ext-text-dark: #fdba74;
+
+      --success-light: #15803d;
+      --success-dark: #4ade80;
+
+      /* Fallback defaults (light) for browsers without light-dark() */
+      --bg: var(--bg-light);
+      --surface: var(--surface-light);
+      --surface-elevated: var(--surface-elevated-light);
+      --surface-subtle: var(--surface-subtle-light);
+      --border: var(--border-light);
+      --border-soft: var(--border-soft-light);
+      --text: var(--text-light);
+      --text-muted: var(--text-muted-light);
+      --accent: var(--accent-light);
+      --accent-hover: var(--accent-hover-light);
+      --accent-contrast: var(--accent-contrast-light);
+      --accent-soft: var(--accent-soft-light);
+      --accent-border: var(--accent-border-light);
+      --core-bg: var(--core-bg-light);
+      --core-text: var(--core-text-light);
+      --ext-bg: var(--ext-bg-light);
+      --ext-text: var(--ext-text-light);
+      --success: var(--success-light);
+
+      --shadow-xs: 0 1px 2px rgb(15 23 42 / 0.05);
+      --shadow-sm: 0 2px 8px -2px rgb(15 23 42 / 0.07), 0 1px 2px rgb(15 23 42 / 0.04);
+      --shadow-md: 0 14px 32px -12px rgb(15 23 42 / 0.14), 0 4px 10px -4px rgb(15 23 42 / 0.06);
+      --shadow-lg: 0 24px 64px -16px rgb(2 6 23 / 0.36);
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-pill: 999px;
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      accent-color: var(--accent);
+      color: var(--text);
     }
 
-    html[data-theme="dark"] {
-      --bg: #111110;
-      --surface: #181816;
-      --surface-subtle: #20201D;
-      --border: #2B2B27;
-      --border-strong: #3E3E38;
-      --text: #F2F1EC;
-      --text-muted: #A4A29A;
-      --text-faint: #706E67;
-      --accent: #E26D43;
-      --accent-soft: #2D1C16;
-      --code-bg: #0B0B0A;
-      --code-text: #ECEBE4;
-      --code-muted: #8C8A80;
-      --badge-core-bg: #262622;
-      --badge-core-text: #D7D5CD;
-      --badge-ext-bg: #2D1C16;
-      --badge-ext-text: #F09B7A;
+    /* Map <meta name="color-scheme"> back to CSS :root so cascade follows user override */
+    :root:has(> head > meta[name="color-scheme"][content="dark"]) {
+      color-scheme: dark;
+    }
+    :root:has(> head > meta[name="color-scheme"][content="light"]) {
+      color-scheme: light;
+    }
+
+    /* Fallback for browsers without light-dark() */
+    @media (prefers-color-scheme: dark) {
+      :root:not(:has(> head > meta[name="color-scheme"][content="light"])) {
+        --bg: var(--bg-dark);
+        --surface: var(--surface-dark);
+        --surface-elevated: var(--surface-elevated-dark);
+        --surface-subtle: var(--surface-subtle-dark);
+        --border: var(--border-dark);
+        --border-soft: var(--border-soft-dark);
+        --text: var(--text-dark);
+        --text-muted: var(--text-muted-dark);
+        --accent: var(--accent-dark);
+        --accent-hover: var(--accent-hover-dark);
+        --accent-contrast: var(--accent-contrast-dark);
+        --accent-soft: var(--accent-soft-dark);
+        --accent-border: var(--accent-border-dark);
+        --core-bg: var(--core-bg-dark);
+        --core-text: var(--core-text-dark);
+        --ext-bg: var(--ext-bg-dark);
+        --ext-text: var(--ext-text-dark);
+        --success: var(--success-dark);
+        --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.35);
+        --shadow-sm: 0 4px 12px -2px rgb(0 0 0 / 0.42);
+        --shadow-md: 0 18px 36px -12px rgb(0 0 0 / 0.58);
+      }
+    }
+
+    :root:has(> head > meta[name="color-scheme"][content="dark"]) {
+      --bg: var(--bg-dark);
+      --surface: var(--surface-dark);
+      --surface-elevated: var(--surface-elevated-dark);
+      --surface-subtle: var(--surface-subtle-dark);
+      --border: var(--border-dark);
+      --border-soft: var(--border-soft-dark);
+      --text: var(--text-dark);
+      --text-muted: var(--text-muted-dark);
+      --accent: var(--accent-dark);
+      --accent-hover: var(--accent-hover-dark);
+      --accent-contrast: var(--accent-contrast-dark);
+      --accent-soft: var(--accent-soft-dark);
+      --accent-border: var(--accent-border-dark);
+      --core-bg: var(--core-bg-dark);
+      --core-text: var(--core-text-dark);
+      --ext-bg: var(--ext-bg-dark);
+      --ext-text: var(--ext-text-dark);
+      --success: var(--success-dark);
+      --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.35);
+      --shadow-sm: 0 4px 12px -2px rgb(0 0 0 / 0.42);
+      --shadow-md: 0 18px 36px -12px rgb(0 0 0 / 0.58);
+    }
+
+    /* Progressive enhancement with light-dark() — keeps expressions live for subtrees */
+    @supports (color: light-dark(white, black)) {
+      :root {
+        --bg: light-dark(var(--bg-light), var(--bg-dark));
+        --surface: light-dark(var(--surface-light), var(--surface-dark));
+        --surface-elevated: light-dark(var(--surface-elevated-light), var(--surface-elevated-dark));
+        --surface-subtle: light-dark(var(--surface-subtle-light), var(--surface-subtle-dark));
+        --border: light-dark(var(--border-light), var(--border-dark));
+        --border-soft: light-dark(var(--border-soft-light), var(--border-soft-dark));
+        --text: light-dark(var(--text-light), var(--text-dark));
+        --text-muted: light-dark(var(--text-muted-light), var(--text-muted-dark));
+        --accent: light-dark(var(--accent-light), var(--accent-dark));
+        --accent-hover: light-dark(var(--accent-hover-light), var(--accent-hover-dark));
+        --accent-contrast: light-dark(var(--accent-contrast-light), var(--accent-contrast-dark));
+        --accent-soft: light-dark(var(--accent-soft-light), var(--accent-soft-dark));
+        --accent-border: light-dark(var(--accent-border-light), var(--accent-border-dark));
+        --core-bg: light-dark(var(--core-bg-light), var(--core-bg-dark));
+        --core-text: light-dark(var(--core-text-light), var(--core-text-dark));
+        --ext-bg: light-dark(var(--ext-bg-light), var(--ext-bg-dark));
+        --ext-text: light-dark(var(--ext-text-light), var(--ext-text-dark));
+        --success: light-dark(var(--success-light), var(--success-dark));
+      }
+    }
+
+    /* Theme toggle non-color branching: show the opposite-state action without relying solely on JS */
+    .theme-option-light {
+      display: none;
+    }
+    .theme-option-dark {
+      display: inline-flex;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not(:has(> head > meta[name="color-scheme"][content="light"])) .theme-option-light {
+        display: inline-flex;
+      }
+      :root:not(:has(> head > meta[name="color-scheme"][content="light"])) .theme-option-dark {
+        display: none;
+      }
+    }
+    :root:has(> head > meta[name="color-scheme"][content="dark"]) .theme-option-light {
+      display: inline-flex;
+    }
+    :root:has(> head > meta[name="color-scheme"][content="dark"]) .theme-option-dark {
+      display: none;
+    }
+    :root:has(> head > meta[name="color-scheme"][content="light"]) .theme-option-light {
+      display: none;
+    }
+    :root:has(> head > meta[name="color-scheme"][content="light"]) .theme-option-dark {
+      display: inline-flex;
+    }
+
+    /* ==========================================================================
+       2. Reset, Typography & Accessibility Utilities
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
     }
 
     html {
       scroll-behavior: smooth;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: var(--font-sans);
       background-color: var(--bg);
       color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
     }
 
     body {
+      margin: 0;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
       background-color: var(--bg);
       color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Visually hidden utility (opt-out on :focus-within / :active for skip links) */
+    .visually-hidden:where(:not(:focus-within, :active)) {
+      position: absolute !important;
+      clip-path: inset(50%) !important;
+      overflow: hidden !important;
+      width: 1px !important;
+      height: 1px !important;
+      margin: -1px !important;
+      padding: 0 !important;
+      border: 0 !important;
+      white-space: nowrap !important;
+    }
+
+    .skip-link:focus-visible {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 100;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      background: var(--text);
+      color: var(--bg);
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-decoration: none;
+      box-shadow: var(--shadow-md);
+    }
+
+    :where(a, button, input, summary, [tabindex]):focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    code, pre, .mono {
+      font-family: var(--font-mono);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1160px;
+      margin-inline: auto;
+      padding-inline: clamp(16px, 3vw, 32px);
+    }
+
+    /* ==========================================================================
+       3. Component-Specific Dark Code Surface (component-specific-light-dark-theme)
+       ========================================================================== */
+    .terminal-card,
+    .code-surface {
+      color-scheme: only dark;
+      background-color: #0d111a;
+      color: #e2e8f0;
+      /* Mandatory: re-specify inherited color properties on color-scheme override */
+      accent-color: #fb923c;
+      border: 1px solid #243047;
+    }
+
+    .terminal-card {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .terminal-chrome {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 16px;
+      background-color: #131a29;
+      border-bottom: 1px solid #243047;
+    }
+
+    .terminal-dots {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-right: 6px;
+    }
+
+    .terminal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #334155;
+    }
+
+    .terminal-body {
+      padding: 18px 20px;
+      overflow-x: auto;
+    }
+
+    .terminal-body pre,
+    .code-surface pre {
       margin: 0;
-      -webkit-font-smoothing: antialiased;
+      font-size: 0.825rem;
+      line-height: 1.65;
+      color: #f1f5f9;
+      white-space: pre-wrap;
+      word-break: break-word;
+      scrollbar-width: thin;
     }
 
-    .font-mono-code {
-      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    .terminal-footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 16px;
+      background-color: #101624;
+      border-top: 1px solid #243047;
+      font-size: 0.8rem;
+      color: #94a3b8;
     }
 
-    .surface {
-      background-color: var(--surface);
-      border-color: var(--border);
+    /* ==========================================================================
+       4. Sticky Navigation Header
+       ========================================================================== */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background-color: color-mix(in oklab, var(--bg) 86%, transparent);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-soft);
     }
 
-    .surface-subtle {
+    .header-inner {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #0f172a;
+      color: #f8fafc;
+      flex-shrink: 0;
+      box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14);
+    }
+
+    .brand-slash {
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-inline: 1px;
+    }
+
+    .nav-links {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    @media (min-width: 768px) {
+      .nav-links {
+        display: flex;
+      }
+    }
+
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      min-block-size: 36px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 150ms ease, background-color 150ms ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
       background-color: var(--surface-subtle);
-      border-color: var(--border);
     }
 
-    .border-hairline {
-      border-color: var(--border);
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .text-muted {
+    /* ==========================================================================
+       5. Buttons & Segmented Controls (24px+ / 44px coarse target sizing)
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-block-size: 38px;
+      min-inline-size: 38px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background-color: var(--surface);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      line-height: 1;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      background-color: var(--surface-subtle);
+    }
+
+    .btn:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      border-color: var(--accent);
+      color: var(--accent-contrast);
+      box-shadow: 0 2px 8px color-mix(in oklab, var(--accent) 28%, transparent);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--accent-hover);
+      border-color: var(--accent-hover);
+      color: var(--accent-contrast);
+    }
+
+    .btn-dark {
+      background-color: #1e293b;
+      border-color: #334155;
+      color: #f8fafc;
+    }
+
+    .btn-dark:hover:not(:disabled) {
+      background-color: #293548;
+      border-color: #fb923c;
+      color: #ffffff;
+    }
+
+    .btn-sm {
+      min-block-size: 32px;
+      padding: 6px 11px;
+      font-size: 0.78rem;
+    }
+
+    .btn-ghost {
+      border-color: transparent;
+      background-color: transparent;
       color: var(--text-muted);
     }
 
-    .text-faint {
-      color: var(--text-faint);
+    .btn-ghost:hover:not(:disabled) {
+      border-color: transparent;
+      background-color: var(--surface-subtle);
+      color: var(--text);
     }
 
-    .accent-text {
+    @media (pointer: coarse) {
+      .btn,
+      .seg-btn,
+      .chip-btn {
+        min-block-size: 44px;
+      }
+    }
+
+    .segmented {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 3px;
+      border-radius: 10px;
+      background-color: var(--surface-subtle);
+      border: 1px solid var(--border-soft);
+    }
+
+    .segmented-dark {
+      background-color: #0b0f19;
+      border-color: #243047;
+    }
+
+    .seg-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-block-size: 30px;
+      padding: 5px 11px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
+    }
+
+    .seg-btn:hover {
+      color: var(--text);
+    }
+
+    .seg-btn[aria-pressed="true"] {
+      background-color: var(--surface);
+      color: var(--text);
+      box-shadow: var(--shadow-xs);
+    }
+
+    .segmented-dark .seg-btn {
+      color: #94a3b8;
+    }
+
+    .segmented-dark .seg-btn:hover {
+      color: #f8fafc;
+    }
+
+    .segmented-dark .seg-btn[aria-pressed="true"] {
+      background-color: #1e293b;
+      color: #f8fafc;
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.45);
+    }
+
+    /* ==========================================================================
+       6. Hero Section
+       ========================================================================== */
+    .hero {
+      position: relative;
+      overflow: clip;
+      border-bottom: 1px solid var(--border-soft);
+      background:
+        radial-gradient(62rem 34rem at 12% -6%, color-mix(in oklab, var(--accent) 11%, transparent), transparent 65%),
+        radial-gradient(50rem 28rem at 92% 10%, color-mix(in oklab, #4f46e5 9%, transparent), transparent 60%),
+        var(--bg);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 36px;
+      padding-block: clamp(44px, 7vw, 76px);
+      align-items: center;
+    }
+
+    @media (min-width: 960px) {
+      .hero-grid {
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 48px;
+      }
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      background-color: var(--surface);
+      border: 1px solid var(--border-soft);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      box-shadow: var(--shadow-xs);
+      margin-bottom: 18px;
+    }
+
+    .eyebrow-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--accent);
+    }
+
+    .hero h1 {
+      margin: 0 0 16px;
+      font-size: clamp(2.25rem, 4.8vw, 3.6rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.08;
+      color: var(--text);
+    }
+
+    .hero-accent {
       color: var(--accent);
     }
 
-    .accent-btn {
-      background-color: var(--text);
-      color: var(--bg);
+    .hero-lead {
+      margin: 0 0 26px;
+      font-size: clamp(1rem, 1.4vw, 1.125rem);
+      color: var(--text-muted);
+      max-width: 54ch;
+      line-height: 1.65;
     }
 
-    .accent-btn:hover {
-      opacity: 0.88;
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 28px;
     }
 
-    .code-block {
-      background-color: var(--code-bg);
-      color: var(--code-text);
-      border: 1px solid var(--border);
+    .hero-actions .btn {
+      min-block-size: 44px;
+      padding: 10px 18px;
+      font-size: 0.9rem;
     }
 
-    .badge-core {
-      background-color: var(--badge-core-bg);
-      color: var(--badge-core-text);
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+      gap: 12px;
+      padding-top: 22px;
+      border-top: 1px solid var(--border-soft);
     }
 
-    .badge-ext {
-      background-color: var(--badge-ext-bg);
-      color: var(--badge-ext-text);
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
-    .seg-active {
-      background-color: var(--surface);
+    .stat-value {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
       color: var(--text);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
     }
 
-    .seg-inactive {
+    .stat-label {
+      font-size: 0.78rem;
       color: var(--text-muted);
     }
 
-    .seg-inactive:hover {
-      color: var(--text);
+    /* ==========================================================================
+       7. Highlights Strip (Why Cortex v0.2.0)
+       ========================================================================== */
+    .section {
+      padding-block: clamp(44px, 6vw, 72px);
+      border-bottom: 1px solid var(--border-soft);
     }
 
-    .skill-row {
-      transition: background-color 120ms ease;
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
     }
 
-    .skill-row:hover {
-      background-color: var(--surface-subtle);
+    .section-kicker {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin: 0 0 6px;
     }
 
-    .skill-row-selected {
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+
+    .section-subtitle {
+      margin: 6px 0 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 62ch;
+    }
+
+    .highlights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+      gap: 16px;
+    }
+
+    .highlight-card {
+      background-color: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      padding: 20px 22px;
+      box-shadow: var(--shadow-xs);
+    }
+
+    .highlight-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
       background-color: var(--accent-soft);
+      color: var(--accent);
+      margin-bottom: 14px;
     }
 
-    .skill-row-selected:hover {
-      background-color: var(--accent-soft);
+    .highlight-card h3 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
     }
 
-    .toast-enter {
-      transform: translateY(0);
-      opacity: 1;
+    .highlight-card p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.55;
     }
 
-    .toast-leave {
-      transform: translateY(12px);
-      opacity: 0;
+    /* ==========================================================================
+       8. Skills Catalog + Container-Query Subgrid Cards (card guide)
+       ========================================================================== */
+    .catalog-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1 1 260px;
+      max-width: 380px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
       pointer-events: none;
     }
 
-    pre {
-      scrollbar-width: thin;
-      scrollbar-color: #444 transparent;
+    .search-input {
+      width: 100%;
+      min-block-size: 40px;
+      padding: 8px 66px 8px 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background-color: var(--surface);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.875rem;
+      box-shadow: var(--shadow-xs);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus-visible {
+      border-color: var(--accent);
+    }
+
+    .search-kbd {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 2px 7px;
+      border-radius: 6px;
+      border: 1px solid var(--border-soft);
+      background-color: var(--surface-subtle);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      pointer-events: none;
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      min-block-size: 28px;
+      min-inline-size: 28px;
+      border: 0;
+      border-radius: 6px;
+      background-color: var(--surface-subtle);
+      color: var(--text);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .search-clear[hidden] {
+      display: none;
+    }
+
+    .catalog-meta {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Responsive Subgrid Card Grid: 4 shared row tracks (header, desc, tags, footer) */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .skill-card {
+      container-type: inline-size;
+      display: grid;
+      grid-template-rows: auto 1fr auto auto;
+      gap: 12px;
+      padding: 18px;
+      border-radius: var(--radius-md);
+      background-color: var(--surface);
+      /* Constant 2px border prevents any layout jump on selection */
+      border: 2px solid var(--border-soft);
+      box-shadow: var(--shadow-xs);
+      transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+    }
+
+    /* Align card header, description, tags, and footer tracks across each row */
+    @supports (grid-template-rows: subgrid) {
+      .skill-card {
+        grid-row: span 4;
+        grid-template-rows: subgrid;
+        row-gap: 12px;
+      }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .skill-card {
+        transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease, transform 180ms ease;
+      }
+      .skill-card:hover {
+        transform: translateY(-2px);
+      }
+    }
+
+    .skill-card:hover {
+      border-color: var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .skill-card:has(.skill-checkbox:checked) {
+      border-color: var(--accent);
+      background-color: color-mix(in oklab, var(--accent-soft) 55%, var(--surface));
+    }
+
+    .skill-card > header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .skill-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .skill-pick {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-block-size: 28px;
+      min-inline-size: 28px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .skill-checkbox {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+
+    .skill-name {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--text);
+      overflow-wrap: anywhere;
+    }
+
+    .tier-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .tier-core {
+      background-color: var(--core-bg);
+      color: var(--core-text);
+    }
+
+    .tier-extended {
+      background-color: var(--ext-bg);
+      color: var(--ext-text);
+    }
+
+    .skill-desc {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .skill-tags li {
+      padding: 2px 8px;
+      border-radius: 6px;
+      background-color: var(--surface-subtle);
+      border: 1px solid var(--border-soft);
+      font-family: var(--font-mono);
+      font-size: 0.71rem;
+      color: var(--text-muted);
+    }
+
+    .skill-card > footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .skill-path-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .card-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    @container (max-width: 280px) {
+      .skill-card > footer {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .card-actions {
+        justify-content: space-between;
+      }
+    }
+
+    .empty-state {
+      padding: 48px 24px;
+      text-align: center;
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--border);
+      background-color: var(--surface);
+    }
+
+    .empty-state[hidden] {
+      display: none;
+    }
+
+    /* ==========================================================================
+       9. Custom Command Builder Panel
+       ========================================================================== */
+    .builder-panel {
+      margin-top: 28px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background-color: var(--surface);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .builder-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      background-color: var(--surface-subtle);
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .builder-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .builder-title {
+      margin: 0;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .count-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: var(--radius-pill);
+      background-color: var(--accent-soft);
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 600;
+    }
+
+    .builder-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .builder-footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 18px;
+      background-color: var(--surface);
+      border-top: 1px solid var(--border-soft);
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       10. Installation Reference & Requirements / Structure
+       ========================================================================== */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    @media (min-width: 820px) {
+      .two-col {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .guide-card {
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-soft);
+      background-color: var(--surface);
+      overflow: hidden;
+      box-shadow: var(--shadow-xs);
+    }
+
+    .guide-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .guide-card-head h3 {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .guide-card-code {
+      flex: 1;
+      padding: 16px 18px;
+      border: 0;
+    }
+
+    .guide-card-foot {
+      padding: 12px 18px;
+      border-top: 1px solid var(--border-soft);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .callout {
+      margin-top: 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--accent-border);
+      background-color: var(--accent-soft);
+      font-size: 0.875rem;
+      color: var(--text);
+    }
+
+    .callout-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .info-list {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-soft);
+      background-color: var(--surface);
+      overflow: hidden;
+      box-shadow: var(--shadow-xs);
+    }
+
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .info-row:last-child {
+      border-bottom: 0;
+    }
+
+    .info-row h3 {
+      margin: 0 0 3px;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .info-row p {
+      margin: 0;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .repo-tree {
+      padding: 18px 20px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.8;
+    }
+
+    .repo-tree-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .repo-tree-path {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .repo-tree-path.accent {
+      color: var(--accent);
+    }
+
+    .repo-tree-note {
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       11. Footer
+       ========================================================================== */
+    .site-footer {
+      margin-top: auto;
+      padding-block: 28px;
+      background-color: var(--surface);
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .footer-links a {
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      color: var(--text);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    /* ==========================================================================
+       12. Native Modal <dialog> + Top-Layer Transitions (dialog + animate-to-from-top-layer)
+       ========================================================================== */
+    dialog.skill-dialog {
+      width: min(92vw, 600px);
+      max-height: min(86dvh, 720px);
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background-color: var(--surface-elevated);
+      color: var(--text);
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transition-property: opacity, transform, display, overlay;
+      transition-duration: 0.22s;
+      transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+      /* Separate after transition so shorthand never resets it or drops in older browsers */
+      transition-behavior: allow-discrete;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      dialog.skill-dialog {
+        transform: translateY(10px) scale(0.97);
+      }
+    }
+
+    /* Mandatory: contain scroll inside modal & backdrop without locking body overflow */
+    dialog.skill-dialog:modal {
+      overscroll-behavior: contain;
+    }
+
+    dialog.skill-dialog::backdrop {
+      background-color: rgb(2 6 23 / 0);
+      backdrop-filter: blur(0px);
+      overflow: hidden;
+      overscroll-behavior: contain;
+      transition-property: background-color, backdrop-filter, display, overlay;
+      transition-duration: 0.22s;
+      transition-timing-function: ease-out;
+      transition-behavior: allow-discrete;
+    }
+
+    /* Scope flex display to [open] (kept during data-closing exit animation) */
+    dialog.skill-dialog[open] {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Open state (with :not([data-closing]) so Safari/Firefox exit fallback animates cleanly) */
+    dialog.skill-dialog[open]:where(:not([data-closing])) {
+      opacity: 1;
+
+      @starting-style {
+        opacity: 0;
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        transform: translateY(0) scale(1);
+
+        @starting-style {
+          transform: translateY(10px) scale(0.97);
+        }
+      }
+
+      &::backdrop {
+        background-color: rgb(2 6 23 / 0.58);
+        backdrop-filter: blur(4px);
+
+        @starting-style {
+          background-color: rgb(2 6 23 / 0);
+          backdrop-filter: blur(0px);
+        }
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      dialog.skill-dialog,
+      dialog.skill-dialog::backdrop {
+        transition-duration: 0.1s;
+      }
+    }
+
+    .dialog-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 22px 16px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .dialog-title {
+      margin: 6px 0 0;
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .dialog-body {
+      padding: 20px 22px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .dialog-section-label {
+      margin: 0 0 8px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .dialog-highlights {
+      margin: 0;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+
+    .dialog-foot {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 22px;
+      border-top: 1px solid var(--border-soft);
+      background-color: var(--surface-subtle);
+    }
+
+    /* ==========================================================================
+       13. Native Top-Layer Toast Popover (persistent-toast-notifications)
+       ========================================================================== */
+    .toast-popover {
+      position: fixed;
+      inset: auto 20px 20px auto;
+      margin: 0;
+      max-width: min(360px, calc(100vw - 32px));
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      color-scheme: only dark;
+      background-color: #0f172a;
+      color: #f8fafc;
+      accent-color: #fb923c;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transition-property: opacity, transform, display, overlay;
+      transition-duration: 0.2s;
+      transition-timing-function: ease-out;
+      transition-behavior: allow-discrete;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .toast-popover {
+        transform: translateY(10px);
+      }
+    }
+
+    /* Mandatory polyfill selector pairing via :is() */
+    .toast-popover:is(:popover-open, .\:popover-open) {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toast-popover:is(:popover-open, .\:popover-open):where(:not([data-closing])) {
+      opacity: 1;
+
+      @starting-style {
+        opacity: 0;
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        transform: translateY(0);
+
+        @starting-style {
+          transform: translateY(10px);
+        }
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .toast-popover {
+        transition-duration: 0.1s;
+      }
+    }
+
+    .toast-text {
+      font-size: 0.84rem;
+      font-weight: 500;
+      line-height: 1.4;
+      color: #f8fafc;
+    }
+
+    .toast-close {
+      min-block-size: 28px;
+      min-inline-size: 28px;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      background: #1e293b;
+      color: #f8fafc;
+      cursor: pointer;
+      display: inline-grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .toast-close:hover {
+      border-color: #fb923c;
+    }
+
+    /* ==========================================================================
+       14. Forced Colors Mode Support (color guide)
+       ========================================================================== */
+    @media (forced-colors: active) {
+      .skill-card,
+      .highlight-card,
+      .guide-card,
+      .builder-panel,
+      .info-list,
+      .terminal-card,
+      dialog.skill-dialog,
+      .toast-popover {
+        border: 1px solid CanvasText;
+        box-shadow: none;
+      }
+      .skill-card:has(.skill-checkbox:checked) {
+        border: 2px solid Highlight;
+        outline: 2px solid Highlight;
+      }
+      .btn-primary {
+        background-color: Highlight;
+        color: HighlightText;
+        border-color: Highlight;
+      }
+      :where(a, button, input, summary, [tabindex]):focus-visible {
+        outline: 2px solid Highlight;
+        outline-offset: 2px;
+      }
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body>
+  <a href="#main-content" class="skip-link visually-hidden">Skip to main content</a>
 
   <!-- Top Navigation -->
-  <header class="sticky top-0 z-30 border-b border-hairline" style="background-color: var(--bg);">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
-      <a href="#top" class="flex items-center gap-2.5 font-semibold tracking-tight text-sm shrink-0" style="color: var(--text);">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <rect x="2" y="2" width="20" height="20" rx="4" stroke="currentColor" stroke-width="2" />
-          <path d="M8 8H16V11H11V13H16V16H8V8Z" fill="currentColor" />
-        </svg>
-        <span>JovianOps<span class="text-faint font-normal">/</span>cortex</span>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#top" class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M5 5H19V9.5H10V14.5H19V19H5V5Z" fill="#F8FAFC" />
+            <rect x="14.5" y="10.5" width="4.5" height="3" rx="0.8" fill="#F97316" />
+          </svg>
+        </span>
+        <span>JovianOps<span class="brand-slash">/</span>cortex</span>
       </a>
 
-      <nav class="hidden sm:flex items-center gap-6 text-sm text-muted">
-        <a href="#skills" class="hover:underline underline-offset-4">Skills</a>
-        <a href="#install" class="hover:underline underline-offset-4">Install</a>
-        <a href="#requirements" class="hover:underline underline-offset-4">Requirements</a>
+      <nav aria-label="Primary">
+        <ul class="nav-links">
+          <li><a href="#skills">Skills</a></li>
+          <li><a href="#install">Install</a></li>
+          <li><a href="#requirements">Requirements</a></li>
+          <li><a href="https://github.com/JovianOps/cortex/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing</a></li>
+        </ul>
       </nav>
 
-      <div class="flex items-center gap-2">
-        <button id="themeToggleBtn" type="button" aria-label="Toggle color theme"
-          class="h-8 px-2.5 rounded-md border border-hairline surface text-xs font-medium text-muted hover:opacity-80 flex items-center gap-1.5 cursor-pointer">
-          <span id="themeToggleIcon" aria-hidden="true"></span>
-          <span id="themeToggleLabel" class="hidden sm:inline">Dark</span>
+      <div class="header-actions">
+        <button id="themeToggleBtn" type="button" class="btn btn-sm">
+          <span class="theme-option-dark" style="align-items:center;gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <span>Dark</span>
+            <span class="visually-hidden">theme — switch to dark mode</span>
+          </span>
+          <span class="theme-option-light" style="align-items:center;gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            <span>Light</span>
+            <span class="visually-hidden">theme — switch to light mode</span>
+          </span>
         </button>
-        <a href="https://github.com/JovianOps/cortex" target="_blank" rel="noopener noreferrer"
-          class="h-8 px-3 rounded-md border border-hairline surface text-xs font-medium flex items-center gap-1.5 hover:opacity-80" style="color: var(--text);">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+
+        <a href="https://github.com/JovianOps/cortex" target="_blank" rel="noopener noreferrer" class="btn btn-sm">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11.02 11.02 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.8 1.19 1.83 1.19 3.08 0 4.41-2.69 5.39-5.25 5.67.41.36.78 1.06.78 2.13 0 1.54-.01 2.78-.01 3.16 0 .31.21.66.79.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
           </svg>
           <span>GitHub</span>
@@ -206,306 +1623,299 @@
     </div>
   </header>
 
-  <main id="top" class="flex-1">
-    <!-- Hero Section -->
-    <section class="border-b border-hairline">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-          <div class="lg:col-span-6 space-y-5">
-            <div class="inline-flex items-center gap-2 text-xs font-mono-code uppercase tracking-wider text-muted">
-              <span class="w-2 h-2 rounded-full" style="background-color: var(--accent);"></span>
-              <span>Hermes Agent Skill Tap</span>
-              <span class="text-faint">/</span>
-              <span>MIT License</span>
+  <main id="top">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">
+            <span class="eyebrow-dot" aria-hidden="true"></span>
+            <span>Hermes Agent Skill Tap</span>
+            <span aria-hidden="true">&middot;</span>
+            <span>v0.2.0 Playbooks</span>
+          </div>
+
+          <h1 id="main-content" tabindex="-1">
+            Modular skills that make agents <span class="hero-accent">measurably sharper</span>.
+          </h1>
+
+          <p class="hero-lead">
+            <strong>Cortex</strong> packages <strong>20 deterministic v0.2.0 skills</strong> for Hermes Agent — 10 core skills in <code>skills/</code> and 10 extended engineering skills in <code>premium-skills/</code>. Native Bash &amp; PowerShell install with zero extra CLI dependencies.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#skills" class="btn btn-primary">
+              <span>Explore 20 skills</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+            </a>
+            <a href="https://github.com/JovianOps/cortex" target="_blank" rel="noopener noreferrer" class="btn">
+              <span>View on GitHub</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+            </a>
+          </div>
+
+          <div class="stats-strip" aria-label="Collection summary">
+            <div class="stat-item">
+              <span class="stat-value">10 Core</span>
+              <span class="stat-label">Academic, QA &amp; 3D</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">10 Extended</span>
+              <span class="stat-label">APIs, DB, DevOps &amp; Sec</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">20 Evals</span>
+              <span class="stat-label">100-pt A/B rubrics</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">MIT</span>
+              <span class="stat-label">Linux · macOS · Win</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Install Terminal Card -->
+        <div class="terminal-card" aria-label="Quick install command">
+          <div class="terminal-chrome">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span class="terminal-dots" aria-hidden="true">
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+              </span>
+              <div class="segmented segmented-dark" role="group" aria-label="Collection">
+                <button type="button" data-hero-scope="core" class="seg-btn hero-scope-btn" aria-pressed="true">Core 10</button>
+                <button type="button" data-hero-scope="extended" class="seg-btn hero-scope-btn" aria-pressed="false">Extended 10</button>
+              </div>
             </div>
 
-            <h1 class="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">
-              Cortex
-            </h1>
-
-            <p class="text-base sm:text-lg text-muted leading-relaxed max-w-xl">
-              20 modular skills for Hermes Agent — 10 core skills in <code class="font-mono-code text-sm px-1.5 py-0.5 rounded surface-subtle">skills/</code> and 10 extended engineering skills in <code class="font-mono-code text-sm px-1.5 py-0.5 rounded surface-subtle">premium-skills/</code>. Native shell install, no <code class="font-mono-code text-sm">jq</code> or <code class="font-mono-code text-sm">xargs</code> required.
-            </p>
-
-            <div class="flex flex-wrap items-center gap-3 pt-1">
-              <a href="#skills" class="accent-btn h-10 px-4 rounded-md text-sm font-medium inline-flex items-center gap-2 transition">
-                <span>Browse 20 skills</span>
-                <span aria-hidden="true">&darr;</span>
-              </a>
-              <a href="https://github.com/JovianOps/cortex" target="_blank" rel="noopener noreferrer"
-                class="h-10 px-4 rounded-md border border-hairline surface text-sm font-medium inline-flex items-center gap-2 hover:opacity-80" style="color: var(--text);">
-                <span>View source on GitHub</span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
-              </a>
-            </div>
-
-            <div class="pt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-mono-code text-faint">
-              <span>10 core skills</span>
-              <span>&middot;</span>
-              <span>10 extended skills</span>
-              <span>&middot;</span>
-              <span>Bash &amp; PowerShell</span>
-              <span>&middot;</span>
-              <span>MIT</span>
+            <div class="segmented segmented-dark" role="group" aria-label="Shell syntax">
+              <button type="button" data-shell="bash" class="seg-btn shell-btn mono" aria-pressed="true">Bash</button>
+              <button type="button" data-shell="powershell" class="seg-btn shell-btn mono" aria-pressed="false">PowerShell</button>
             </div>
           </div>
 
-          <!-- Quick Install Terminal Card -->
-          <div class="lg:col-span-6">
-            <div class="rounded-lg border border-hairline surface overflow-hidden">
-              <div class="px-3.5 py-2.5 border-b border-hairline flex flex-wrap items-center justify-between gap-2 surface-subtle">
-                <div class="flex items-center gap-1 p-0.5 rounded-md border border-hairline" style="background-color: var(--bg);">
-                  <button type="button" data-hero-scope="core" class="hero-scope-btn px-2.5 py-1 rounded text-xs font-medium cursor-pointer">
-                    Core 10
-                  </button>
-                  <button type="button" data-hero-scope="extended" class="hero-scope-btn px-2.5 py-1 rounded text-xs font-medium cursor-pointer">
-                    Extended 10
-                  </button>
-                </div>
-
-                <div class="flex items-center gap-1 p-0.5 rounded-md border border-hairline" style="background-color: var(--bg);">
-                  <button type="button" data-shell="bash" class="shell-btn px-2.5 py-1 rounded text-xs font-mono-code cursor-pointer">
-                    Bash
-                  </button>
-                  <button type="button" data-shell="powershell" class="shell-btn px-2.5 py-1 rounded text-xs font-mono-code cursor-pointer">
-                    PowerShell
-                  </button>
-                </div>
-              </div>
-
-              <div class="code-block border-0 p-4 relative">
-                <pre id="heroCommandCode" class="font-mono-code text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap break-words m-0 pr-2"></pre>
-              </div>
-
-              <div class="px-3.5 py-2.5 border-t border-hairline flex items-center justify-between gap-3 text-xs">
-                <span id="heroCommandNote" class="text-muted">Linux / macOS — native Bash loop</span>
-                <button id="copyHeroBtn" type="button"
-                  class="px-3 py-1.5 rounded-md border border-hairline surface font-medium hover:opacity-80 cursor-pointer shrink-0" style="color: var(--text);">
-                  Copy command
-                </button>
-              </div>
-            </div>
+          <div class="terminal-body">
+            <pre id="heroCommandCode"></pre>
           </div>
+
+          <div class="terminal-footer">
+            <span id="heroCommandNote">Linux / macOS — native Bash loop</span>
+            <button id="copyHeroBtn" type="button" class="btn btn-dark btn-sm">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy command</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Cortex v0.2.0 -->
+    <section class="section" aria-labelledby="highlightsHeading">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="section-kicker">Architecture</p>
+            <h2 id="highlightsHeading" class="section-title">Built for verifiable results, not vague prompts</h2>
+          </div>
+        </div>
+
+        <div class="highlights-grid">
+          <article class="highlight-card">
+            <div class="highlight-icon" aria-hidden="true">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <h3>Deterministic Stop Gates</h3>
+            <p>Every v0.2.0 playbook requires inspecting source inputs, running real linters, <code>Decimal</code> scripts, or <code>EXPLAIN</code> plans, and tagging unverified claims explicitly.</p>
+          </article>
+
+          <article class="highlight-card">
+            <div class="highlight-icon" aria-hidden="true">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            </div>
+            <h3>20-Task A/B Eval Suite</h3>
+            <p>Includes <code>evals/skill_evals.json</code> and <code>scripts/eval_skills.py</code> with 100-point rubrics to measure Without-Skill vs. With-Skill score lift.</p>
+          </article>
+
+          <article class="highlight-card">
+            <div class="highlight-icon" aria-hidden="true">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            </div>
+            <h3>Native Shell, Zero Extra Tools</h3>
+            <p>Every skill ships as a CI-verified ZIP and installs cleanly with native Bash or PowerShell loops — no <code>jq</code>, <code>xargs</code>, or custom package manager needed.</p>
+          </article>
         </div>
       </div>
     </section>
 
     <!-- Skills Catalog + Live Command Builder -->
-    <section id="skills" class="border-b border-hairline">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-14 space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+    <section id="skills" class="section" aria-labelledby="catalogHeading">
+      <div class="container">
+        <div class="section-header">
           <div>
-            <p class="text-xs font-mono-code uppercase tracking-wider text-faint mb-1">Catalog</p>
-            <h2 class="text-2xl font-bold tracking-tight">Skills &amp; Command Builder</h2>
-            <p class="text-sm text-muted mt-1">Select individual skills to assemble a custom install command, or expand any row to inspect its path.</p>
+            <p class="section-kicker">Interactive Catalog</p>
+            <h2 id="catalogHeading" class="section-title">Skills &amp; Custom Command Builder</h2>
+            <p class="section-subtitle">Check any combination of skills to assemble a custom install command, or inspect a skill to preview its playbook highlights.</p>
           </div>
-          <div id="catalogCount" class="text-xs font-mono-code text-muted shrink-0">Showing 20 of 20</div>
+          <div id="catalogCount" class="catalog-meta" aria-live="polite">Showing 20 of 20 skills</div>
         </div>
 
-        <!-- Filter & Search Controls -->
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <div class="inline-flex p-1 rounded-md border border-hairline surface-subtle self-start">
-            <button type="button" data-tier="all" class="tier-btn px-3 py-1.5 rounded text-xs font-medium cursor-pointer">
-              All (20)
-            </button>
-            <button type="button" data-tier="core" class="tier-btn px-3 py-1.5 rounded text-xs font-medium cursor-pointer">
-              Core (10)
-            </button>
-            <button type="button" data-tier="extended" class="tier-btn px-3 py-1.5 rounded text-xs font-medium cursor-pointer">
-              Extended (10)
-            </button>
+        <div class="catalog-toolbar">
+          <div class="segmented" role="group" aria-label="Filter skills by collection">
+            <button type="button" data-tier="all" class="seg-btn tier-btn" aria-pressed="true">All (20)</button>
+            <button type="button" data-tier="core" class="seg-btn tier-btn" aria-pressed="false">Core (10)</button>
+            <button type="button" data-tier="extended" class="seg-btn tier-btn" aria-pressed="false">Extended (10)</button>
           </div>
 
-          <div class="relative flex-1 sm:max-w-xs">
-            <input id="skillSearchInput" type="search" placeholder="Filter by slug or capability..."
-              class="w-full h-9 pl-3 pr-8 rounded-md border border-hairline surface text-sm focus:outline-none"
-              style="color: var(--text);" />
-            <button id="clearSearchBtn" type="button" aria-label="Clear search"
-              class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-xs text-faint hover:opacity-80 px-1 cursor-pointer">
-              &times;
-            </button>
+          <div class="search-wrap">
+            <label for="skillSearchInput" class="visually-hidden">Filter skills by name, tag, or capability</label>
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input id="skillSearchInput" type="search" class="search-input" placeholder="Search skills, tags, or topics..." autocomplete="off" />
+            <kbd id="searchKbd" class="search-kbd" aria-hidden="true">/</kbd>
+            <button id="clearSearchBtn" type="button" class="search-clear" aria-label="Clear search" hidden>&times;</button>
           </div>
         </div>
 
-        <!-- Skill Table/List -->
-        <div class="rounded-lg border border-hairline surface overflow-hidden">
-          <div class="hidden md:grid grid-cols-12 gap-3 px-4 py-2.5 border-b border-hairline surface-subtle text-xs font-mono-code uppercase tracking-wider text-faint">
-            <div class="col-span-1">Pick</div>
-            <div class="col-span-4">Skill</div>
-            <div class="col-span-5">Scope</div>
-            <div class="col-span-2 text-right">Action</div>
-          </div>
-          <div id="skillsList" class="divide-y" style="border-color: var(--border);"></div>
-          <div id="emptyState" class="hidden px-6 py-10 text-center space-y-2">
-            <p class="text-sm font-medium">No skills match that filter.</p>
-            <button id="resetFiltersBtn" type="button" class="text-xs underline underline-offset-4 accent-text cursor-pointer">
-              Reset filters
-            </button>
-          </div>
+        <div id="skillsGrid" class="skills-grid"></div>
+
+        <div id="emptyState" class="empty-state" hidden>
+          <p style="margin:0 0 12px;font-weight:600;">No skills matched your search.</p>
+          <button id="resetFiltersBtn" type="button" class="btn btn-sm">Reset filters</button>
         </div>
 
-        <!-- Live Custom Install Builder -->
-        <div class="rounded-lg border border-hairline surface overflow-hidden">
-          <div class="px-4 py-3 border-b border-hairline surface-subtle flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-2.5">
-              <span class="text-xs font-mono-code uppercase tracking-wider text-faint">Custom Command</span>
-              <span id="selectedBadge" class="text-xs font-mono-code px-2 py-0.5 rounded badge-core">0 selected</span>
+        <!-- Live Custom Command Builder -->
+        <div class="builder-panel" aria-labelledby="builderHeading">
+          <div class="builder-header">
+            <div class="builder-title-row">
+              <h3 id="builderHeading" class="builder-title">Custom Install Command</h3>
+              <span id="selectedBadge" class="count-pill">0 selected</span>
             </div>
 
-            <div class="flex flex-wrap items-center gap-2 text-xs">
-              <button id="selectCorePresetBtn" type="button" class="px-2.5 py-1 rounded border border-hairline surface hover:opacity-80 cursor-pointer" style="color: var(--text);">
-                Select Core 10
-              </button>
-              <button id="selectExtendedPresetBtn" type="button" class="px-2.5 py-1 rounded border border-hairline surface hover:opacity-80 cursor-pointer" style="color: var(--text);">
-                Select Extended 10
-              </button>
-              <button id="clearSelectionBtn" type="button" class="px-2.5 py-1 rounded border border-hairline surface text-muted hover:opacity-80 cursor-pointer">
-                Clear
-              </button>
+            <div class="builder-presets">
+              <button id="selectCorePresetBtn" type="button" class="btn btn-sm">Select Core 10</button>
+              <button id="selectExtendedPresetBtn" type="button" class="btn btn-sm">Select Extended 10</button>
+              <button id="clearSelectionBtn" type="button" class="btn btn-ghost btn-sm">Clear</button>
             </div>
           </div>
 
-          <div class="code-block border-0 p-4">
-            <pre id="customBuilderCode" class="font-mono-code text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap break-words m-0"></pre>
+          <div class="code-surface terminal-body" style="border:0;">
+            <pre id="customBuilderCode"></pre>
           </div>
 
-          <div class="px-4 py-2.5 border-t border-hairline flex flex-wrap items-center justify-between gap-3 text-xs">
-            <span id="builderMeta" class="text-muted">Check skills above to build a tailored install command.</span>
-            <button id="copyBuilderBtn" type="button"
-              class="accent-btn px-3 py-1.5 rounded-md font-medium cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
-              Copy custom command
+          <div class="builder-footer">
+            <span id="builderMeta">Check skills above or pick a preset to build a tailored install command.</span>
+            <button id="copyBuilderBtn" type="button" class="btn btn-primary btn-sm" disabled>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy custom command</span>
             </button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Installation Guide -->
-    <section id="install" class="border-b border-hairline">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-14 space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+    <!-- Installation Reference -->
+    <section id="install" class="section" aria-labelledby="installHeading">
+      <div class="container">
+        <div class="section-header">
           <div>
-            <p class="text-xs font-mono-code uppercase tracking-wider text-faint mb-1">Setup</p>
-            <h2 class="text-2xl font-bold tracking-tight">Installation Reference</h2>
-            <p class="text-sm text-muted mt-1">Add the tap once, then install a single skill or batch-install an entire collection.</p>
+            <p class="section-kicker">Setup</p>
+            <h2 id="installHeading" class="section-title">Installation Reference</h2>
+            <p class="section-subtitle">Add the Cortex tap once, then install a single skill or batch-install an entire collection.</p>
           </div>
 
-          <div class="inline-flex p-1 rounded-md border border-hairline surface-subtle self-start">
-            <button type="button" data-shell="bash" class="shell-btn px-3 py-1.5 rounded text-xs font-mono-code cursor-pointer">
-              Linux / macOS (Bash)
-            </button>
-            <button type="button" data-shell="powershell" class="shell-btn px-3 py-1.5 rounded text-xs font-mono-code cursor-pointer">
-              Windows (PowerShell)
-            </button>
+          <div class="segmented" role="group" aria-label="Preferred shell for installation examples">
+            <button type="button" data-shell="bash" class="seg-btn shell-btn mono" aria-pressed="true">Linux / macOS (Bash)</button>
+            <button type="button" data-shell="powershell" class="seg-btn shell-btn mono" aria-pressed="false">Windows (PowerShell)</button>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <!-- Step 1: Single Skill -->
-          <div class="rounded-lg border border-hairline surface overflow-hidden flex flex-col">
-            <div class="px-4 py-3 border-b border-hairline flex items-center justify-between gap-2">
-              <span class="text-sm font-semibold">1. Install one skill</span>
-              <button id="copySingleGuideBtn" type="button" class="text-xs font-medium px-2.5 py-1 rounded border border-hairline surface-subtle hover:opacity-80 cursor-pointer" style="color: var(--text);">
-                Copy
-              </button>
+        <div class="two-col">
+          <div class="guide-card">
+            <div class="guide-card-head">
+              <h3>1. Install a single skill</h3>
+              <button id="copySingleGuideBtn" type="button" class="btn btn-sm">Copy</button>
             </div>
-            <div class="code-block border-0 p-4 flex-1">
-              <pre id="singleGuideCode" class="font-mono-code text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap break-words m-0"></pre>
+            <div class="code-surface guide-card-code">
+              <pre id="singleGuideCode"></pre>
             </div>
-            <div class="px-4 py-2.5 border-t border-hairline text-xs text-muted">
-              For an extended skill, replace <code class="font-mono-code">skills/</code> with <code class="font-mono-code">premium-skills/</code>.
+            <div class="guide-card-foot">
+              For an extended skill, replace <code>skills/</code> with <code>premium-skills/</code>.
             </div>
           </div>
 
-          <!-- Step 2: Batch Install -->
-          <div class="rounded-lg border border-hairline surface overflow-hidden flex flex-col">
-            <div class="px-4 py-3 border-b border-hairline flex items-center justify-between gap-2">
-              <span id="batchGuideTitle" class="text-sm font-semibold">2. Install all 10 core skills</span>
-              <button id="copyBatchGuideBtn" type="button" class="text-xs font-medium px-2.5 py-1 rounded border border-hairline surface-subtle hover:opacity-80 cursor-pointer" style="color: var(--text);">
-                Copy
-              </button>
+          <div class="guide-card">
+            <div class="guide-card-head">
+              <h3 id="batchGuideTitle">2. Batch install all 10 core skills (Bash)</h3>
+              <button id="copyBatchGuideBtn" type="button" class="btn btn-sm">Copy</button>
             </div>
-            <div class="code-block border-0 p-4 flex-1">
-              <pre id="batchGuideCode" class="font-mono-code text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap break-words m-0"></pre>
+            <div class="code-surface guide-card-code">
+              <pre id="batchGuideCode"></pre>
             </div>
-            <div class="px-4 py-2.5 border-t border-hairline text-xs text-muted">
-              Uses native shell loops only — no <code class="font-mono-code">jq</code> or <code class="font-mono-code">xargs</code> needed.
+            <div class="guide-card-foot">
+              Uses native shell loops only — no <code>jq</code> or <code>xargs</code> required.
             </div>
           </div>
         </div>
 
-        <!-- Shell Warning Callout -->
-        <div class="rounded-lg border border-hairline surface-subtle px-4 py-3 text-xs sm:text-sm text-muted flex items-start gap-3">
-          <span class="font-mono-code font-semibold accent-text shrink-0">NOTE</span>
-          <p class="m-0 leading-relaxed">
-            On Windows, use the <strong style="color: var(--text);">PowerShell</strong> commands (<code class="font-mono-code">ForEach-Object</code>) rather than pasting Bash <code class="font-mono-code">for ...; do ... done</code> loops into PowerShell.
-          </p>
+        <div class="callout" role="note">
+          <span class="callout-badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>WINDOWS NOTE</span>
+          </span>
+          <span>On Windows, select <strong>PowerShell</strong> above (<code>ForEach-Object</code>) rather than pasting Bash <code>for ...; do ... done</code> loops into PowerShell.</span>
         </div>
       </div>
     </section>
 
-    <!-- Requirements & Repo Layout -->
-    <section id="requirements">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-14">
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
-          <div class="md:col-span-6 space-y-4">
-            <div>
-              <p class="text-xs font-mono-code uppercase tracking-wider text-faint mb-1">Environment</p>
-              <h2 class="text-xl font-bold tracking-tight">Requirements</h2>
+    <!-- Requirements & Repository Structure -->
+    <section id="requirements" class="section" style="border-bottom:0;" aria-labelledby="envHeading">
+      <div class="container two-col">
+        <div>
+          <p class="section-kicker">Environment</p>
+          <h2 id="envHeading" class="section-title" style="margin-bottom:20px;">Requirements</h2>
+
+          <div class="info-list">
+            <div class="info-row">
+              <div>
+                <h3>Hermes Agent</h3>
+                <p>Required to register the tap and run <code>hermes skills install</code>.</p>
+              </div>
+              <span class="tier-badge tier-core">Required</span>
             </div>
 
-            <div class="rounded-lg border border-hairline surface divide-y" style="border-color: var(--border);">
-              <div class="p-4 flex items-start justify-between gap-4">
-                <div>
-                  <div class="text-sm font-medium">Hermes Agent</div>
-                  <div class="text-xs text-muted mt-0.5">Required to register the tap and run <code class="font-mono-code">hermes skills install</code>.</div>
-                </div>
-                <span class="text-xs font-mono-code px-2 py-0.5 rounded badge-core shrink-0">Required</span>
+            <div class="info-row">
+              <div>
+                <h3>PowerShell 5.1+ / 7+ or Bash</h3>
+                <p>Native cross-platform shell support on Windows, Linux, and macOS.</p>
               </div>
+              <span class="tier-badge tier-core">Required</span>
+            </div>
 
-              <div class="p-4 flex items-start justify-between gap-4">
-                <div>
-                  <div class="text-sm font-medium">PowerShell 5.1+ / 7+ or Bash</div>
-                  <div class="text-xs text-muted mt-0.5">Native shell support on Windows, Linux, and macOS.</div>
-                </div>
-                <span class="text-xs font-mono-code px-2 py-0.5 rounded badge-core shrink-0">Required</span>
+            <div class="info-row">
+              <div>
+                <h3>Python 3</h3>
+                <p>Optional — used for PDF export in <code>college-report-card</code> and local skill validation / eval scripts.</p>
               </div>
-
-              <div class="p-4 flex items-start justify-between gap-4">
-                <div>
-                  <div class="text-sm font-medium">Python</div>
-                  <div class="text-xs text-muted mt-0.5">Optional — used for PDF export in <code class="font-mono-code">college-report-card</code>.</div>
-                </div>
-                <span class="text-xs font-mono-code px-2 py-0.5 rounded badge-ext shrink-0">Optional</span>
-              </div>
+              <span class="tier-badge tier-extended">Optional</span>
             </div>
           </div>
+        </div>
 
-          <div class="md:col-span-6 space-y-4">
-            <div>
-              <p class="text-xs font-mono-code uppercase tracking-wider text-faint mb-1">Repository</p>
-              <h2 class="text-xl font-bold tracking-tight">Structure</h2>
-            </div>
+        <div>
+          <p class="section-kicker">Repository</p>
+          <h2 class="section-title" style="margin-bottom:20px;">Structure</h2>
 
-            <div class="rounded-lg border border-hairline surface p-4 font-mono-code text-xs leading-6">
-              <div class="text-faint mb-1">JovianOps/cortex (main)</div>
-              <div class="space-y-0.5">
-                <div><span class="accent-text">skills/</span> <span class="text-faint">— 10 core Hermes skills</span></div>
-                <div><span class="accent-text">premium-skills/</span> <span class="text-faint">— 10 extended skills</span></div>
-                <div><span>assets/</span> <span class="text-faint">— adaptive light &amp; dark SVG banners</span></div>
-                <div><span>scripts/</span> <span class="text-faint">— validation &amp; packaging scripts</span></div>
-                <div><span>zips/ &amp; premium-zips/</span> <span class="text-faint">— packaged archives</span></div>
-                <div><span>.github/</span> <span class="text-faint">— CI workflows &amp; issue/PR templates</span></div>
-                <div><span>CONTRIBUTING.md</span> <span class="text-faint">— contribution guide</span></div>
-                <div><span>LICENSE</span> <span class="text-faint">— MIT License</span></div>
-                <div><span>README.md</span> <span class="text-faint">— full install reference</span></div>
-              </div>
-              <div class="mt-4 pt-3 border-t border-hairline flex items-center justify-between">
-                <span class="text-muted">Public repository</span>
-                <a href="https://github.com/JovianOps/cortex" target="_blank" rel="noopener noreferrer" class="accent-text hover:underline underline-offset-4">
-                  github.com/JovianOps/cortex <span class="inline-block align-middle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg></span>
-                </a>
-              </div>
+          <div class="info-list">
+            <div class="repo-tree">
+              <div style="color:var(--text-muted);margin-bottom:8px;">JovianOps/cortex (main)</div>
+              <div class="repo-tree-row"><span class="repo-tree-path accent">skills/</span> <span class="repo-tree-note">— 10 core Hermes skills (v0.2.0)</span></div>
+              <div class="repo-tree-row"><span class="repo-tree-path accent">premium-skills/</span> <span class="repo-tree-note">— 10 extended engineering skills (v0.2.0)</span></div>
+              <div class="repo-tree-row"><span class="repo-tree-path">evals/</span> <span class="repo-tree-note">— 20 paired 100-pt A/B eval rubrics</span></div>
+              <div class="repo-tree-row"><span class="repo-tree-path">scripts/</span> <span class="repo-tree-note">— package, validate &amp; eval CLI tools</span></div>
+              <div class="repo-tree-row"><span class="repo-tree-path">zips/ &amp; premium-zips/</span> <span class="repo-tree-note">— CI-verified archives</span></div>
+              <div class="repo-tree-row"><span class="repo-tree-path">assets/</span> <span class="repo-tree-note">— adaptive light &amp; dark SVG banners</span></div>
+              <div class="repo-tree-row"><span class="repo-tree-path">.github/</span> <span class="repo-tree-note">— CI workflows &amp; issue/PR templates</span></div>
+              <div class="repo-tree-row"><span class="repo-tree-path">README.md · CONTRIBUTING.md · LICENSE</span></div>
             </div>
           </div>
         </div>
@@ -514,29 +1924,87 @@
   </main>
 
   <!-- Footer -->
-  <footer class="border-t border-hairline">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted">
-      <div class="flex items-center gap-3 font-mono-code">
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="mono" style="font-size:0.8rem;">
         <span>JovianOps/cortex</span>
-        <span class="text-faint">&middot;</span>
+        <span aria-hidden="true"> &middot; </span>
+        <span>v0.2.0</span>
+        <span aria-hidden="true"> &middot; </span>
         <span>MIT License</span>
       </div>
-      <div class="flex items-center gap-4">
-        <a href="#skills" class="hover:underline underline-offset-4">Skills</a>
-        <a href="#install" class="hover:underline underline-offset-4">Install</a>
-        <a href="https://github.com/JovianOps/cortex" target="_blank" rel="noopener noreferrer" class="hover:underline underline-offset-4">
-          GitHub <span class="inline-block align-middle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg></span>
-        </a>
-      </div>
+      <ul class="footer-links">
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a href="https://github.com/JovianOps/cortex/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing</a></li>
+        <li><a href="https://github.com/JovianOps/cortex" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+      </ul>
     </div>
   </footer>
 
-  <!-- Toast -->
-  <div id="toast" role="status" aria-live="polite"
-    class="fixed bottom-5 right-5 z-50 px-3.5 py-2 rounded-md text-xs font-mono-code shadow-lg transition-all duration-150 toast-leave"
-    style="background-color: var(--text); color: var(--bg);">
-    Copied to clipboard
+  <!-- Native Modal Skill Inspector (<dialog> with closedby="any", no redundant ARIA roles) -->
+  <dialog id="skillDialog" class="skill-dialog" closedby="any" aria-labelledby="dialogTitle">
+    <div class="dialog-head">
+      <div>
+        <span id="dialogTierBadge" class="tier-badge tier-core">Core · v0.2.0</span>
+        <h2 id="dialogTitle" class="dialog-title">skill-name</h2>
+      </div>
+      <button id="dialogCloseBtn" type="button" class="btn btn-sm" aria-label="Close skill details" autofocus>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <p id="dialogDescription" style="margin:0;color:var(--text-muted);font-size:0.95rem;"></p>
+
+      <div>
+        <h3 class="dialog-section-label">When to Use</h3>
+        <ul id="dialogHighlights" class="dialog-highlights"></ul>
+      </div>
+
+      <div>
+        <h3 class="dialog-section-label">Tags</h3>
+        <ul id="dialogTags" class="skill-tags"></ul>
+      </div>
+
+      <div>
+        <h3 class="dialog-section-label">Install Command</h3>
+        <div class="code-surface" style="border-radius:10px;padding:14px 16px;">
+          <pre id="dialogCommand"></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-foot">
+      <a id="dialogSourceLink" href="https://github.com/JovianOps/cortex" target="_blank" rel="noopener noreferrer" class="btn btn-sm">
+        <span>Read full SKILL.md</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+      </a>
+      <button id="dialogCopyBtn" type="button" class="btn btn-primary btn-sm">Copy install command</button>
+    </div>
+  </dialog>
+
+  <!-- Named Notification Region + Native Top-Layer Manual Popover Toast -->
+  <div role="region" aria-label="Notifications">
+    <div id="toast" popover="manual" class="toast-popover">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.4" aria-hidden="true" style="flex-shrink:0;"><path d="M20 6 9 17l-5-5"/></svg>
+      <span id="toastText" class="toast-text">Copied to clipboard</span>
+      <button id="toastCloseBtn" type="button" class="toast-close" popovertarget="toast" popovertargetaction="hide" aria-label="Dismiss notification">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
   </div>
+
+  <!-- Pre-populated polite live region fallback for browsers without document.ariaNotify() -->
+  <p class="visually-hidden">Status notifications</p>
+  <div id="srLiveRegion" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Progressive polyfill for Popover API ONLY when native support is missing -->
+  <script type="module">
+    if (!Object.hasOwn(HTMLElement.prototype, "popover")) {
+      import("https://unpkg.com/@oddbird/popover-polyfill@latest/dist/popover.min.js").catch(() => {});
+    }
+  </script>
 
   <script>
     const SKILLS = [
@@ -544,121 +2012,261 @@
         slug: 'academic-assistant',
         dir: 'skills',
         tier: 'core',
-        description: 'Core academic assistant: report cards, coding, 3D modeling, anti-hallucination, persistent memory'
-      },
-      {
-        slug: 'college-report-card',
-        dir: 'skills',
-        tier: 'core',
-        description: 'Deterministic report card generator from structured grade data (optional Python for PDF export)'
+        version: '0.2.0',
+        description: 'Orchestrate grading, coding, and 3D academic workflows.',
+        tags: ['education', 'coding', '3d-modeling', 'report-cards'],
+        highlights: [
+          'Multi-domain coursework tasks combining data processing, grading, code, or 3D modeling',
+          'Deterministic Decimal grade calculation and anti-hallucination verification gates',
+          'Persistent context.json state management across multi-session projects'
+        ]
       },
       {
         slug: 'anti-hallucination',
         dir: 'skills',
         tier: 'core',
-        description: 'Anti-hallucination measures and validation'
+        version: '0.2.0',
+        description: 'Verify AI claims and code with deterministic audit gates.',
+        tags: ['anti-hallucination', 'validation', 'verification', 'fact-checking'],
+        highlights: [
+          '5-layer verification pipeline: claim extraction, AST/import checks, math reconciliation, provenance tags',
+          'Explicit [VERIFIED-TOOL], [VERIFIED-FILE], [INFERRED], [UNVERIFIED], and [CONTRADICTED] matrix',
+          'Catches phantom kwargs, deprecated APIs, math drift, and unverified CVEs'
+        ]
       },
       {
         slug: 'blender-3d-modeling',
         dir: 'skills',
         tier: 'core',
-        description: 'Blender 3D modeling guidance with validation'
+        version: '0.2.0',
+        description: 'Build and validate Blender 3D meshes with bmesh checks.',
+        tags: ['3d-modeling', 'blender', 'modeling', 'validation'],
+        highlights: [
+          'Blender 3.x / 4.x aware non-destructive workflows and transform-apply gates',
+          'Headless bpy/bmesh audit script checking non-manifold edges, loose verts, and unapplied scale',
+          'Export pre-flight checks for Unity/Unreal/Godot glTF & watertight 3D printing'
+        ]
       },
       {
         slug: 'code-review-assistant',
         dir: 'skills',
         tier: 'core',
-        description: 'Automated code review with deterministic checks'
+        version: '0.2.0',
+        description: 'Run evidence-backed code reviews with severity rubrics.',
+        tags: ['code-review', 'validation', 'anti-hallucination', 'quality'],
+        highlights: [
+          'Diff-first review backed by real linter/typechecker/test output',
+          'Structured P0–P3 severity rubric with exact file:line evidence and minimal fixes',
+          'Targets boundary bugs, concurrency races, resource leaks, and trust-boundary security flaws'
+        ]
+      },
+      {
+        slug: 'college-report-card',
+        dir: 'skills',
+        tier: 'core',
+        version: '0.2.0',
+        description: 'Generate exact report cards using Decimal grade scripts.',
+        tags: ['education', 'report-cards', 'college', 'grading'],
+        highlights: [
+          'Zero LLM arithmetic — Python Decimal (ROUND_HALF_UP) with rubric weight-sum validation',
+          'Duplicate student ID quarantine, HTML escaping, and metric-grounded comments',
+          'Automated post-render reconciliation and audit_summary.json export'
+        ]
       },
       {
         slug: 'documentation-generator',
         dir: 'skills',
         tier: 'core',
-        description: 'Automated documentation generation'
+        version: '0.2.0',
+        description: 'Generate code-verified docs, API specs, and diagrams.',
+        tags: ['documentation', 'generation', 'markdown', 'api-docs'],
+        highlights: [
+          'Extracts real CLI flags, routes, and env vars from source code before writing prose',
+          'Generates grounded Mermaid architecture diagrams and Keep a Changelog entries',
+          'Enforces relative link checks and eliminates phantom commands or fabricated defaults'
+        ]
       },
       {
         slug: 'memory-manager',
         dir: 'skills',
         tier: 'core',
-        description: 'Persistent memory management across sessions'
+        version: '0.2.0',
+        description: 'Persist versioned session memory with staleness checks.',
+        tags: ['memory', 'context', 'persistence', 'anti-forgetting'],
+        highlights: [
+          'Canonical versioned context.json schema separating decisions, constraints, and verified facts',
+          'Append-only decision history (supersede instead of overwrite) and file-hash staleness detection',
+          'Secret-scrubbed atomic writes via temporary file and os.replace'
+        ]
       },
       {
         slug: 'python-coding-assistant',
         dir: 'skills',
         tier: 'core',
-        description: 'Python coding with validation and type hints'
+        version: '0.2.0',
+        description: 'Write typed, linted, and tested Python code reliably.',
+        tags: ['coding', 'python', 'validation', 'anti-hallucination'],
+        highlights: [
+          'Strict type hints, pathlib.Path UTF-8 I/O, Decimal math, and safe subprocess/YAML defaults',
+          'Bans mutable defaults, bare excepts, shell=True interpolation, and unsafe deserialization',
+          'Mandatory py_compile, ruff/mypy, and boundary smoke-test verification gate'
+        ]
       },
       {
         slug: 'testing-automation',
         dir: 'skills',
         tier: 'core',
-        description: 'Test automation with pytest and CI/CD'
+        version: '0.2.0',
+        description: 'Build branch-tested pytest suites with CI coverage gates.',
+        tags: ['testing', 'automation', 'pytest', 'ci-cd'],
+        highlights: [
+          'Parametrized boundary matrices with strict tmp_path and monkeypatch isolation',
+          'Branch coverage configuration (branch = true, fail_under) and anti-tautology checks',
+          'Property-based round-trip invariants and deterministic CI workflow integration'
+        ]
       },
       {
         slug: 'web-scraper',
         dir: 'skills',
         tier: 'core',
-        description: 'Web scraping with validation and rate limiting'
+        version: '0.2.0',
+        description: 'Scrape web data politely with strict schema validation.',
+        tags: ['web-scraping', 'automation', 'data-extraction', 'validation'],
+        highlights: [
+          'robots.txt enforcement via RobotFileParser, explicit User-Agent, and per-domain rate jitter',
+          'Bounded backoff honoring Retry-After plus pagination cycle guards',
+          'Strict schema validation recording None (never fabricated data) with offline HTML fixture tests'
+        ]
       },
       {
         slug: 'api-designer',
         dir: 'premium-skills',
         tier: 'extended',
-        description: 'Design and validate REST/GraphQL APIs from specifications with contract testing'
+        version: '0.2.0',
+        description: 'Design strict OpenAPI and GraphQL specs with contracts.',
+        tags: ['api', 'openapi', 'graphql', 'rest'],
+        highlights: [
+          'OpenAPI 3.1 & GraphQL SDL with cursor pagination and RFC 9457 application/problem+json errors',
+          'Idempotency-Key retries, ETag optimistic concurrency, and strict additionalProperties schemas',
+          'Automated spec linting and executable contract test cases'
+        ]
       },
       {
         slug: 'code-migration',
         dir: 'premium-skills',
         tier: 'extended',
-        description: 'Migrate code between languages, frameworks, or versions with behavior preservation'
+        version: '0.2.0',
+        description: 'Migrate languages and frameworks with parity tests.',
+        tags: ['migration', 'modernization', 'upgrade', 'parity-testing'],
+        highlights: [
+          'Golden-master characterization tests captured BEFORE touching legacy code',
+          'Explicit semantic-trap audits (Py2->3, JS->TS, Pydantic v1->v2, Express->Fastify)',
+          'Side-by-side behavioral parity proof and explicit rollback plan'
+        ]
       },
       {
         slug: 'db-optimizer',
         dir: 'premium-skills',
         tier: 'extended',
-        description: 'Analyze and optimize SQL queries, suggest indexes, and detect performance bottlenecks'
+        version: '0.2.0',
+        description: 'Optimize SQL queries and indexes using EXPLAIN plans.',
+        tags: ['database', 'sql', 'performance', 'indexing'],
+        highlights: [
+          'EXPLAIN (ANALYZE, BUFFERS) diagnosis catching row-estimate skew and non-sargable predicates',
+          'ESR composite & partial index ordering with online-safe CREATE INDEX CONCURRENTLY',
+          'Keyset pagination replacing deep OFFSET, ORM N+1 fixes, and write-amplification trade-offs'
+        ]
       },
       {
         slug: 'devops-pipeline',
         dir: 'premium-skills',
         tier: 'extended',
-        description: 'Generate and validate CI/CD pipelines for GitHub Actions, GitLab CI, and CircleCI'
+        version: '0.2.0',
+        description: 'Build hardened, SHA-pinned CI/CD pipelines across tools.',
+        tags: ['devops', 'ci-cd', 'github-actions', 'gitlab-ci'],
+        highlights: [
+          'Least-privilege permissions blocks, OIDC auth, and script-injection env: guards',
+          'Lockfile-keyed caching, concurrency cancellation, and explicit job timeout-minutes',
+          'YAML & actionlint schema validation for GitHub Actions, GitLab CI, and CircleCI'
+        ]
       },
       {
         slug: 'docker-generator',
         dir: 'premium-skills',
         tier: 'extended',
-        description: 'Generate optimized Dockerfiles, docker-compose, and container orchestration configs'
+        version: '0.2.0',
+        description: 'Generate hardened multi-stage Docker and Compose setups.',
+        tags: ['docker', 'containers', 'docker-compose', 'kubernetes'],
+        highlights: [
+          'Pinned multi-stage Dockerfiles with lockfile-first layer caching and non-root USER',
+          'JSON exec-form CMD for clean SIGTERM handling paired with complete .dockerignore',
+          'Hardened compose.yaml with healthchecks, cap_drop: [ALL], and no-new-privileges'
+        ]
       },
       {
         slug: 'performance-profiler',
         dir: 'premium-skills',
         tier: 'extended',
-        description: 'Profile and optimize code performance — CPU, memory, and I/O bottlenecks'
+        version: '0.2.0',
+        description: 'Profile CPU, memory, and I/O with measured benchmarks.',
+        tags: ['performance', 'profiling', 'benchmarking', 'optimization'],
+        highlights: [
+          'Measure-first harness with warmup runs, median/p95 latency, and tracemalloc/RSS',
+          'Native profiler traces (cProfile, Node --cpu-prof, go test -benchmem) + Amdahl prioritization',
+          'Verified before-vs-after metrics table with strict functional parity check'
+        ]
       },
       {
         slug: 'refactoring-assistant',
         dir: 'premium-skills',
         tier: 'extended',
-        description: 'Refactor code with behavior preservation, complexity reduction, and pattern application'
+        version: '0.2.0',
+        description: 'Refactor complex code safely with parity verification.',
+        tags: ['refactoring', 'clean-code', 'design-patterns', 'complexity'],
+        highlights: [
+          'Green-test precondition and quantified complexity/nesting diagnosis before edits',
+          'Guard clauses, pure-logic extraction, and anti-over-engineering pattern discipline',
+          'Concrete before-vs-after complexity table and full regression verification'
+        ]
       },
       {
         slug: 'security-auditor',
         dir: 'premium-skills',
         tier: 'extended',
-        description: 'Audit code for security vulnerabilities, secrets, and compliance issues'
+        version: '0.2.0',
+        description: 'Audit code for OWASP flaws, secrets, and CWE findings.',
+        tags: ['security', 'owasp', 'audit', 'secrets'],
+        highlights: [
+          'Source-to-sink taint traces mapped to exact CWE IDs and severity rubrics',
+          'Mandatory secret redaction with test-fixture filtering and zero invented CVEs',
+          'Actionable exploit scenarios paired with minimal secure remediation patches'
+        ]
       },
       {
         slug: 'terraform-generator',
         dir: 'premium-skills',
         tier: 'extended',
-        description: 'Generate and validate Terraform/OpenTofu infrastructure as code'
+        version: '0.2.0',
+        description: 'Generate hardened, validated Terraform and OpenTofu IaC.',
+        tags: ['terraform', 'opentofu', 'iac', 'cloud'],
+        highlights: [
+          'Clean multi-file modules with pinned required_version/providers and input validations',
+          'Private-by-default networking, KMS encryption, least-privilege IAM, and prevent_destroy',
+          'terraform fmt/validate verification plus explicit cost and blast-radius notes'
+        ]
       },
       {
         slug: 'unit-test-generator',
         dir: 'premium-skills',
         tier: 'extended',
-        description: 'Generate comprehensive unit tests from source code with coverage analysis'
+        version: '0.2.0',
+        description: 'Generate branch-covering unit tests from source code.',
+        tags: ['testing', 'unit-tests', 'coverage', 'edge-cases'],
+        highlights: [
+          'AST/branch inventory mapping every guard clause and exception to dedicated tests',
+          'Deterministic clocks/seeds, I/O-only mocking, and anti-tautology mutation thinking',
+          'Supports pytest, Vitest/Jest, Go testing, and JUnit 5 with branch coverage proof'
+        ]
       }
     ];
 
@@ -666,49 +2274,209 @@
     const EXTENDED_SLUGS = SKILLS.filter(s => s.tier === 'extended').map(s => s.slug);
 
     const state = {
-      theme: 'light',
       shell: 'bash',
       heroScope: 'core',
       filterTier: 'all',
       searchQuery: '',
       selectedSlugs: new Set(),
-      expandedSlug: null
+      activeDialogSlug: null
     };
 
-    try {
-      const savedTheme = localStorage.getItem('cortex-theme');
-      if (savedTheme === 'dark' || savedTheme === 'light') {
-        state.theme = savedTheme;
+    /* ==========================================================================
+       Theme Toggle (dark-mode-toggle two-state protocol + cross-tab storage sync)
+       ========================================================================== */
+    const colorSchemeMeta = document.querySelector('meta[name="color-scheme"]');
+    const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function getSystemScheme() {
+      return darkMediaQuery.matches ? 'dark' : 'light';
+    }
+
+    function getRenderedScheme() {
+      const current = colorSchemeMeta.content;
+      if (current === 'dark' || current === 'light') return current;
+      return getSystemScheme();
+    }
+
+    function syncMetaFromStorage() {
+      let stored = null;
+      try {
+        stored = localStorage.getItem('color-scheme');
+      } catch (_) {}
+      colorSchemeMeta.content = (stored === 'light' || stored === 'dark') ? stored : 'light dark';
+    }
+
+    document.getElementById('themeToggleBtn').addEventListener('click', () => {
+      const target = getRenderedScheme() === 'dark' ? 'light' : 'dark';
+      const matchesSystem = target === getSystemScheme();
+
+      try {
+        if (matchesSystem) {
+          localStorage.removeItem('color-scheme');
+        } else {
+          localStorage.setItem('color-scheme', target);
+        }
+      } catch (_) {}
+
+      colorSchemeMeta.content = matchesSystem ? 'light dark' : target;
+    });
+
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'color-scheme' || event.key === null) {
+        syncMetaFromStorage();
       }
-    } catch (_) {}
+    });
+
+    /* ==========================================================================
+       Top-Layer Exit Animation Fallback (animate-to-from-top-layer guide)
+       ========================================================================== */
+    let supportsDisplayTransition;
+    function canTransitionDisplay() {
+      if (supportsDisplayTransition !== undefined) return supportsDisplayTransition;
+      if (!window.CSS?.supports?.('transition-behavior', 'allow-discrete') || !document.body) {
+        return false;
+      }
+      const probe = document.createElement('div');
+      probe.style.cssText = 'transition: display 1s allow-discrete !important; display: block;';
+      document.body.appendChild(probe);
+      getComputedStyle(probe).display;
+      probe.style.display = 'none';
+      supportsDisplayTransition = getComputedStyle(probe).display === 'block';
+      probe.remove();
+      return supportsDisplayTransition;
+    }
+
+    function supportsTopLayerExit() {
+      return Boolean(window.CSS?.supports?.('overlay', 'auto') && canTransitionDisplay());
+    }
+
+    async function closeTopLayer(element, closeMethod) {
+      if (!supportsTopLayerExit()) {
+        element.setAttribute('data-closing', '');
+        const animations = typeof element.getAnimations === 'function'
+          ? element.getAnimations({ subtree: true })
+          : [];
+        if (animations.length > 0) {
+          await Promise.race([
+            Promise.allSettled(animations.map(a => a.finished)),
+            new Promise(resolve => setTimeout(resolve, 600))
+          ]);
+        }
+        if (!element.hasAttribute('data-closing')) return;
+        element.removeAttribute('data-closing');
+      }
+      closeMethod();
+    }
+
+    /* ==========================================================================
+       Toast Popover Notifications (persistent-toast-notifications guide)
+       ========================================================================== */
+    const toastEl = document.getElementById('toast');
+    const toastTextEl = document.getElementById('toastText');
+    const toastCloseBtn = document.getElementById('toastCloseBtn');
+    const srLiveRegion = document.getElementById('srLiveRegion');
+    const skillDialog = document.getElementById('skillDialog');
 
     let toastTimer = null;
+    let toastPaused = false;
+    let lastFocusBeforeToast = null;
 
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.classList.remove('toast-leave');
-      toast.classList.add('toast-enter');
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        toast.classList.remove('toast-enter');
-        toast.classList.add('toast-leave');
-      }, 1800);
-    }
-
-    function copyText(text, label) {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(() => {
-          showToast(label || 'Copied to clipboard');
-        }).catch(() => {
-          fallbackCopy(text, label);
-        });
+    function announceStatus(message) {
+      if (typeof document.ariaNotify === 'function') {
+        document.ariaNotify(message);
       } else {
-        fallbackCopy(text, label);
+        srLiveRegion.textContent = '';
+        requestAnimationFrame(() => {
+          srLiveRegion.textContent = message;
+        });
       }
     }
 
-    function fallbackCopy(text, label) {
+    function scheduleToastDismiss() {
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        if (!toastPaused) {
+          hideToast();
+        }
+      }, 2800);
+    }
+
+    function hideToast() {
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = null;
+      if (typeof toastEl.hidePopover === 'function') {
+        try {
+          if (toastEl.matches(':popover-open') || toastEl.classList.contains(':popover-open')) {
+            closeTopLayer(toastEl, () => {
+              try { toastEl.hidePopover(); } catch (_) {}
+            });
+          }
+        } catch (_) {}
+      }
+    }
+
+    function showToast(message) {
+      // Never surface background toast while a modal <dialog> is open (content outside is inert)
+      if (skillDialog.open) {
+        announceStatus(message);
+        return;
+      }
+
+      toastEl.removeAttribute('data-closing');
+      toastTextEl.textContent = message;
+      lastFocusBeforeToast = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+      if (typeof toastEl.showPopover === 'function') {
+        try {
+          toastEl.showPopover();
+        } catch (_) {}
+      }
+
+      announceStatus(message);
+      scheduleToastDismiss();
+    }
+
+    toastEl.addEventListener('focusin', () => {
+      toastPaused = true;
+      if (toastTimer) clearTimeout(toastTimer);
+    });
+
+    toastEl.addEventListener('focusout', (event) => {
+      if (!toastEl.contains(event.relatedTarget)) {
+        toastPaused = false;
+        scheduleToastDismiss();
+      }
+    });
+
+    toastCloseBtn.addEventListener('click', () => {
+      if (lastFocusBeforeToast && lastFocusBeforeToast.isConnected) {
+        lastFocusBeforeToast.focus();
+      }
+    });
+
+    /* ==========================================================================
+       Command Builders & Clipboard Helper
+       ========================================================================== */
+    function copyText(text, label, inlineBtn) {
+      const onSuccess = () => {
+        if (inlineBtn) {
+          const original = inlineBtn.textContent;
+          inlineBtn.textContent = 'Copied!';
+          setTimeout(() => {
+            if (inlineBtn.isConnected) inlineBtn.textContent = original;
+          }, 1600);
+        }
+        showToast(label || 'Copied to clipboard');
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(onSuccess).catch(() => fallbackCopy(text, onSuccess));
+      } else {
+        fallbackCopy(text, onSuccess);
+      }
+    }
+
+    function fallbackCopy(text, onSuccess) {
       const ta = document.createElement('textarea');
       ta.value = text;
       ta.setAttribute('readonly', '');
@@ -718,9 +2486,9 @@
       ta.select();
       try {
         document.execCommand('copy');
-        showToast(label || 'Copied to clipboard');
+        onSuccess();
       } catch (_) {
-        showToast('Copy failed — select manually');
+        showToast('Copy failed — select command manually');
       }
       document.body.removeChild(ta);
     }
@@ -738,29 +2506,29 @@
       ].join('\n');
     }
 
+    function singleSkillCommand(skill, shell) {
+      if (shell === 'powershell') {
+        return `hermes skills tap add JovianOps/cortex; hermes skills install JovianOps/cortex/${skill.dir}/${skill.slug} --yes`;
+      }
+      return [
+        'hermes skills tap add JovianOps/cortex',
+        `hermes skills install JovianOps/cortex/${skill.dir}/${skill.slug} --yes`
+      ].join('\n');
+    }
+
     function buildCustomCommand(selectedSet, shell) {
       const chosen = SKILLS.filter(s => selectedSet.has(s.slug));
       if (chosen.length === 0) {
-        return '# Select one or more skills above to generate a native install command.';
+        return '# Select one or more skills above to assemble a native install command.';
       }
       if (chosen.length === 1) {
-        const item = chosen[0];
-        if (shell === 'powershell') {
-          return `hermes skills tap add JovianOps/cortex; hermes skills install JovianOps/cortex/${item.dir}/${item.slug} --yes`;
-        }
-        return [
-          'hermes skills tap add JovianOps/cortex',
-          `hermes skills install JovianOps/cortex/${item.dir}/${item.slug} --yes`
-        ].join('\n');
+        return singleSkillCommand(chosen[0], shell);
       }
       const allCore = chosen.every(s => s.dir === 'skills');
       const allExt = chosen.every(s => s.dir === 'premium-skills');
-      if (allCore) {
-        return buildBatchCommand('skills', chosen.map(s => s.slug), shell);
-      }
-      if (allExt) {
-        return buildBatchCommand('premium-skills', chosen.map(s => s.slug), shell);
-      }
+      if (allCore) return buildBatchCommand('skills', chosen.map(s => s.slug), shell);
+      if (allExt) return buildBatchCommand('premium-skills', chosen.map(s => s.slug), shell);
+
       const paths = chosen.map(s => `${s.dir}/${s.slug}`);
       if (shell === 'powershell') {
         const list = paths.map(p => `'${p}'`).join(',');
@@ -774,57 +2542,104 @@
       ].join('\n');
     }
 
-    function singleSkillCommand(skill) {
-      return `hermes skills tap add JovianOps/cortex\nhermes skills install JovianOps/cortex/${skill.dir}/${skill.slug} --yes`;
-    }
+    /* ==========================================================================
+       Native Modal Skill Inspector (<dialog> + closedby fallback)
+       ========================================================================== */
+    function openSkillDialog(skill) {
+      state.activeDialogSlug = skill.slug;
+      skillDialog.removeAttribute('data-closing');
 
-    function applyTheme() {
-      document.documentElement.setAttribute('data-theme', state.theme);
-      const iconEl = document.getElementById('themeToggleIcon');
-      const labelEl = document.getElementById('themeToggleLabel');
-      if (state.theme === 'dark') {
-        iconEl.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-        labelEl.textContent = 'Light';
-      } else {
-        iconEl.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-        labelEl.textContent = 'Dark';
+      const badge = document.getElementById('dialogTierBadge');
+      badge.className = `tier-badge ${skill.tier === 'core' ? 'tier-core' : 'tier-extended'}`;
+      badge.textContent = `${skill.tier === 'core' ? 'Core' : 'Extended'} · v${skill.version}`;
+
+      document.getElementById('dialogTitle').textContent = skill.slug;
+      document.getElementById('dialogDescription').textContent = skill.description;
+
+      const highlightsEl = document.getElementById('dialogHighlights');
+      highlightsEl.innerHTML = '';
+      for (const item of skill.highlights) {
+        const li = document.createElement('li');
+        li.textContent = item;
+        highlightsEl.appendChild(li);
       }
-      try {
-        localStorage.setItem('cortex-theme', state.theme);
-      } catch (_) {}
+
+      const tagsEl = document.getElementById('dialogTags');
+      tagsEl.innerHTML = '';
+      for (const tag of skill.tags) {
+        const li = document.createElement('li');
+        li.textContent = `#${tag}`;
+        tagsEl.appendChild(li);
+      }
+
+      document.getElementById('dialogCommand').textContent = singleSkillCommand(skill, state.shell);
+      document.getElementById('dialogSourceLink').href = `https://github.com/JovianOps/cortex/blob/main/${skill.dir}/${skill.slug}/SKILL.md`;
+      document.getElementById('dialogCopyBtn').textContent = 'Copy install command';
+
+      hideToast();
+      skillDialog.showModal();
     }
 
+    document.getElementById('dialogCloseBtn').addEventListener('click', () => {
+      closeTopLayer(skillDialog, () => skillDialog.close('close'));
+    });
+
+    document.getElementById('dialogCopyBtn').addEventListener('click', (event) => {
+      const skill = SKILLS.find(s => s.slug === state.activeDialogSlug);
+      if (!skill) return;
+      copyText(singleSkillCommand(skill, state.shell), `Copied ${skill.slug}`, event.currentTarget);
+    });
+
+    skillDialog.addEventListener('cancel', (event) => {
+      if (!supportsTopLayerExit()) {
+        event.preventDefault();
+        closeTopLayer(skillDialog, () => skillDialog.close());
+      }
+    });
+
+    skillDialog.addEventListener('close', () => {
+      skillDialog.returnValue = '';
+    });
+
+    // Progressive light-dismiss fallback when <dialog closedby="any"> is unsupported (Safari)
+    if (!('closedBy' in HTMLDialogElement.prototype)) {
+      const isOutside = (e, dialog) => {
+        const r = dialog.getBoundingClientRect();
+        return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+      };
+      let pressedOutside = false;
+      skillDialog.addEventListener('pointerdown', (e) => {
+        pressedOutside = isOutside(e, skillDialog);
+      });
+      skillDialog.addEventListener('pointerup', (e) => {
+        if (pressedOutside && isOutside(e, skillDialog)) {
+          closeTopLayer(skillDialog, () => skillDialog.close());
+        }
+      });
+    }
+
+    /* ==========================================================================
+       Rendering Functions
+       ========================================================================== */
     function renderHeroCommand() {
       const dir = state.heroScope === 'core' ? 'skills' : 'premium-skills';
       const slugs = state.heroScope === 'core' ? CORE_SLUGS : EXTENDED_SLUGS;
-      const cmd = buildBatchCommand(dir, slugs, state.shell);
-      document.getElementById('heroCommandCode').textContent = cmd;
+      document.getElementById('heroCommandCode').textContent = buildBatchCommand(dir, slugs, state.shell);
       document.getElementById('heroCommandNote').textContent = state.shell === 'powershell'
         ? 'Windows — PowerShell 5.1+ / 7+ (recommended)'
         : 'Linux / macOS — native Bash loop';
 
       document.querySelectorAll('.hero-scope-btn').forEach(btn => {
-        const active = btn.dataset.heroScope === state.heroScope;
-        btn.classList.toggle('seg-active', active);
-        btn.classList.toggle('seg-inactive', !active);
+        btn.setAttribute('aria-pressed', String(btn.dataset.heroScope === state.heroScope));
       });
-
       document.querySelectorAll('.shell-btn').forEach(btn => {
-        const active = btn.dataset.shell === state.shell;
-        btn.classList.toggle('seg-active', active);
-        btn.classList.toggle('seg-inactive', !active);
+        btn.setAttribute('aria-pressed', String(btn.dataset.shell === state.shell));
       });
     }
 
     function renderInstallGuide() {
-      const singleCmd = [
-        'hermes skills tap add JovianOps/cortex',
-        'hermes skills install JovianOps/cortex/skills/academic-assistant --yes'
-      ].join('\n');
-      document.getElementById('singleGuideCode').textContent = singleCmd;
-
-      const batchCmd = buildBatchCommand('skills', CORE_SLUGS, state.shell);
-      document.getElementById('batchGuideCode').textContent = batchCmd;
+      document.getElementById('singleGuideCode').textContent = singleSkillCommand(SKILLS[0], state.shell);
+      document.getElementById('batchGuideCode').textContent = buildBatchCommand('skills', CORE_SLUGS, state.shell);
       document.getElementById('batchGuideTitle').textContent = state.shell === 'powershell'
         ? '2. Batch install all 10 core skills (PowerShell)'
         : '2. Batch install all 10 core skills (Bash)';
@@ -832,124 +2647,102 @@
 
     function renderBuilder() {
       const count = state.selectedSlugs.size;
-      const badge = document.getElementById('selectedBadge');
-      const codeEl = document.getElementById('customBuilderCode');
-      const metaEl = document.getElementById('builderMeta');
+      document.getElementById('selectedBadge').textContent = `${count} selected`;
+      document.getElementById('customBuilderCode').textContent = buildCustomCommand(state.selectedSlugs, state.shell);
       const copyBtn = document.getElementById('copyBuilderBtn');
-
-      badge.textContent = `${count} selected`;
-      codeEl.textContent = buildCustomCommand(state.selectedSlugs, state.shell);
+      const metaEl = document.getElementById('builderMeta');
 
       if (count === 0) {
-        metaEl.textContent = 'Check skills above or use a preset to generate a command.';
+        metaEl.textContent = 'Check skills above or pick a preset to build a tailored install command.';
         copyBtn.disabled = true;
       } else {
-        const shellName = state.shell === 'powershell' ? 'PowerShell' : 'Bash';
-        metaEl.textContent = `Ready for ${shellName} — ${count} skill${count === 1 ? '' : 's'} queued.`;
+        const shellLabel = state.shell === 'powershell' ? 'PowerShell' : 'Bash';
+        metaEl.textContent = `Ready for ${shellLabel} — ${count} skill${count === 1 ? '' : 's'} queued.`;
         copyBtn.disabled = false;
       }
     }
 
     function renderSkills() {
-      const listEl = document.getElementById('skillsList');
+      const gridEl = document.getElementById('skillsGrid');
       const emptyEl = document.getElementById('emptyState');
       const countEl = document.getElementById('catalogCount');
       const clearBtn = document.getElementById('clearSearchBtn');
+      const kbdHint = document.getElementById('searchKbd');
 
       const q = state.searchQuery.trim().toLowerCase();
-      clearBtn.classList.toggle('hidden', q.length === 0);
+      clearBtn.hidden = q.length === 0;
+      kbdHint.hidden = q.length > 0;
 
       document.querySelectorAll('.tier-btn').forEach(btn => {
-        const active = btn.dataset.tier === state.filterTier;
-        btn.classList.toggle('seg-active', active);
-        btn.classList.toggle('seg-inactive', !active);
+        btn.setAttribute('aria-pressed', String(btn.dataset.tier === state.filterTier));
       });
 
       const filtered = SKILLS.filter(skill => {
         if (state.filterTier !== 'all' && skill.tier !== state.filterTier) return false;
-        if (q) {
-          const hay = `${skill.slug} ${skill.dir} ${skill.description}`.toLowerCase();
-          return hay.includes(q);
-        }
-        return true;
+        if (!q) return true;
+        const hay = `${skill.slug} ${skill.dir} ${skill.description} ${skill.tags.join(' ')}`.toLowerCase();
+        return hay.includes(q);
       });
 
-      countEl.textContent = `Showing ${filtered.length} of ${SKILLS.length}`;
+      countEl.textContent = `Showing ${filtered.length} of ${SKILLS.length} skills`;
 
       if (filtered.length === 0) {
-        listEl.innerHTML = '';
-        emptyEl.classList.remove('hidden');
+        gridEl.innerHTML = '';
+        emptyEl.hidden = false;
         return;
       }
 
-      emptyEl.classList.add('hidden');
-      listEl.innerHTML = filtered.map(skill => {
-        const isSelected = state.selectedSlugs.has(skill.slug);
-        const isExpanded = state.expandedSlug === skill.slug;
-        const badgeClass = skill.tier === 'core' ? 'badge-core' : 'badge-ext';
-        const badgeText = skill.tier === 'core' ? 'skills/' : 'premium-skills/';
+      emptyEl.hidden = true;
+      gridEl.innerHTML = filtered.map(skill => {
+        const checked = state.selectedSlugs.has(skill.slug);
+        const isCore = skill.tier === 'core';
+        const badgeClass = isCore ? 'tier-core' : 'tier-extended';
+        const badgeLabel = isCore ? 'Core' : 'Extended';
+        const badgeIcon = isCore
+          ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="6"/></svg>'
+          : '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15 9 22 9.5 16.5 14 18.2 21 12 17.3 5.8 21 7.5 14 2 9.5 9 9"/></svg>';
 
         return `
-          <div class="skill-row ${isSelected ? 'skill-row-selected' : ''}" data-slug="${skill.slug}">
-            <div class="grid grid-cols-12 gap-3 px-4 py-3.5 items-center">
-              <div class="col-span-2 sm:col-span-1 flex items-center">
-                <input type="checkbox"
-                  class="skill-checkbox h-4 w-4 rounded cursor-pointer accent-[#B8421B]"
-                  data-slug="${skill.slug}"
-                  aria-label="Select ${skill.slug}"
-                  ${isSelected ? 'checked' : ''} />
+          <article class="skill-card" data-slug="${skill.slug}">
+            <header>
+              <div class="skill-title-group">
+                <label class="skill-pick" for="pick-${skill.slug}">
+                  <input id="pick-${skill.slug}" type="checkbox" class="skill-checkbox" data-slug="${skill.slug}" ${checked ? 'checked' : ''} />
+                  <span class="visually-hidden">Select ${skill.slug} for batch install</span>
+                </label>
+                <h3 class="skill-name">${skill.slug}</h3>
               </div>
+              <span class="tier-badge ${badgeClass}">${badgeIcon}<span>${badgeLabel}</span></span>
+            </header>
 
-              <div class="col-span-10 md:col-span-4 flex flex-wrap items-center gap-2 min-w-0">
-                <button type="button" class="expand-btn text-left font-mono-code text-sm font-medium hover:underline underline-offset-4 truncate cursor-pointer" data-slug="${skill.slug}" style="color: var(--text);">
-                  ${skill.slug}
-                </button>
-                <span class="text-[11px] font-mono-code px-1.5 py-0.5 rounded ${badgeClass}">${badgeText}</span>
-              </div>
+            <p class="skill-desc">${skill.description}</p>
 
-              <div class="col-span-12 md:col-span-5 text-xs sm:text-sm text-muted leading-snug">
-                ${skill.description}
-              </div>
+            <ul class="skill-tags" aria-label="${skill.slug} tags">
+              ${skill.tags.map(t => `<li>#${t}</li>`).join('')}
+            </ul>
 
-              <div class="col-span-12 md:col-span-2 flex items-center md:justify-end gap-2">
-                <button type="button" class="copy-one-btn text-xs font-mono-code px-2.5 py-1 rounded border border-hairline surface hover:opacity-80 cursor-pointer" data-slug="${skill.slug}" style="color: var(--text);">
-                  Copy
-                </button>
-                <button type="button" class="expand-btn text-xs px-2 py-1 rounded text-muted hover:opacity-80 cursor-pointer" data-slug="${skill.slug}" aria-expanded="${isExpanded}">
-                  ${isExpanded ? 'Hide' : 'Cmd'}
-                </button>
+            <footer>
+              <span class="skill-path-label">${skill.dir}/</span>
+              <div class="card-actions">
+                <button type="button" class="btn btn-sm inspect-btn" data-slug="${skill.slug}">Inspect<span class="visually-hidden"> ${skill.slug}</span></button>
+                <button type="button" class="btn btn-sm copy-one-btn" data-slug="${skill.slug}">Copy<span class="visually-hidden"> ${skill.slug} install command</span></button>
               </div>
-            </div>
-
-            ${isExpanded ? `
-              <div class="px-4 pb-4 pt-1">
-                <div class="code-block rounded-md p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <pre class="font-mono-code text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap break-words m-0">${singleSkillCommand(skill)}</pre>
-                  <button type="button" class="copy-one-btn text-xs font-mono-code px-2.5 py-1.5 rounded border border-[#3A3A35] text-[#ECEBE4] hover:opacity-80 shrink-0 self-start sm:self-center cursor-pointer" data-slug="${skill.slug}">
-                    Copy install
-                  </button>
-                </div>
-              </div>
-            ` : ''}
-          </div>
+            </footer>
+          </article>
         `;
       }).join('');
     }
 
     function renderAll() {
-      applyTheme();
       renderHeroCommand();
       renderInstallGuide();
       renderSkills();
       renderBuilder();
     }
 
-    // Event bindings
-    document.getElementById('themeToggleBtn').addEventListener('click', () => {
-      state.theme = state.theme === 'light' ? 'dark' : 'light';
-      applyTheme();
-    });
-
+    /* ==========================================================================
+       Event Bindings
+       ========================================================================== */
     document.querySelectorAll('.hero-scope-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         state.heroScope = btn.dataset.heroScope;
@@ -963,6 +2756,10 @@
         renderHeroCommand();
         renderInstallGuide();
         renderBuilder();
+        if (skillDialog.open && state.activeDialogSlug) {
+          const active = SKILLS.find(s => s.slug === state.activeDialogSlug);
+          if (active) document.getElementById('dialogCommand').textContent = singleSkillCommand(active, state.shell);
+        }
       });
     });
 
@@ -978,52 +2775,54 @@
       });
     });
 
-    document.getElementById('skillSearchInput').addEventListener('input', e => {
+    const searchInput = document.getElementById('skillSearchInput');
+    searchInput.addEventListener('input', (e) => {
       state.searchQuery = e.target.value;
       renderSkills();
     });
 
     document.getElementById('clearSearchBtn').addEventListener('click', () => {
       state.searchQuery = '';
-      document.getElementById('skillSearchInput').value = '';
+      searchInput.value = '';
       renderSkills();
+      searchInput.focus();
     });
 
     document.getElementById('resetFiltersBtn').addEventListener('click', () => {
       state.filterTier = 'all';
       state.searchQuery = '';
-      document.getElementById('skillSearchInput').value = '';
+      searchInput.value = '';
       renderSkills();
     });
 
-    document.getElementById('skillsList').addEventListener('change', e => {
+    // Quick `/` keyboard shortcut to focus skill search when not already typing
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && !skillDialog.open && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        searchInput.focus();
+      }
+    });
+
+    document.getElementById('skillsGrid').addEventListener('change', (e) => {
       if (e.target.classList.contains('skill-checkbox')) {
         const slug = e.target.dataset.slug;
-        if (e.target.checked) {
-          state.selectedSlugs.add(slug);
-        } else {
-          state.selectedSlugs.delete(slug);
-        }
-        renderSkills();
+        if (e.target.checked) state.selectedSlugs.add(slug);
+        else state.selectedSlugs.delete(slug);
         renderBuilder();
       }
     });
 
-    document.getElementById('skillsList').addEventListener('click', e => {
+    document.getElementById('skillsGrid').addEventListener('click', (e) => {
       const copyBtn = e.target.closest('.copy-one-btn');
       if (copyBtn) {
         const skill = SKILLS.find(s => s.slug === copyBtn.dataset.slug);
-        if (skill) {
-          copyText(singleSkillCommand(skill), `Copied ${skill.slug}`);
-        }
+        if (skill) copyText(singleSkillCommand(skill, state.shell), `Copied ${skill.slug}`);
         return;
       }
-
-      const expandBtn = e.target.closest('.expand-btn');
-      if (expandBtn) {
-        const slug = expandBtn.dataset.slug;
-        state.expandedSlug = state.expandedSlug === slug ? null : slug;
-        renderSkills();
+      const inspectBtn = e.target.closest('.inspect-btn');
+      if (inspectBtn) {
+        const skill = SKILLS.find(s => s.slug === inspectBtn.dataset.slug);
+        if (skill) openSkillDialog(skill);
       }
     });
 
@@ -1047,18 +2846,15 @@
 
     document.getElementById('copyBuilderBtn').addEventListener('click', () => {
       if (state.selectedSlugs.size === 0) return;
-      const cmd = document.getElementById('customBuilderCode').textContent;
-      copyText(cmd, `Copied ${state.selectedSlugs.size} skill command`);
+      copyText(document.getElementById('customBuilderCode').textContent, `Copied ${state.selectedSlugs.size}-skill command`);
     });
 
     document.getElementById('copySingleGuideBtn').addEventListener('click', () => {
-      const cmd = document.getElementById('singleGuideCode').textContent;
-      copyText(cmd, 'Copied single-skill install');
+      copyText(document.getElementById('singleGuideCode').textContent, 'Copied single-skill command');
     });
 
     document.getElementById('copyBatchGuideBtn').addEventListener('click', () => {
-      const cmd = document.getElementById('batchGuideCode').textContent;
-      copyText(cmd, `Copied batch install (${state.shell})`);
+      copyText(document.getElementById('batchGuideCode').textContent, `Copied batch command (${state.shell})`);
     });
 
     renderAll();
