@@ -2,7 +2,6 @@
 """Validate Cortex skill metadata, required sections, and ZIP distributions."""
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 import yaml
