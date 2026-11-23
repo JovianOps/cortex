@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import json
-import re
 import subprocess
 import sys
 import tempfile
+from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,11 +16,39 @@ PACKS_JSON = ROOT / "packs.json"
 A11Y_SCAN = ROOT / "premium-skills" / "accessibility-auditor" / "scripts" / "a11y_scan.py"
 
 
+class _InlineScriptExtractor(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self._in_inline_script = False
+        self._buf: list[str] = []
+        self.scripts: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag.lower() == "script":
+            attr_map = {k.lower(): v for k, v in attrs}
+            if "src" not in attr_map:
+                self._in_inline_script = True
+                self._buf = []
+
+    def handle_data(self, data: str) -> None:
+        if self._in_inline_script:
+            self._buf.append(data)
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag.lower() == "script" and self._in_inline_script:
+            self._in_inline_script = False
+            body = "".join(self._buf)
+            if body.strip():
+                self.scripts.append(body)
+
+
 def check_inline_js(html: str) -> None:
-    scripts = re.findall(r"<script>([\s\S]*?)</script>", html)
-    if not scripts:
+    parser = _InlineScriptExtractor()
+    parser.feed(html)
+    parser.close()
+    if not parser.scripts:
         raise RuntimeError("No inline <script> blocks found in index.html")
-    for idx, body in enumerate(scripts, 1):
+    for idx, body in enumerate(parser.scripts, 1):
         with tempfile.NamedTemporaryFile("w", suffix=".js", encoding="utf-8", delete=False) as tf:
             tf.write(body)
             tmp_path = Path(tf.name)
