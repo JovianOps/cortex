@@ -32,7 +32,7 @@
     <a href="#extended-skills">
       <img src="https://img.shields.io/badge/extended_skills-14-B8421B?style=flat" alt="14 Extended Skills" />
     </a>
-    <a href="checksums.json">
+    <a href="#verify-authenticity-sha-256--provenance">
       <img src="https://img.shields.io/badge/integrity-SHA--256%20Verified-16A34A?style=flat" alt="SHA-256 Verified" />
     </a>
     <a href="LICENSE">
@@ -52,6 +52,8 @@
     <a href="#extended-skills">Extended Skills</a>
     &nbsp;&middot;&nbsp;
     <a href="#installation">Installation</a>
+    &nbsp;&middot;&nbsp;
+    <a href="#verify-authenticity-sha-256--provenance">Verify SHA-256</a>
     &nbsp;&middot;&nbsp;
     <a href="#validation-packaging--benchmarks">Development</a>
     &nbsp;&middot;&nbsp;
@@ -296,6 +298,51 @@ done
 ```
 
 </details>
+
+## Verify Authenticity (SHA-256 & Provenance)
+
+Every official release of **`@jovianops/cortex`** is published from GitHub Actions with **SLSA v1 Provenance** and deterministic **SHA-256 checksums** so you can verify you installed the real, untampered release before your AI agent reads a single instruction.
+
+### Official `@jovianops/cortex@0.3.0` Package Hashes
+
+| Artifact | Algorithm | Expected Fingerprint |
+| :--- | :--- | :--- |
+| **`@jovianops/cortex@0.3.0`** npm tarball (`cortex-0.3.0.tgz`) | **SHA-256** | `852506860c9de0f4673a4d7fcda7456f2fa3fe743deadfeb185b95fa50e46117` |
+| **`@jovianops/cortex@0.3.0`** npm tarball (SRI) | **SHA-512** | `sha512-s5fzpR6o1vwy5Z0IXr6T0frqY7kRnsw2qIFidMSw+monuHB3JAhAbjJTAP8JBV5jwJTpJeX2zawhmuqztIcxsA==` |
+| **SLSA v1 Provenance Attestation** | Sigstore / OIDC | [`registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@0.3.0`](https://registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@0.3.0) |
+| **All 24 Skills, 10 Bundled Scripts & 24 ZIPs** | **SHA-256** | [`checksums.json`](checksums.json) |
+
+### 1. Verify the npm Package Tarball SHA-256
+
+**Linux / macOS (Bash):**
+
+```bash
+# Should print: 852506860c9de0f4673a4d7fcda7456f2fa3fe743deadfeb185b95fa50e46117
+curl -fsSL https://registry.npmjs.org/@jovianops/cortex/-/cortex-0.3.0.tgz | sha256sum
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Should print: 852506860C9DE0F4673A4D7FCDA7456F2FA3FE743DEADFEB185B95FA50E46117
+$tmp = "$env:TEMP\cortex-0.3.0.tgz"
+Invoke-WebRequest https://registry.npmjs.org/@jovianops/cortex/-/cortex-0.3.0.tgz -OutFile $tmp
+(Get-FileHash $tmp -Algorithm SHA256).Hash
+Remove-Item $tmp
+```
+
+### 2. Verify npm SLSA Provenance & Installed Skill Integrity
+
+```bash
+# Verify registry signatures & SLSA v1 provenance attestation
+npm audit signatures
+
+# Verify all 24 bundled skills (34 files) & any installed .cortex-lock.json against checksums.json
+npx @jovianops/cortex doctor
+
+# Verify a specific agent's installed skills for tampering or drift
+npx @jovianops/cortex status --agent claude-code
+```
 
 ## Requirements
 
