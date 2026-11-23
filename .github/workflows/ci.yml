@@ -27,8 +27,17 @@ jobs:
       - name: Validate all SKILL.md files
         run: python scripts/validate_skills.py
 
+      - name: Verify ZIP archives and SHA-256 checksums
+        run: python scripts/package_skills.py --check
+
       - name: Validate multi-agent plugin & extension manifests
         run: python scripts/validate_manifests.py
+
+      - name: Audit skill quality & validate 24-task eval suite
+        run: python scripts/eval_skills.py
+
+      - name: Run automated test suite
+        run: python -m unittest discover -s tests -v
 
       - name: Check for empty skill directories
         run: |

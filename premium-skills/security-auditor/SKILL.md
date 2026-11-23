@@ -1,7 +1,7 @@
 ---
 name: security-auditor
 description: Audit code for OWASP flaws, secrets, and CWE findings.
-version: 0.2.0
+version: 0.3.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Audit source code, configurations, and dependency manifests for OWASP Top 10 vul
 - Offensive exploitation against systems you do not own or have explicit authorization to test
 
 ## How to Run
+
+> **Bundled Helper Script (`v0.3.0`):** Run `python premium-skills/security-auditor/scripts/secret_scan.py .` for offline, auto-redacted CWE secret and dangerous-sink pre-scanning.
 
 ```bash
 hermes skills tap add JovianOps/cortex

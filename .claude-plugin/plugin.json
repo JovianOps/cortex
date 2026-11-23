@@ -1,7 +1,7 @@
 {
   "name": "cortex",
-  "version": "0.2.0",
-  "description": "20 modular, deterministic v0.2.0 skill playbooks for Claude Code, Codex, Gemini CLI, Cursor, GitHub Copilot, OpenCode, OpenClaw, Goose, Aider, Cline, and Hermes Agent.",
+  "version": "0.3.0",
+  "description": "24 modular, deterministic v0.3.0 skill playbooks with bundled helper scripts for Claude Code, Codex, Gemini CLI, Cursor, GitHub Copilot, OpenCode, OpenClaw, Goose, Aider, Cline, and Hermes Agent.",
   "author": {
     "name": "Athalla Jovian Maharsa",
     "url": "https://github.com/JovianOps"
@@ -40,13 +40,17 @@
     "./skills/python-coding-assistant",
     "./skills/testing-automation",
     "./skills/web-scraper",
+    "./premium-skills/accessibility-auditor",
     "./premium-skills/api-designer",
     "./premium-skills/code-migration",
     "./premium-skills/db-optimizer",
     "./premium-skills/devops-pipeline",
     "./premium-skills/docker-generator",
+    "./premium-skills/incident-response",
+    "./premium-skills/observability-setup",
     "./premium-skills/performance-profiler",
     "./premium-skills/refactoring-assistant",
+    "./premium-skills/release-engineering",
     "./premium-skills/security-auditor",
     "./premium-skills/terraform-generator",
     "./premium-skills/unit-test-generator"

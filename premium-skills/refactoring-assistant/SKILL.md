@@ -1,7 +1,7 @@
 ---
 name: refactoring-assistant
 description: Refactor complex code safely with parity verification.
-version: 0.2.0
+version: 0.3.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

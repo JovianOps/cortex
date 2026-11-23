@@ -1,7 +1,7 @@
 ---
 name: memory-manager
 description: Persist versioned session memory with staleness checks.
-version: 0.2.0
+version: 0.3.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
