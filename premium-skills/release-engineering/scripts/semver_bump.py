@@ -9,7 +9,6 @@ import argparse
 import json
 import re
 import subprocess
-import sys
 from pathlib import Path
 
 SEMVER_RE = re.compile(r"^v?(\d+)\.(\d+)\.(\d+)$")

@@ -3,28 +3,48 @@ name: CI
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/') }}
 
 permissions:
   contents: read
 
 jobs:
   validate-skills:
-    name: Validate Skills
+    name: Validate Skills (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.12', '3.13']
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Python
-        uses: actions/setup-python@v7
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version: '3.15'
+          python-version: ${{ matrix.python-version }}
 
-      - name: Install validation deps
-        run: pip install pyyaml ruff
+      - name: Install validation dependencies
+        run: python -m pip install --upgrade pip pyyaml ruff
 
-      - name: Validate all SKILL.md files
+      - name: Check Python syntax and lint rules
+        run: |
+          python -m compileall -q -f scripts skills premium-skills tests
+          ruff check --select E9,F scripts skills premium-skills tests
+
+      - name: Validate all YAML files (including workflows)
+        run: python scripts/validate_yaml.py
+
+      - name: Validate all SKILL.md files and ZIP distributions
         run: python scripts/validate_skills.py
 
       - name: Verify ZIP archives and SHA-256 checksums
@@ -42,77 +62,91 @@ jobs:
       - name: Run Cortex CLI doctor smoke check
         run: python scripts/cortex.py doctor
 
-      - name: Check for empty skill directories
-        run: |
-          for dir in skills/*/; do
-            if [ ! -f "$dir/SKILL.md" ]; then
-              echo "::error::$dir: Missing SKILL.md"
-              exit 1
-            fi
-          done
-          echo "All skill directories have SKILL.md"
-
-  validate-scripts:
-    name: Validate Scripts
+  validate-web-and-docs:
+    name: Validate Web & Docs
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          package-manager-cache: false
 
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version: '3.15'
+          python-version: '3.12'
 
-      - name: Run Python script syntax checks
-        run: |
-          python -m py_compile scripts/*.py 2>/dev/null || true
-          find . -name "*.py" -exec python -m py_compile {} \;
+      - name: Verify Node CLI launcher syntax
+        run: node --check bin/cortex.mjs
 
-  validate-markdown:
-    name: Validate Markdown
+      - name: Verify index.html JS, checksums/packs parity, and WCAG 2.2 AA
+        run: python scripts/verify_site.py
+
+      - name: Check README.md local links and heading anchors
+        run: python skills/documentation-generator/scripts/check_docs.py README.md
+
+  package-smoke-test:
+    name: npm Package Smoke Test
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Node
-        uses: actions/setup-node@v7
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '26'
-
-      - name: Install markdownlint
-        run: npm install -g markdownlint-cli
-
-      - name: Lint markdown files
-        run: markdownlint '**/*.md' --config .markdownlint.json || true
-
-  validate-yaml:
-    name: Validate YAML
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
+          node-version: '24'
+          package-manager-cache: false
 
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version: '3.15'
+          python-version: '3.12'
 
-      - name: Install pyyaml
-        run: pip install pyyaml
+      - name: Pack @jovianops/cortex and test installed CLI in isolation
+        run: |
+          TARBALL=$(npm pack --silent)
+          TMPDIR=$(mktemp -d)
+          trap 'rm -rf "$TMPDIR" "$TARBALL"' EXIT
+          npm --prefix "$TMPDIR" install --no-save "./$TARBALL"
+          (
+            cd "$TMPDIR"
+            ./node_modules/.bin/cortex detect
+            ./node_modules/.bin/cortex doctor
+            ./node_modules/.bin/cortex packs
+            ./node_modules/.bin/cortex search --has-script
+            ./node_modules/.bin/cortex audit
+            ./node_modules/.bin/cortex install --agent claude-code --pack fullstack --scope project
+            test -f "$TMPDIR/.claude/skills/security-auditor/scripts/secret_scan.py"
+          )
 
-      - name: Validate YAML files
-        run: python scripts/validate_yaml.py
-
-  security-scan:
-    name: Security Scan
+  security-and-workflows:
+    name: Security & Workflow Hardening
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       security-events: write
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+
+      - name: Audit GitHub Actions workflows (Cortex lint_actions.py)
+        run: python premium-skills/devops-pipeline/scripts/lint_actions.py .github/workflows
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -124,20 +158,30 @@ jobs:
           vuln-type: 'os,library'
 
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v4
+        if: always() && hashFiles('trivy-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4
         with:
           sarif_file: 'trivy-results.sarif'
           category: 'trivy'
 
   release:
     name: Release
+    needs:
+      - validate-skills
+      - validate-web-and-docs
+      - package-smoke-test
+      - security-and-workflows
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Create Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           generate_release_notes: true
           draft: false
