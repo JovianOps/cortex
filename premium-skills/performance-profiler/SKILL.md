@@ -1,38 +1,95 @@
 ---
 name: performance-profiler
-description: Profile and optimize code performance — CPU, memory, and I/O bottlenecks.
-version: 0.1.0
-author: Athalla Jovian Maharsa
+description: Profile CPU, memory, and I/O with measured benchmarks.
+version: 0.2.0
+author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
+metadata:
+  hermes:
+    tags: [performance, profiling, benchmarking, optimization, memory]
+    related_skills: [db-optimizer, python-coding-assistant, refactoring-assistant]
 ---
 
 # Performance Profiler
 
-Profile and optimize code performance across CPU, memory, and I/O dimensions.
+Diagnose and fix CPU, memory, and I/O bottlenecks using mandatory baseline profiling, reproducible benchmarks, Amdahl's Law prioritization, and verified before-vs-after measurements.
 
 ## When to Use
-- Application is slow and needs optimization
-- Memory leaks or excessive memory usage
-- High CPU usage in production
-- I/O bottlenecks (disk, network, database)
-- Pre-release performance validation
+
+- Investigating high latency, CPU saturation, memory leaks, GC pauses, or I/O bottlenecks
+- Building reproducible micro- or macro-benchmarks before optimizing hot code paths
+- Verifying that a proposed optimization actually speeds up execution without breaking behavior
+
+### When Not to Use
+
+- Pure SQL query plan & index tuning (use `db-optimizer`)
 
 ## How to Run
+
 ```bash
-hermes skills install JovianOps/cortex/premium-skills/performance-profiler
-hermes chat -q "Profile this Python function for performance issues"
+hermes skills tap add JovianOps/cortex
+hermes skills install JovianOps/cortex/premium-skills/performance-profiler --yes
+hermes chat -q "Profile src/pipeline.py for CPU and memory bottlenecks and benchmark a verified fix"
 ```
 
-## Core Capabilities
-1. **CPU profiling** — Identify hot paths and expensive operations
-4. **Memory profiling** — Detect leaks, excessive allocations, GC pressure
-4. **I/O analysis** — Find blocking I/O, N+1 queries, unnecessary round-trips
-5. **Optimization suggestions** — Algorithmic improvements, caching, batching
-6. **Benchmark generation** — Create reproducible performance tests
+## Mandatory Measure-First Protocol
 
-## Anti-Hallucination Measures
-- Profile actual code execution, not guesses
-- No invented performance numbers
-- Deterministic benchmark methodology
-- Explicit measurement of before/after
+### Step 1 — Establish a Reproducible Baseline BEFORE Editing
+
+**Never optimize by intuition alone and never invent performance numbers.**
+
+1. Build or run a deterministic benchmark harness with:
+   - Representative realistic input size (not a 5-item toy input where startup dominates)
+   - Warmup runs discarded (`>= 3` warmup iterations)
+   - Multiple measured iterations reporting **median, p95, and peak memory (RSS / `tracemalloc`)**
+2. Capture a real profiler trace using the native runtime profiler:
+
+```bash
+# Python CPU + Memory profiling (stdlib — always available)
+python3 -m cProfile -s cumtime bench.py | head -n 30
+python3 -c "import tracemalloc; tracemalloc.start(); ..."
+
+# Node.js CPU profiling
+node --cpu-prof bench.js
+
+# Go CPU & alloc profiling
+go test -bench=. -benchmem -cpuprofile=cpu.out -memprofile=mem.out
+```
+
+### Step 2 — Classify Bottleneck & Apply Amdahl's Law
+
+Rank hotspots by **percentage of total wall time or peak allocation** (`cumtime` / `tottime` / retained bytes). Only optimize components representing meaningful wall-time share (`>= 10%` of total) and diagnose the true bottleneck class:
+
+- **Algorithmic / CPU**: Accidental $O(N^2)$ membership checks (`x in list` → `set`), repeated regex compilation inside loops, redundant JSON/date parsing, unmemoized recomputation, Python loop vs. vectorized/built-in operations.
+- **Memory & GC Pressure**: Holding entire files/streams in RAM instead of streaming/generators, string concatenation in loops (`+=` vs `"".join()`), unbounded caches (`@lru_cache(maxsize=None)` leaking memory), circular references or retained closures.
+- **I/O & Concurrency**: Sequential network/DB calls inside loops (batching, connection pooling, `asyncio.gather` with `Semaphore` bound), blocking I/O inside an async event loop, unbuffered tiny file writes.
+
+### Step 3 — Verify Functional Equivalence + After-Measurements
+
+After implementing the optimization:
+
+1. **Functional parity check**: Confirm existing tests + exact output equality (`baseline_output == optimized_output`) pass 100%.
+2. **Re-run the exact same benchmark harness** under identical input size and warmup settings.
+3. **Never cherry-pick a single lucky run** — report median, p95, peak memory, and exact speedup factor (`before / after`) from actual measured output. If an optimization does not beat baseline cleanly, revert it.
+
+## Strict Output Contract
+
+```markdown
+## Profiling Findings (Baseline)
+- **Workload:** Exact input size, iterations, environment.
+- **Top Hotspots:** Exact function names and measured share from profiler output.
+
+## Optimizations Applied
+1. `file.py:line` — Root cause, complexity change (e.g., O(N^2) -> O(N)), and exact code change.
+
+## Measured Before vs. After
+| Metric | Baseline | Optimized | Change |
+| :--- | ---: | ---: | ---: |
+| Median latency (ms) | ... | ... | ... |
+| p95 latency (ms) | ... | ... | ... |
+| Peak memory (MB) | ... | ... | ... |
+
+## Functional Parity
+- Exact test / output-equality command and PASS result.
+```
