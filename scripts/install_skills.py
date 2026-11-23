@@ -236,12 +236,40 @@ def resolve_agents(raw_agents: list[str]) -> list[AgentTarget]:
     return resolved
 
 
-def select_skills(catalog: dict, collection: str, requested: list[str]) -> list[tuple[str, dict]]:
+def load_packs(remote: bool = False, repo: str = DEFAULT_REPO, ref: str = DEFAULT_REF) -> dict[str, dict]:
+    if remote:
+        data = json.loads(fetch_bytes(raw_url(repo, ref, "packs.json")).decode("utf-8"))
+        return data.get("packs", {})
+    packs_path = ROOT / "packs.json"
+    if packs_path.is_file():
+        return json.loads(packs_path.read_text(encoding="utf-8")).get("packs", {})
+    return {}
+
+
+def select_skills(
+    catalog: dict,
+    collection: str,
+    requested: list[str],
+    pack_names: list[str] | None = None,
+    packs: dict[str, dict] | None = None,
+) -> list[tuple[str, dict]]:
     skills_map: dict[str, dict] = catalog["skills"]
-    if requested:
+    combined: list[str] = list(requested)
+    if pack_names:
+        available_packs = packs or {}
+        for pname in pack_names:
+            key = pname.strip().lower()
+            if key not in available_packs:
+                valid = ", ".join(sorted(available_packs.keys()))
+                raise SystemExit(f"ERROR: Unknown pack {pname!r}. Available packs: {valid}")
+            for slug in available_packs[key]["skills"]:
+                if slug not in combined:
+                    combined.append(slug)
+
+    if combined:
         chosen: list[tuple[str, dict]] = []
         missing: list[str] = []
-        for slug in requested:
+        for slug in combined:
             if slug in skills_map:
                 chosen.append((slug, skills_map[slug]))
             else:
@@ -523,6 +551,13 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Specific skill slug to install/uninstall (repeatable). Overrides --collection.",
     )
     parser.add_argument(
+        "--pack",
+        "-p",
+        action="append",
+        default=[],
+        help="Install a curated role-based skill pack from packs.json (e.g., fullstack, devops-sre, security-hardening, python-pro, academic, clean-migration).",
+    )
+    parser.add_argument(
         "--scope",
         choices=("global", "project"),
         default="global",
@@ -608,7 +643,8 @@ def main(argv: list[str] | None = None) -> int:
             dry_run=args.dry_run,
         )
 
-    skills = select_skills(catalog, args.collection, args.skill)
+    packs = load_packs(args.remote, args.repo, args.ref) if args.pack else {}
+    skills = select_skills(catalog, args.collection, args.skill, args.pack, packs)
     release_ver = catalog.get("release_version", "0.3.0")
 
     for target in agents:

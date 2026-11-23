@@ -27,6 +27,8 @@ Maintain durable, structured, staleness-checked project memory across sessions u
 
 ## How to Run
 
+> **Bundled Helper Script (`v0.3.0`):** Run `python skills/memory-manager/scripts/memory_store.py init --project <name>` (plus `add-decision`, `add-task`, `complete-task`, `check-stale`, `summary`) for atomic JSON session persistence.
+
 ```bash
 hermes skills tap add JovianOps/cortex
 hermes skills install JovianOps/cortex/skills/memory-manager --yes

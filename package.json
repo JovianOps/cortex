@@ -33,13 +33,18 @@
     "url": "https://github.com/JovianOps/cortex/issues"
   },
   "homepage": "https://github.com/JovianOps/cortex#readme",
+  "bin": {
+    "cortex": "./bin/cortex.mjs"
+  },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   },
   "scripts": {
+    "cortex": "python scripts/cortex.py",
     "test": "python scripts/package_skills.py --check && python scripts/validate_skills.py && python scripts/validate_manifests.py && python scripts/eval_skills.py && python -m unittest discover -s tests -v"
   },
   "files": [
+    "bin/",
     "skills/",
     "premium-skills/",
     "scripts/",
@@ -50,6 +55,7 @@
     "gemini-extension.json",
     "AGENTS.md",
     "GEMINI.md",
+    "packs.json",
     "checksums.json"
   ]
 }

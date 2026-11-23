@@ -29,6 +29,8 @@ Plan, verify, and ship deterministic software releases using strict SemVer calcu
 
 ## How to Run
 
+> **Bundled Helper Script (`v0.3.0`):** Run `python premium-skills/release-engineering/scripts/semver_bump.py --current 0.2.0` to compute deterministic SemVer bumps and Keep-a-Changelog drafts from Conventional Commits.
+
 ```bash
 # Universal CLI (Claude Code, Codex, Gemini CLI, Cursor, Copilot, OpenCode, OpenClaw, Goose, Cline)
 npx skills add JovianOps/cortex --skill release-engineering -g -y

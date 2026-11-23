@@ -54,18 +54,20 @@
       "collection": "core",
       "dir": "skills",
       "zip": "zips/documentation-generator.zip",
-      "zip_sha256": "21f4eb059e44b24e3a6cf1407c56b8cd91fcbe0a836ba6ed5572f6f124043e3b",
+      "zip_sha256": "9fb3f9bd0cd147f4cbacf367637649864d7eba0e0c07f61adc579933a73b315c",
       "files": {
-        "SKILL.md": "54e34ffeac679e1ac14f9abcd1766a99f4f0df01abdb54b825ae3b2eb6df39aa"
+        "SKILL.md": "234c5428f3edf30160be5e255aa564b6ec20e407496ecadc2acbd9517f1bc1eb",
+        "scripts/check_docs.py": "ca29ca9f647475935563db1d0d7b9daaa729f992cdb68a6819fbaa9d1296a870"
       }
     },
     "memory-manager": {
       "collection": "core",
       "dir": "skills",
       "zip": "zips/memory-manager.zip",
-      "zip_sha256": "2dd6f11158b0e63988d1390aa70ded24aaa309da0862708142b0ac99555ce4f2",
+      "zip_sha256": "8e85ca135fa4372277e1c5d82cf4284cda5b2b28a71a32bae530f73d30fd08ea",
       "files": {
-        "SKILL.md": "42c4a574a1490fd174d222e021e012a8752df968ed69b88753d4959dd16ece67"
+        "SKILL.md": "1e6b58e57f7ebf08e934e39cdac3ba9fea33f09ff1e4a9ffd19fd3777ff58773",
+        "scripts/memory_store.py": "1ad410509bcd8852c0515224f6eb583794136943fa2336426e5d9a36d5f2122a"
       }
     },
     "python-coding-assistant": {
@@ -137,18 +139,20 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/devops-pipeline.zip",
-      "zip_sha256": "280427ad3afacee53b7798f3a8585ac027af03fbb610c7e03441259e4644a537",
+      "zip_sha256": "6d7e607cdc419adef343d4d2b2b9ccf5c416384b3ec65a33bc8bd75b813bd597",
       "files": {
-        "SKILL.md": "6aa365ad62710afc2486b735c659b013f54f423aa2be263f8ee7480b910e7feb"
+        "SKILL.md": "ce8bacb743dd96a19fbb3ae26d376790858715c97193eab03ea72b3e39f2d61a",
+        "scripts/lint_actions.py": "2172ce7468f315f16a63d2cb29f8cdabe88a6d0725f1fecc8a320bc503837d5e"
       }
     },
     "docker-generator": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/docker-generator.zip",
-      "zip_sha256": "a0413ee27ae7d278dd9954ee294799d701c8ffebe9b5edf47bef1f4c65c99419",
+      "zip_sha256": "58ee0d3205b1a797e82017288e8a9a348b0a74273d675b5d29017a972dcba718",
       "files": {
-        "SKILL.md": "5f07d7a340df6cba1b077db71a1fa17bab29ad6be0ec4cd1da669c2ba064b9bb"
+        "SKILL.md": "aa8f2700318ea4ce3800b541be80f6f9bbe6e35f4cdc6133bd9babd9bfae18f5",
+        "scripts/lint_dockerfile.py": "7a92f2a4fb2b0a9a4f3fdf42789c1a8e5018aa048517dfe067286a2b328c29bb"
       }
     },
     "incident-response": {
@@ -191,9 +195,10 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/release-engineering.zip",
-      "zip_sha256": "7e0ea3f60ace144f4f47e0c215d114837059ec185b1594beedf7b326e0445386",
+      "zip_sha256": "9c6fddd74eece0cd278f966891ef99818174634866d4e047b4a2c7fc61d9b9fb",
       "files": {
-        "SKILL.md": "2bfd54551acb3b99daec0233b182045be20f2691a52ee21829923af90dbf8b6d"
+        "SKILL.md": "6d0b0c39b820d7e620b557904a3bb8b565008d0fc6afa13ce8212e16ee9b1c14",
+        "scripts/semver_bump.py": "1b2aeeafe73c791ae10450278cb2088bbe943abcc10bf4fb4c4f699723dd1f19"
       }
     },
     "security-auditor": {

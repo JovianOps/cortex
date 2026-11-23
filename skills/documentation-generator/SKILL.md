@@ -28,6 +28,8 @@ Generate accurate, code-verified READMEs, API references, architecture diagrams,
 
 ## How to Run
 
+> **Bundled Helper Script (`v0.3.0`):** Run `python skills/documentation-generator/scripts/check_docs.py README.md` to verify every relative Markdown link and `#heading` anchor exists.
+
 ```bash
 hermes skills tap add JovianOps/cortex
 hermes skills install JovianOps/cortex/skills/documentation-generator --yes

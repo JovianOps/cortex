@@ -55,24 +55,33 @@
 
 ---
 
-**Cortex `v0.3.0`** is a cryptographically verified collection of **24 modular, deterministic Agent Skills (`SKILL.md`)** — organized into **10 core skills** (`skills/`) and **14 extended engineering skills** (`premium-skills/`), complete with **bundled executable helper scripts**, **SHA-256 integrity verification (`checksums.json`)**, a **full-lifecycle multi-agent installer**, and a **24-task live A/B benchmark harness**.
+**Cortex `v0.3.0`** is a cryptographically verified AI-agent skill platform shipping **24 modular, deterministic Agent Skills (`SKILL.md`)** — organized into **10 core skills** (`skills/`) and **14 extended engineering skills** (`premium-skills/`), complete with a **unified `cortex` CLI** (`detect`, `doctor`, `search`, `packs`, `new`, `install`, `upgrade`), **6 curated Role-Based Skill Packs** (`packs.json`), **10 bundled deterministic helper scripts**, **SHA-256 integrity verification (`checksums.json`)**, and a **24-task live A/B benchmark harness**.
 
 Built on the open **`SKILL.md`** standard, Cortex works natively across **Claude** (Claude Code & Claude apps), **OpenAI** (Codex CLI & ChatGPT), **Gemini CLI**, **Cursor**, **GitHub Copilot & VS Code**, **OpenCode**, **OpenClaw**, **Goose**, **Aider**, **Cline**, and **Hermes Agent**.
 
 ## What's New in `v0.3.0`
 
+- **Unified `cortex` Developer CLI (`scripts/cortex.py` + `bin/cortex.mjs`)**: Run `python scripts/cortex.py <command>` (or `npx cortex <command>`) to auto-detect installed AI agents (`cortex detect`), run integrity & drift checks (`cortex doctor`), filter the catalog (`cortex search --has-script`), inspect packs (`cortex packs`), or scaffold a 100/100 audit-ready skill (`cortex new my-skill --with-script`).
+- **6 Curated Role-Based Skill Packs (`packs.json`)**: Install tailored workflows in one command with `--pack`: `fullstack`, `devops-sre`, `security-hardening`, `python-pro`, `academic`, and `clean-migration`.
 - **20 → 24 Deterministic Skills**: Added `incident-response`, `release-engineering`, `observability-setup`, and `accessibility-auditor` — all scoring **100/100** on the Cortex structural audit with paired 100-point A/B eval rubrics.
-- **5 Bundled Executable Helper Scripts**: Real, zero-dependency Python tools packaged directly inside skill folders and ZIPs — `grade_calc.py` (`Decimal` GPA & weight-sum stop gates), `bmesh_check.py` (Blender geometry auditor), `secret_scan.py` (auto-redacted CWE secret & sink scanner), `lint_openapi.py` (OpenAPI 3.x contract linter), and `a11y_scan.py` (static WCAG 2.2 AA scanner).
+- **10 Bundled Executable Helper Scripts**: Real, zero-dependency Python tools packaged directly inside skill folders and ZIPs — `grade_calc.py`, `bmesh_check.py`, `memory_store.py`, `check_docs.py`, `secret_scan.py`, `lint_openapi.py`, `a11y_scan.py`, `lint_dockerfile.py`, `lint_actions.py`, and `semver_bump.py`.
 - **Zero-Clone Remote Install + SHA-256 Verification**: `scripts/install_skills.py --remote` fetches directly from GitHub and verifies every file against [`checksums.json`](checksums.json) before writing a single byte.
 - **Lockfile Lifecycle Management**: Tracks installations in `.cortex-lock.json` with `--status` (tamper/drift detection), `--check-updates`, `--upgrade`, and `--uninstall`.
 - **Live A/B Benchmark Runner**: `scripts/eval_skills.py --run` executes paired Without-Skill vs. With-Skill evaluations across OpenAI, Anthropic, Gemini, or OpenAI-compatible APIs and writes a Markdown scorecard.
-- **Automated Test Suite (`tests/`)**: End-to-end `unittest` suite verified in CI covering packaging, manifests, installer lifecycle, SHA-256 tamper rejection, eval scoring, and bundled helper scripts.
+- **Automated Test Suite (`tests/`)**: 16 end-to-end `unittest` tests verified in CI covering the `cortex` CLI, role packs, skill scaffolding, packaging, manifests, installer lifecycle, SHA-256 tamper rejection, eval scoring, and all 10 bundled helper scripts.
 
 ## Quick Start
 
-Install into any agent in one command using the universal **Agent Skills CLI (`npx skills`)**, zero-clone **Python `--remote`** (with SHA-256 verification), or your agent's native plugin marketplace / tap:
+Install into any agent in one command using the **Cortex CLI**, universal **Agent Skills CLI (`npx skills`)**, zero-clone **Python `--remote`** (with SHA-256 verification), or your agent's native plugin marketplace / tap:
 
 ```bash
+# Cortex Unified CLI (detect agents, verify integrity, install role packs, scaffold new skills)
+python scripts/cortex.py detect
+python scripts/cortex.py doctor
+python scripts/cortex.py packs
+python scripts/cortex.py install --agent claude-code --pack fullstack
+python scripts/cortex.py new my-new-skill --with-script
+
 # Universal CLI (Claude Code, Codex, Gemini CLI, Cursor, Copilot, OpenCode, OpenClaw, Goose, Cline...)
 npx skills add JovianOps/cortex
 
@@ -81,13 +90,13 @@ npx skills add JovianOps/cortex --skill security-auditor -a claude-code -a curso
 ```
 
 ```bash
-# Zero-clone Python remote install (no git clone, no Node.js — verifies SHA-256 via checksums.json)
-curl -fsSL https://raw.githubusercontent.com/JovianOps/cortex/main/scripts/install_skills.py | python3 - --remote --agent claude-code --collection all
+# Zero-clone Python remote install with a Role Pack (no git clone, no Node.js — verifies SHA-256 via checksums.json)
+curl -fsSL https://raw.githubusercontent.com/JovianOps/cortex/main/scripts/install_skills.py | python3 - --remote --agent claude-code --pack fullstack
 ```
 
 ```powershell
 # Windows PowerShell zero-clone remote install (SHA-256 verified)
-irm https://raw.githubusercontent.com/JovianOps/cortex/main/scripts/install_skills.py | python - --remote --agent claude-code --collection all
+irm https://raw.githubusercontent.com/JovianOps/cortex/main/scripts/install_skills.py | python - --remote --agent claude-code --pack fullstack
 ```
 
 ```bash

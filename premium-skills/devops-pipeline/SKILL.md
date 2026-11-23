@@ -28,6 +28,8 @@ Design, harden, optimize, and migrate CI/CD pipelines (GitHub Actions, GitLab CI
 
 ## How to Run
 
+> **Bundled Helper Script (`v0.3.0`):** Run `python premium-skills/devops-pipeline/scripts/lint_actions.py .github/workflows` to check 40-char SHA pinning, least-privilege `permissions:`, and script injection risks.
+
 ```bash
 hermes skills tap add JovianOps/cortex
 hermes skills install JovianOps/cortex/premium-skills/devops-pipeline --yes

@@ -28,6 +28,8 @@ Generate production-hardened, layer-cached, multi-stage `Dockerfile`, `.dockerig
 
 ## How to Run
 
+> **Bundled Helper Script (`v0.3.0`):** Run `python premium-skills/docker-generator/scripts/lint_dockerfile.py Dockerfile` to audit pinned base tags, non-root `USER`, secret `ENV`s, `curl | sh`, and `HEALTHCHECK`.
+
 ```bash
 hermes skills tap add JovianOps/cortex
 hermes skills install JovianOps/cortex/premium-skills/docker-generator --yes

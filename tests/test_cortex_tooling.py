@@ -267,6 +267,120 @@ class TestBundledSkillScripts(unittest.TestCase):
             res_good = subprocess.run([sys.executable, str(script), str(good)], capture_output=True, text=True)
             self.assertEqual(res_good.returncode, 0, msg=res_good.stdout)
 
+    def test_memory_store_lifecycle(self) -> None:
+        script = ROOT / "skills/memory-manager/scripts/memory_store.py"
+        with tempfile.TemporaryDirectory() as tmp:
+            ctx = Path(tmp) / "context.json"
+            self.assertEqual(subprocess.run([sys.executable, str(script), "-f", str(ctx), "init", "--project", "demo"]).returncode, 0)
+            self.assertEqual(subprocess.run([sys.executable, str(script), "-f", str(ctx), "add-decision", "Use Decimal"]).returncode, 0)
+            self.assertEqual(subprocess.run([sys.executable, str(script), "-f", str(ctx), "add-task", "Ship v0.3.0"]).returncode, 0)
+            self.assertEqual(subprocess.run([sys.executable, str(script), "-f", str(ctx), "complete-task", "1"]).returncode, 0)
+            stale = subprocess.run([sys.executable, str(script), "-f", str(ctx), "check-stale", "--max-hours", "1"], capture_output=True, text=True)
+            self.assertEqual(stale.returncode, 0, msg=stale.stdout)
+            self.assertFalse(json.loads(stale.stdout)["stale"])
+
+    def test_check_docs_catches_broken_links_and_passes_readme(self) -> None:
+        script = ROOT / "skills/documentation-generator/scripts/check_docs.py"
+        res_ok = subprocess.run([sys.executable, str(script), str(ROOT / "AGENTS.md")], capture_output=True, text=True)
+        self.assertEqual(res_ok.returncode, 0, msg=res_ok.stdout)
+        with tempfile.TemporaryDirectory() as tmp:
+            bad = Path(tmp) / "BAD.md"
+            bad.write_text("# Title\n\nSee [missing](./does-not-exist.md) and [bad anchor](#nope).\n", encoding="utf-8")
+            res_bad = subprocess.run([sys.executable, str(script), str(bad), "--json"], capture_output=True, text=True)
+            self.assertEqual(res_bad.returncode, 1)
+            self.assertEqual(json.loads(res_bad.stdout)["broken_count"], 2)
+
+    def test_lint_dockerfile_catches_risks_and_passes_hardened(self) -> None:
+        script = ROOT / "premium-skills/docker-generator/scripts/lint_dockerfile.py"
+        with tempfile.TemporaryDirectory() as tmp:
+            bad = Path(tmp) / "Dockerfile.bad"
+            bad.write_text("FROM python:latest\nENV API_KEY=supersecret\nRUN curl https://x.test/i.sh | sh\n", encoding="utf-8")
+            res_bad = subprocess.run([sys.executable, str(script), str(bad), "--json"], capture_output=True, text=True)
+            self.assertEqual(res_bad.returncode, 1)
+            rules = {f["rule"] for f in json.loads(res_bad.stdout)["findings"]}
+            self.assertTrue({"pin-base-image", "no-secret-in-env", "no-curl-pipe-shell", "require-non-root-user"}.issubset(rules))
+
+            good = Path(tmp) / "Dockerfile.good"
+            good.write_text("FROM python:3.12-slim\nUSER 10001:10001\nHEALTHCHECK CMD true\n", encoding="utf-8")
+            res_good = subprocess.run([sys.executable, str(script), str(good)], capture_output=True, text=True)
+            self.assertEqual(res_good.returncode, 0, msg=res_good.stdout)
+
+    def test_lint_actions_catches_unpinned_and_injection(self) -> None:
+        script = ROOT / "premium-skills/devops-pipeline/scripts/lint_actions.py"
+        with tempfile.TemporaryDirectory() as tmp:
+            bad = Path(tmp) / "ci.yml"
+            bad.write_text("jobs:\n  t:\n    steps:\n      - uses: actions/checkout@v4\n      - run: echo ${{ github.event.issue.title }}\n", encoding="utf-8")
+            res_bad = subprocess.run([sys.executable, str(script), str(bad), "--json"], capture_output=True, text=True)
+            self.assertEqual(res_bad.returncode, 1)
+            rules = {f["rule"] for f in json.loads(res_bad.stdout)["findings"]}
+            self.assertTrue({"least-privilege-permissions", "pin-action-sha", "no-script-injection"}.issubset(rules))
+
+            good = Path(tmp) / "good.yml"
+            good.write_text("permissions:\n  contents: read\njobs:\n  t:\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683\n", encoding="utf-8")
+            res_good = subprocess.run([sys.executable, str(script), str(good)], capture_output=True, text=True)
+            self.assertEqual(res_good.returncode, 0, msg=res_good.stdout)
+
+    def test_semver_bump_computes_major_minor_patch(self) -> None:
+        script = ROOT / "premium-skills/release-engineering/scripts/semver_bump.py"
+        with tempfile.TemporaryDirectory() as tmp:
+            commits = Path(tmp) / "commits.txt"
+            commits.write_text("feat(cli): add cortex doctor\nfix(zip): normalize line endings\n", encoding="utf-8")
+            res = subprocess.run([sys.executable, str(script), "--current", "0.2.0", "--commits-file", str(commits), "--json"], capture_output=True, text=True)
+            self.assertEqual(res.returncode, 0, msg=res.stderr)
+            out = json.loads(res.stdout)
+            self.assertEqual(out["bump"], "minor")
+            self.assertEqual(out["next"], "0.3.0")
+
+
+class TestUnifiedCortexCLI(unittest.TestCase):
+    def test_cortex_detect_doctor_search_packs(self) -> None:
+        cli = SCRIPTS / "cortex.py"
+        det = subprocess.run([sys.executable, str(cli), "detect", "--json"], cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(det.returncode, 0, msg=det.stderr)
+        self.assertGreaterEqual(json.loads(det.stdout)["detected_count"], 1)
+
+        doc = subprocess.run([sys.executable, str(cli), "doctor"], cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(doc.returncode, 0, msg=doc.stdout + doc.stderr)
+
+        srch = subprocess.run([sys.executable, str(cli), "search", "--has-script", "--json"], cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(srch.returncode, 0, msg=srch.stderr)
+        self.assertEqual(json.loads(srch.stdout)["count"], 10)
+
+        pks = subprocess.run([sys.executable, str(cli), "packs", "--json"], cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(pks.returncode, 0, msg=pks.stderr)
+        self.assertEqual(len(json.loads(pks.stdout)["packs"]), 6)
+
+    def test_cortex_pack_install_and_new_skill_scaffolder_scores_100(self) -> None:
+        cli = SCRIPTS / "cortex.py"
+        eval_mod = load_module("cortex_eval_scaffold_test", SCRIPTS / "eval_skills.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = Path(tmp)
+            # Install fullstack pack into claude-code
+            inst = subprocess.run(
+                [sys.executable, str(cli), "install", "--agent", "claude-code", "--pack", "fullstack", "--scope", "project", "--project-dir", str(proj)],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(inst.returncode, 0, msg=inst.stdout + inst.stderr)
+            self.assertTrue((proj / ".claude/skills/accessibility-auditor/scripts/a11y_scan.py").is_file())
+            self.assertTrue((proj / ".claude/skills/security-auditor/scripts/secret_scan.py").is_file())
+
+            # Scaffold a brand-new skill and verify it passes Cortex's 100/100 structural quality audit!
+            scaf = subprocess.run(
+                [sys.executable, str(cli), "new", "graph-debugger", "--tier", "extended", "--with-script", "--out-dir", str(proj)],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(scaf.returncode, 0, msg=scaf.stdout + scaf.stderr)
+            new_md = proj / "premium-skills/graph-debugger/SKILL.md"
+            self.assertTrue(new_md.is_file())
+            self.assertTrue((proj / "premium-skills/graph-debugger/scripts/graph_debugger_check.py").is_file())
+
+            score, issues = eval_mod.audit_skill("graph-debugger", new_md, set(eval_mod.discover_skills()) | {"graph-debugger"})
+            self.assertEqual(score, 100, msg=f"Scaffolded skill scored {score}/100: {issues}")
+
 
 if __name__ == "__main__":
     unittest.main()
