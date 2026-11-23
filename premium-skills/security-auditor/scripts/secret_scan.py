@@ -85,6 +85,16 @@ def scan_path(target: Path) -> list[dict]:
     return findings
 
 
+def sanitize_findings_for_output(findings: list[dict]) -> list[dict]:
+    sanitized: list[dict] = []
+    for finding in findings:
+        sanitized_finding = dict(finding)
+        if "evidence" in sanitized_finding:
+            sanitized_finding["evidence"] = "[REDACTED]"
+        sanitized.append(sanitized_finding)
+    return sanitized
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Offline secret & dangerous-sink scanner (CWE-mapped, auto-redacted).")
     parser.add_argument("target", type=Path, help="File or directory to scan.")
@@ -94,13 +104,14 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: Path not found: {args.target}", file=sys.stderr)
         return 2
     findings = scan_path(args.target)
+    findings_for_output = sanitize_findings_for_output(findings)
     if args.format == "json":
-        print(json.dumps({"target": args.target.as_posix(), "count": len(findings), "findings": findings}, indent=2))
+        print(json.dumps({"target": args.target.as_posix(), "count": len(findings_for_output), "findings": findings_for_output}, indent=2))
     else:
-        print(f"# Security Scan Summary ({len(findings)} finding(s))\n")
-        for f in findings:
+        print(f"# Security Scan Summary ({len(findings_for_output)} finding(s))\n")
+        for f in findings_for_output:
             print(f"- **[{f['severity']}] {f['title']} ({f['cwe']})** — `{f['file']}:{f['line']}` (`{f['evidence']}`)")
-        if not findings:
+        if not findings_for_output:
             print("No hardcoded secrets or high-risk sink patterns detected.")
     return 1 if findings else 0
 
