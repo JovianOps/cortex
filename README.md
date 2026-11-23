@@ -39,7 +39,7 @@
     &nbsp;&middot;&nbsp;
     <a href="#repository-structure">Structure</a>
     &nbsp;&middot;&nbsp;
-    <a href="#validation--packaging">Development</a>
+    <a href="#validation-packaging--benchmarks">Development</a>
     &nbsp;&middot;&nbsp;
     <a href="CONTRIBUTING.md">Contributing</a>
   </p>
@@ -181,17 +181,20 @@ cortex/
 ├── premium-skills/         # 10 extended engineering skills (each with SKILL.md)
 ├── zips/                   # Verified one-file ZIP distributions for core skills
 ├── premium-zips/           # Verified one-file ZIP distributions for extended skills
+├── evals/
+│   └── skill_evals.json    # 20 paired 100-point Without-Skill vs. With-Skill rubrics
 ├── scripts/
 │   ├── package_skills.py   # Build or verify skill ZIP archives
 │   ├── validate_skills.py  # Validate skill frontmatter, sections & ZIP parity
-│   └── validate_yaml.py    # Validate all YAML configuration files
+│   ├── validate_yaml.py    # Validate all YAML configuration files
+│   └── eval_skills.py      # Audit skill quality & score Without vs. With Skill runs
 ├── .github/                # CI workflows, Dependabot & issue/PR templates
 ├── index.html              # Interactive catalog & custom install command builder
 ├── CONTRIBUTING.md         # Authoring standards and contribution workflow
 └── LICENSE                 # MIT License
 ```
 
-## Validation & Packaging
+## Validation, Packaging & Benchmarks
 
 Before opening a pull request, regenerate ZIP archives if you edited any `SKILL.md` and run the repository checks:
 
@@ -203,12 +206,19 @@ python scripts/package_skills.py
 npm test
 ```
 
-You can also run the Python validation scripts directly:
+You can also run the validation and benchmark scripts directly:
 
 ```bash
 python scripts/package_skills.py --check
 python scripts/validate_skills.py
 python scripts/validate_yaml.py
+
+# Audit playbook quality across all 20 skills & validate eval rubrics
+python scripts/eval_skills.py
+
+# Export paired A/B prompts or score saved Without-Skill vs. With-Skill outputs
+python scripts/eval_skills.py --export-prompts /tmp/paired_prompts.json
+python scripts/eval_skills.py --score ./runs/without-skill ./runs/with-skill
 ```
 
 ## Contributing

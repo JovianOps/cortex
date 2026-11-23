@@ -1,96 +1,95 @@
 ---
 name: academic-assistant
-description: Multi-purpose academic assistant for coding, report cards, 3D modeling with anti-hallucination and persistent memory.
-version: 0.1.0
+description: Orchestrate grading, coding, and 3D academic workflows.
+version: 0.2.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
 metadata:
   hermes:
     tags: [education, coding, 3d-modeling, report-cards, anti-hallucination, memory]
-    related_skills: []
+    related_skills: [college-report-card, python-coding-assistant, blender-3d-modeling, anti-hallucination, memory-manager]
 ---
 
-A comprehensive academic assistant for coding, college report cards, and 3D modeling with built-in anti-hallucination measures and persistent memory management.
+# Academic Assistant
+
+Orchestrate high-accuracy academic tasks across grading/report cards, Python coding, and Blender 3D modeling with mandatory deterministic verification and cross-session state persistence.
 
 ## When to Use
-- Generate accurate college report cards from structured grade data
-- Get coding assistance with anti-hallucination measures
-- Get 3D modeling guidance with validation
-- Maintain persistent context across sessions to prevent hallucination
-- Reduce AI hallucinations through structured validation and deterministic outputs
 
-## Prerequisites
-- Student data in CSV/JSON format (grades, attendance, assignments)
-- Course syllabus and grading rubric (JSON)
-- For 3D modeling: Blender/3D software installed
-- Python/PowerShell for report generation scripts
+- Multi-domain coursework tasks combining data processing, grading, code, or 3D modeling
+- Generating student report cards or grade summaries from CSV/JSON datasets
+- Continuing multi-session academic projects that require persistent `context.json` state
+- Any academic deliverable where calculation errors, invented citations, or unverified code are unacceptable
+
+### When Not to Use
+
+- Purely creative essays or open-ended brainstorming with no source data or verification criteria
 
 ## How to Run
+
 ```bash
-hermes skills install JovianOps/cortex/skills/academic-assistant
-hermes chat -q "Generate report cards for CS101 Fall 2024 from grades.csv"
-hermes chat -q "Help me write a Python script for data analysis"
-hermes chat -q "Guide me through creating a 3D model of a chair in Blender"
+hermes skills tap add JovianOps/cortex
+hermes skills install JovianOps/cortex/skills/academic-assistant --yes
+hermes chat -q "Generate report cards for CS101 Fall 2024 from grades.csv using syllabus.json"
 ```
 
-## Core Capabilities
+## Mandatory Operating Protocol
 
-### 1. College Report Card Generation (Primary)
-- Deterministic grade calculation from structured data
-- Template-based report card generation (HTML/PDF)
-- Data validation to prevent hallucination
-- Persistent memory across sessions
+Follow these gates in strict order before producing any final academic deliverable:
 
-### 2. Coding Assistance
-- Code review with anti-hallucination checks
-- Deterministic code generation from specs
-- Best practices enforcement
+### Step 1 — Load Context & Inspect Source Inputs First
 
-### 2. 3D Modeling Guidance
-- Step-by-step modeling workflows
-- Validation checks for model integrity
-- Export format validation
+1. Check whether `context.json` exists in the working directory; if present, load course metadata, rubric rules, and prior decisions before acting.
+2. Read all referenced source files (`grades.csv`, `syllabus.json`, source scripts, `.blend` specs) directly.
+3. Never assume column names, grading scales, or library versions that were not read from disk or tool output.
 
-### Anti-Hallucination Measures
-- Deterministic calculations (no AI math)
-- Data validation before processing
-- Template-based generation (no free-form generation)
-- Structured validation with explicit error reporting
-- Source-cited outputs only
+### Step 2 — Route to the Strict Domain Workflow
 
-### Memory & Context Management
-- Persistent context file (`context.json`)
-- Student grade cache across sessions
-- Course/syllabus context persistence
-- Session resumption support
+| Task Domain | Mandatory Deterministic Rule | Verification Gate |
+| :--- | :--- | :--- |
+| **Grading / Report Cards** | Compute all averages, weights, GPAs, and letter grades in Python using `decimal.Decimal` (`ROUND_HALF_UP`). **Never perform arithmetic in LLM text.** | Rubric weights sum to `1.00`; zero duplicate IDs; every score within `[0, max_points]` |
+| **Academic Coding** | Write typed, self-contained scripts with explicit input validation and edge-case handling. | Execute `python -m py_compile` and run the script on sample/real inputs |
+| **3D Modeling (Blender)** | Provide exact Blender steps plus a `bmesh` integrity check script (manifoldness, normals, scale `(1,1,1)`). | Verify mesh topology and target export format (`.gltf`, `.fbx`, `.stl`) |
+| **Research / Citations** | Quote or cite only files, datasets, or verified references actually inspected. | Tag any unverified claim as `[UNVERIFIED]` — never fabricate citations or stats |
 
-## Commands
-| Command | Description |
-|---------|-------------|
-| `generate-report-cards` | Generate report cards from grade data |
-| `validate-grades` | Validate grade data against syllabus |
-| `coding-assist` | Coding help with anti-hallucination |
-| `3d-model-guide` | 3D modeling step-by-step |
-| `validate-data` | Validate data before processing |
-| `load-context` | Load persistent context |
-| `save-context` | Save current context |
+### Step 3 — Anti-Hallucination Audit Gate
 
-## Usage Examples
-- `hermes chat -q "Generate report cards for CS101 Fall 2024 from grades.csv"`
-- `hermes chat -q "Help me write a Python script for data analysis with validation"`
-- `hermes chat -q "Guide me through creating a low-poly chair in Blender"`
-- `hermes chat -q "Load my CS101 context and continue grading"`
+Before outputting the final answer, verify every item below:
 
-## Anti-Hallucination Architecture
-1. **Deterministic calculations only** - All math done by code, not LLM
-2. **Input validation first** - All data validated before processing
-3. **Template-based output** - No free-form generation
-4. **Explicit error reporting** - Fail fast with clear messages
-4. **Source-cited outputs** - Every number traced to source data
+- [ ] Every numeric value (grade, GPA, count, percentage, metric) came directly from script output or a cited source file.
+- [ ] Every file path, column name, function signature, and CLI flag was confirmed to exist.
+- [ ] Missing or malformed input records are reported explicitly instead of silently filled or guessed.
+- [ ] If a rubric rule or threshold is ambiguous (e.g., rounding `89.5` vs `89.49`), state the ambiguity and ask or apply the documented policy explicitly.
 
-## Memory System
-- `context.json` - Course, term, grading policy, student cache
-- `grade_cache.json` - Student grades across sessions
-- Auto-save after each student processed
-- Resume capability with `--continue` flag
+### Step 4 — Persist Session State
+
+After completing a milestone, write an atomic update to `context.json` (write to `context.json.tmp` then rename) containing:
+
+```json
+{
+  "schema_version": "1.0",
+  "course": "CS101",
+  "term": "Fall 2024",
+  "updated_at": "2026-01-01T00:00:00Z",
+  "source_files": ["grades.csv", "syllabus.json"],
+  "decisions": ["Used ROUND_HALF_UP to 2 decimal places per syllabus"],
+  "completed_items": ["Validated 32 student rows"],
+  "open_tasks": ["Export PDF report cards"]
+}
+```
+
+## Output Contract
+
+Structure every completed response with:
+
+1. **Summary** — 1–3 sentences stating what was executed and verified.
+2. **Evidence & Verification** — Exact commands run, files inspected, row/check counts, and any anomalies caught.
+3. **Deliverable** — Generated artifact paths, validated code, or structured results.
+4. **State & Next Step** — Whether `context.json` was updated and any remaining items.
+
+## Failure-Mode Guards
+
+- **Never do mental math** on weighted grades, GPAs, or statistical summaries — always execute Python.
+- **Never invent student comments** citing attendance, participation, or exam trends not supported by actual columns in the input file.
+- **Never silently drop bad rows** (NaN, negative scores, unknown IDs); quarantine and report them with row numbers.

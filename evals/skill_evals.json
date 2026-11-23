@@ -1,0 +1,266 @@
+{
+  "schema_version": "1.0",
+  "description": "Paired evaluation tasks and objective 100-point rubrics designed to measure score lift between unguided baseline prompts (without skill) and Cortex-guided runs (with skill).",
+  "tasks": [
+    {
+      "id": "eval-academic-assistant",
+      "skill": "academic-assistant",
+      "collection": "skills",
+      "prompt": "I have grades.csv (40 students, two duplicate IDs, one blank midterm) and syllabus.json (weights: labs 0.30, midterm 0.30, final 0.45). Compute everyone's final grade, summarize the class, and save progress so I can resume tomorrow.",
+      "rubric": [
+        {"id": "weight_sum_catch", "points": 20, "description": "Catches that rubric weights sum to 1.05 instead of 1.00 before computing grades", "patterns": ["1\\.05", "sum.*1\\.00|not.*1\\.00|weight.*mismatch"]},
+        {"id": "decimal_math", "points": 20, "description": "Uses Python Decimal (not LLM mental math or float) with explicit rounding", "patterns": ["Decimal", "ROUND_HALF_UP"]},
+        {"id": "quarantine_anomalies", "points": 20, "description": "Quarantines duplicate IDs and reports blank midterm explicitly instead of silently guessing", "patterns": ["duplicate", "blank|missing|quarantine"]},
+        {"id": "atomic_context_save", "points": 20, "description": "Persists structured context.json state for session resumption", "patterns": ["context\\.json", "schema_version|open_tasks|decisions"]},
+        {"id": "structured_output", "points": 20, "description": "Reports evidence/verification counts and clear next steps", "patterns": ["Evidence|Verification", "Next Step|open_tasks"]}
+      ]
+    },
+    {
+      "id": "eval-anti-hallucination",
+      "skill": "anti-hallucination",
+      "collection": "skills",
+      "prompt": "Audit this snippet and claim: `import requests; r = requests.get('https://example.com', retries=3); print(r.text_lines())` — the author claims this improves reliability by 40% and fixes CVE-2026-99999.",
+      "rubric": [
+        {"id": "phantom_kwarg", "points": 20, "description": "Flags `retries=3` as a non-existent kwarg on `requests.get`", "patterns": ["retries", "CONTRADICTED|does not exist|invalid"]},
+        {"id": "phantom_method", "points": 20, "description": "Flags `r.text_lines()` as a fabricated method on `requests.Response`", "patterns": ["text_lines", "iter_lines|splitlines"]},
+        {"id": "unverified_cve", "points": 20, "description": "Flags CVE-2026-99999 and the 40% claim as UNVERIFIED rather than accepting them", "patterns": ["UNVERIFIED", "CVE-2026-99999"]},
+        {"id": "tool_verification", "points": 20, "description": "Provides or executes deterministic Python AST/inspect/hasattr checks", "patterns": ["py_compile|ast\\.parse|hasattr|inspect"]},
+        {"id": "verdict_matrix", "points": 20, "description": "Outputs an explicit Audit Verdict and claim-by-claim verification matrix", "patterns": ["Audit Verdict.*FAIL", "Verification Matrix"]}
+      ]
+    },
+    {
+      "id": "eval-blender-3d-modeling",
+      "skill": "blender-3d-modeling",
+      "collection": "skills",
+      "prompt": "I scaled a cube non-uniformly into a low-poly wooden chair in Blender 4.2 for Unity and 3D printing. Give me the modeling/export checklist and a validation script.",
+      "rubric": [
+        {"id": "apply_scale_before_uv", "points": 20, "description": "Requires applying Rotation & Scale (Ctrl+A) to (1,1,1) before beveling/UV unwrapping", "patterns": ["Ctrl\\+A|apply.*scale", "1\\.0|1, ?1, ?1"]},
+        {"id": "blender_4_api_guard", "points": 20, "description": "Accounts for Blender 4.x API differences (Smooth by Angle / Principled BSDF)", "patterns": ["Smooth by Angle|use_auto_smooth|4\\.1|4\\.2"]},
+        {"id": "bmesh_audit_script", "points": 20, "description": "Provides a headless bpy/bmesh script checking non-manifold, boundary edges, and loose verts", "patterns": ["import bmesh", "is_manifold", "is_boundary"]},
+        {"id": "watertight_3d_print", "points": 20, "description": "Enforces 0 non-manifold and 0 boundary edges for watertight 3D-print export", "patterns": ["watertight|non_manifold_edges == 0", "stl|3mf"]},
+        {"id": "uv_and_normals", "points": 20, "description": "Includes Face Orientation/normal recalculation and UV packing margin checks", "patterns": ["Shift\\+N|Face Orientation|normals", "Pack Islands|uv_layers"]}
+      ]
+    },
+    {
+      "id": "eval-code-review-assistant",
+      "skill": "code-review-assistant",
+      "collection": "skills",
+      "prompt": "Review this Python function:\n```python\ndef add_item(user_id, item, cache=[]):\n    cache.append(item)\n    try:\n        os.system(f'echo {item} >> /tmp/{user_id}.log')\n    except:\n        pass\n    return cache\n```",
+      "rubric": [
+        {"id": "cmd_injection_p0", "points": 20, "description": "Flags OS command injection and path traversal in os.system as P0 Blocker", "patterns": ["P0", "command injection|os\\.system|path traversal"]},
+        {"id": "mutable_default_p1", "points": 20, "description": "Flags shared mutable default argument `cache=[]`", "patterns": ["mutable default|cache=\\[\\]", "None"]},
+        {"id": "bare_except", "points": 20, "description": "Flags bare `except: pass` swallowing errors", "patterns": ["bare.*except|except:.*pass|swallow"]},
+        {"id": "structured_verdict", "points": 20, "description": "Emits explicit Review Verdict (REQUEST_CHANGES) and severity labels", "patterns": ["REQUEST_CHANGES", "\\[P[0-3]\\]"]},
+        {"id": "missing_tests", "points": 20, "description": "Includes concrete missing regression test cases and minimal secure fix", "patterns": ["Missing Test Cases", "Path|subprocess|resolve"]}
+      ]
+    },
+    {
+      "id": "eval-college-report-card",
+      "skill": "college-report-card",
+      "collection": "skills",
+      "prompt": "Write a Python grading pipeline that computes weighted scores from grades.csv, assigns letter grades (A- >= 90, B+ >= 87), escapes HTML student names, and reconciles output report cards.",
+      "rubric": [
+        {"id": "decimal_quantize", "points": 20, "description": "Uses Decimal with ROUND_HALF_UP to avoid floating-point boundary bugs", "patterns": ["Decimal", "ROUND_HALF_UP"]},
+        {"id": "rubric_validation", "points": 20, "description": "Validates rubric weight sum == 1.00 and descending non-overlapping cutoffs", "patterns": ["1\\.00", "duplicate|cutoff|weight"]},
+        {"id": "html_escape", "points": 20, "description": "Escapes student names and comments with html.escape before HTML rendering", "patterns": ["html\\.escape"]},
+        {"id": "grounded_comments", "points": 20, "description": "Binds comments strictly to computed category scores without inventing traits", "patterns": ["computed|category|source|never invent"]},
+        {"id": "post_reconciliation", "points": 20, "description": "Reconciles generated card count and writes an audit_summary.json", "patterns": ["audit_summary\\.json|reconcil", "VERIFIED|count"]}
+      ]
+    },
+    {
+      "id": "eval-documentation-generator",
+      "skill": "documentation-generator",
+      "collection": "skills",
+      "prompt": "Document a Python FastAPI service with two routes (`GET /health`, `POST /items`), an env var `API_KEY` (no default), and a Mermaid diagram.",
+      "rubric": [
+        {"id": "env_table_required", "points": 20, "description": "Documents API_KEY in an env table explicitly marked Required (no default)", "patterns": ["API_KEY", "Required.*no default|no default"]},
+        {"id": "request_and_error_examples", "points": 20, "description": "Includes concrete 2xx success AND error response payload examples", "patterns": ["200|201", "400|401|422"]},
+        {"id": "mermaid_diagram", "points": 20, "description": "Provides a concise Mermaid diagram using a fenced mermaid block", "patterns": ["```mermaid"]},
+        {"id": "drift_verification", "points": 20, "description": "Includes code-truth / relative-link / command verification steps", "patterns": ["link check|drift|Source Inventory|Verification"]},
+        {"id": "no_phantom_commands", "points": 20, "description": "Avoids inventing unverified scripts or non-existent directories", "patterns": ["GET /health", "POST /items"]}
+      ]
+    },
+    {
+      "id": "eval-memory-manager",
+      "skill": "memory-manager",
+      "collection": "skills",
+      "prompt": "Design a cross-session context.json update flow when we change our database choice from SQLite to PostgreSQL while preserving prior decision history safely.",
+      "rubric": [
+        {"id": "versioned_schema", "points": 20, "description": "Uses versioned JSON schema with schema_version, updated_at, constraints, decisions, tasks", "patterns": ["schema_version", "updated_at", "file_pointers"]},
+        {"id": "append_only_decisions", "points": 20, "description": "Marks the old SQLite decision superseded and appends a new decision instead of deleting", "patterns": ["superseded", "DEC-"]},
+        {"id": "staleness_check", "points": 20, "description": "Checks referenced file paths/hashes and tags changed facts as STALE", "patterns": ["STALE|sha256|staleness"]},
+        {"id": "atomic_write", "points": 20, "description": "Writes via temporary file + json.loads sanity check + os.replace", "patterns": ["\\.tmp|tmp", "os\\.replace"]},
+        {"id": "secret_scrub", "points": 20, "description": "Explicitly forbids storing secrets/API keys/passwords in context.json", "patterns": ["secret|password|API key|scrub"]}
+      ]
+    },
+    {
+      "id": "eval-python-coding-assistant",
+      "skill": "python-coding-assistant",
+      "collection": "skills",
+      "prompt": "Write a Python script that loads a YAML config file, runs a user-selected subcommand with a timeout, and totals currency values from a CSV file.",
+      "rubric": [
+        {"id": "strict_typing", "points": 20, "description": "Uses `from __future__ import annotations` and full parameter/return type annotations", "patterns": ["from __future__ import annotations", "-> "]},
+        {"id": "safe_yaml", "points": 20, "description": "Uses `yaml.safe_load` instead of unsafe `yaml.load`", "patterns": ["safe_load"]},
+        {"id": "safe_subprocess", "points": 20, "description": "Uses `subprocess.run` with list args (no shell=True), check=True, and explicit timeout", "patterns": ["subprocess\\.run", "timeout=", "check=True"]},
+        {"id": "decimal_currency", "points": 20, "description": "Uses `Decimal` for currency math and `pathlib.Path` with explicit UTF-8 encoding", "patterns": ["Decimal", "Path", "utf-8"]},
+        {"id": "verification_commands", "points": 20, "description": "Includes verification commands (`py_compile`, `ruff`/`mypy`, and edge-case tests)", "patterns": ["py_compile", "ruff|mypy|pytest"]}
+      ]
+    },
+    {
+      "id": "eval-testing-automation",
+      "skill": "testing-automation",
+      "collection": "skills",
+      "prompt": "Set up a pytest suite and pyproject.toml configuration for a Python CSV parser module that reads files and checks an environment variable `MAX_ROWS`.",
+      "rubric": [
+        {"id": "branch_coverage_config", "points": 20, "description": "Configures branch=true, show_missing=true, and fail_under in pyproject.toml", "patterns": ["branch = true", "fail_under"]},
+        {"id": "strict_pytest_opts", "points": 20, "description": "Uses strict pytest options (`--strict-markers`, `--strict-config`)", "patterns": ["--strict-markers|--strict-config"]},
+        {"id": "parametrized_boundaries", "points": 20, "description": "Uses `@pytest.mark.parametrize` and `pytest.raises(..., match=...)` for boundaries", "patterns": ["parametrize", "pytest\\.raises"]},
+        {"id": "isolated_fixtures", "points": 20, "description": "Uses `tmp_path` and `monkeypatch` for zero-flakiness file and env isolation", "patterns": ["tmp_path", "monkeypatch"]},
+        {"id": "coverage_command", "points": 20, "description": "Provides exact branch coverage verification command (`--cov-branch --cov-report=term-missing`)", "patterns": ["--cov-branch", "term-missing"]}
+      ]
+    },
+    {
+      "id": "eval-web-scraper",
+      "skill": "web-scraper",
+      "collection": "skills",
+      "prompt": "Build a Python scraper for paginated product catalog pages at `https://shop.example.com/catalog` that extracts title, price, and stock status to JSONL.",
+      "rubric": [
+        {"id": "robots_txt_check", "points": 20, "description": "Checks robots.txt via RobotFileParser with an explicit User-Agent before fetching", "patterns": ["RobotFileParser|robots\\.txt", "User-Agent"]},
+        {"id": "timeouts_and_backoff", "points": 20, "description": "Enforces explicit request timeout, per-domain rate limit/jitter, and bounded backoff honoring Retry-After", "patterns": ["timeout=", "Retry-After|backoff|sleep"]},
+        {"id": "pagination_cycle_guard", "points": 20, "description": "Prevents infinite pagination via visited URL set and max_pages cap", "patterns": ["visited|seen", "max_pages"]},
+        {"id": "no_fabricated_fields", "points": 20, "description": "Stores None for missing fields, uses Decimal for price, and quarantines invalid rows", "patterns": ["Decimal", "rejected\\.jsonl|quarantine|None"]},
+        {"id": "offline_fixture_test", "points": 20, "description": "Includes provenance fields (source_url, fetched_at) and an offline HTML fixture test", "patterns": ["source_url", "fetched_at"]}
+      ]
+    },
+    {
+      "id": "eval-api-designer",
+      "skill": "api-designer",
+      "collection": "premium-skills",
+      "prompt": "Design an OpenAPI 3.1 REST API for creating and listing payment orders (`/v1/orders`) with safe retries and error handling.",
+      "rubric": [
+        {"id": "cursor_pagination", "points": 20, "description": "Uses cursor-based pagination with capped limit instead of unbounded lists", "patterns": ["cursor", "next_cursor|has_more"]},
+        {"id": "rfc9457_errors", "points": 20, "description": "Uses RFC 9457 `application/problem+json` ProblemDetails error schema", "patterns": ["application/problem\\+json", "ProblemDetails"]},
+        {"id": "idempotency_key", "points": 20, "description": "Requires `Idempotency-Key` header on POST /v1/orders and returns 201 + Location", "patterns": ["Idempotency-Key", "201", "Location"]},
+        {"id": "strict_schema", "points": 20, "description": "Uses `additionalProperties: false`, explicit formats/bounds, and rate-limit headers", "patterns": ["additionalProperties:\\s*false", "RateLimit-"]},
+        {"id": "contract_tests", "points": 20, "description": "Provides OpenAPI validation command and executable contract test cases", "patterns": ["redocly|safe_load", "contract|401|422"]}
+      ]
+    },
+    {
+      "id": "eval-code-migration",
+      "skill": "code-migration",
+      "collection": "premium-skills",
+      "prompt": "Plan and execute migrating a legacy Python 2.7 CSV billing module (using `/`, `dict.keys()`, `str`/`unicode`, and `round()`) to Python 3.12.",
+      "rubric": [
+        {"id": "golden_master_first", "points": 20, "description": "Captures golden-master / characterization tests BEFORE modifying source code", "patterns": ["golden-master|characterization"]},
+        {"id": "py2_semantic_traps", "points": 20, "description": "Explicitly audits `/` vs `//` division, `bytes` vs `str`, iterator views, and banker's rounding", "patterns": ["//", "bytes.*str|str.*bytes", "iterator|list\\("]},
+        {"id": "no_feature_creep", "points": 20, "description": "Separates mechanical syntax vs semantic fixes and forbids speculative feature additions", "patterns": ["mechanical|semantic", "Behavioral Deltas|feature"]},
+        {"id": "parity_verification", "points": 20, "description": "Runs side-by-side parity tests plus static checks (`mypy`/`ruff`)", "patterns": ["parity", "mypy|ruff|pytest"]},
+        {"id": "rollback_plan", "points": 20, "description": "Includes an explicit rollback and cutover checklist", "patterns": ["Rollback|rollback"]}
+      ]
+    },
+    {
+      "id": "eval-db-optimizer",
+      "skill": "db-optimizer",
+      "collection": "premium-skills",
+      "prompt": "Optimize this PostgreSQL query on a 50M-row `orders` table: `SELECT * FROM orders WHERE LOWER(customer_email) = 'a@b.com' AND status = 'pending' ORDER BY created_at DESC LIMIT 20 OFFSET 10000;`",
+      "rubric": [
+        {"id": "explain_analyze_buffers", "points": 20, "description": "Requests or provides `EXPLAIN (ANALYZE, BUFFERS)` and flags missing-plan assumptions", "patterns": ["EXPLAIN \\(ANALYZE, BUFFERS\\)", "ASSUMED|EXPLAIN"]},
+        {"id": "non_sargable_fix", "points": 20, "description": "Fixes non-sargable `LOWER(customer_email)` via expression index or `citext`", "patterns": ["LOWER\\(customer_email\\)|citext", "non-sargable|sargable|expression index"]},
+        {"id": "esr_index_concurrently", "points": 20, "description": "Applies ESR composite/partial index ordering using `CREATE INDEX CONCURRENTLY`", "patterns": ["CREATE INDEX CONCURRENTLY", "ESR|partial index|WHERE status = 'pending'"]},
+        {"id": "keyset_pagination", "points": 20, "description": "Replaces deep `OFFSET 10000` with keyset pagination and replaces `SELECT *`", "patterns": ["keyset|seek pagination", "\\(created_at, id\\)"]},
+        {"id": "tradeoff_analysis", "points": 20, "description": "Documents index write-amplification / storage / redundancy trade-offs", "patterns": ["write amplification|write overhead|redundant|HOT"]}
+      ]
+    },
+    {
+      "id": "eval-devops-pipeline",
+      "skill": "devops-pipeline",
+      "collection": "premium-skills",
+      "prompt": "Create a GitHub Actions workflow triggered on pull requests that echoes the PR title, runs npm tests, and uploads SARIF security findings.",
+      "rubric": [
+        {"id": "least_privilege_permissions", "points": 20, "description": "Sets minimal top-level `permissions:` and scopes `security-events: write` only to the scan job", "patterns": ["permissions:", "security-events: write"]},
+        {"id": "script_injection_guard", "points": 20, "description": "Passes PR title via `env:` variable instead of interpolating `${{ github.event.pull_request.title }}` directly in `run:`", "patterns": ["env:", "PR_TITLE|TITLE"]},
+        {"id": "concurrency_and_timeout", "points": 20, "description": "Configures `concurrency:` cancel-in-progress (protecting main) and `timeout-minutes:`", "patterns": ["concurrency:", "timeout-minutes:"]},
+        {"id": "lockfile_and_pinning", "points": 20, "description": "Uses `npm ci` + lockfile caching and addresses SHA pinning without inventing fake SHAs", "patterns": ["npm ci", "SHA|pin"]},
+        {"id": "yaml_validation", "points": 20, "description": "Includes YAML parse / `actionlint` verification", "patterns": ["actionlint|safe_load"]}
+      ]
+    },
+    {
+      "id": "eval-docker-generator",
+      "skill": "docker-generator",
+      "collection": "premium-skills",
+      "prompt": "Containerize a TypeScript Node 22 Express API (`npm run build` -> `dist/server.js`, port 3000) with PostgreSQL in Compose.",
+      "rubric": [
+        {"id": "multistage_pinned", "points": 20, "description": "Uses a multi-stage Dockerfile with pinned minor Node 22 tag (never `:latest`)", "patterns": ["AS builder|as builder", "node:22"]},
+        {"id": "lockfile_layer_cache", "points": 20, "description": "Copies `package*.json` and runs `npm ci` before copying source code", "patterns": ["COPY package", "npm ci"]},
+        {"id": "non_root_exec_cmd", "points": 20, "description": "Switches to non-root `USER` and uses JSON `exec`-form `CMD [\"node\", ...]` for SIGTERM", "patterns": ["USER ", "CMD \\[\"node\""]},
+        {"id": "dockerignore_included", "points": 20, "description": "Provides a `.dockerignore` excluding `.git`, `node_modules`, and `.env*`", "patterns": ["\\.dockerignore", "node_modules", "\\.env"]},
+        {"id": "hardened_compose", "points": 20, "description": "Hardens `compose.yaml` with `healthcheck`, `service_healthy`, `cap_drop: [ALL]`, and `no-new-privileges`", "patterns": ["service_healthy", "cap_drop", "no-new-privileges"]}
+      ]
+    },
+    {
+      "id": "eval-performance-profiler",
+      "skill": "performance-profiler",
+      "collection": "premium-skills",
+      "prompt": "This Python function slows down on 50,000 items because it checks `if item in seen_list:` and builds output with `out += line`. Profile and optimize it.",
+      "rubric": [
+        {"id": "measure_first_harness", "points": 20, "description": "Creates a reproducible benchmark with warmup runs, median/p95 latency, and tracemalloc/RSS", "patterns": ["warmup", "median|p95", "tracemalloc"]},
+        {"id": "profiler_command", "points": 20, "description": "Uses real `cProfile` profiling instead of guessing numbers", "patterns": ["cProfile"]},
+        {"id": "algorithmic_fixes", "points": 20, "description": "Replaces O(N^2) list membership with `set` and string `+=` with `''.join()`", "patterns": ["set\\(", "join\\("]},
+        {"id": "before_after_table", "points": 20, "description": "Formats a structured Before vs. After metrics table without fabricated numbers", "patterns": ["Baseline", "Optimized", "Peak memory|p95"]},
+        {"id": "functional_parity", "points": 20, "description": "Verifies exact functional output equality (`baseline == optimized`) after optimization", "patterns": ["parity|equality|=="]}
+      ]
+    },
+    {
+      "id": "eval-refactoring-assistant",
+      "skill": "refactoring-assistant",
+      "collection": "premium-skills",
+      "prompt": "Refactor a 120-line deeply nested (depth 6) `process_order` function that mixes validation, 2 discount types, and file logging without breaking callers.",
+      "rubric": [
+        {"id": "green_test_precondition", "points": 20, "description": "Requires running/writing characterization tests BEFORE refactoring", "patterns": ["characterization|precondition|before refactoring"]},
+        {"id": "guard_clauses", "points": 20, "description": "Flattens nesting using early-return guard clauses", "patterns": ["guard clause|early return"]},
+        {"id": "separate_io", "points": 20, "description": "Separates pure validation/pricing logic from file logging side effects", "patterns": ["pure", "side effect|I/O|logging"]},
+        {"id": "anti_overengineering", "points": 20, "description": "Avoids heavy Strategy/Factory class hierarchies for only 2 discount variants", "patterns": ["over-engineering|2.*variant|lookup|dict"]},
+        {"id": "metrics_and_verification", "points": 20, "description": "Reports before/after complexity metrics (nesting depth, length) and test verification", "patterns": ["Before.*After|nesting depth", "pytest|ruff|mypy"]}
+      ]
+    },
+    {
+      "id": "eval-security-auditor",
+      "skill": "security-auditor",
+      "collection": "premium-skills",
+      "prompt": "Audit this Flask snippet:\n```python\nAPI_TOKEN = 'sk-live-99887766554433221100'\n@app.get('/files')\ndef get_file():\n    name = request.args['name']\n    return open('/var/data/' + name).read()\n@app.get('/user')\ndef get_user():\n    q = f\"SELECT * FROM users WHERE id = {request.args['id']}\"\n    return db.execute(q).fetchall()\n```",
+      "rubric": [
+        {"id": "cwe_mappings", "points": 20, "description": "Maps findings accurately to CWE-89 (SQLi), CWE-22 (Path Traversal), and CWE-798 (Hardcoded Secret)", "patterns": ["CWE-89", "CWE-22", "CWE-798"]},
+        {"id": "secret_redaction", "points": 20, "description": "Redacts the hardcoded token instead of echoing the full secret value verbatim", "patterns": ["\\*{3,}|REDACTED", "sk-live"]},
+        {"id": "source_to_sink_trace", "points": 20, "description": "Provides explicit Source -> Sink trace and concrete exploit payloads for each finding", "patterns": ["Source.*Sink|request\\.args", "\\.\\./|OR 1=1|UNION"]},
+        {"id": "secure_patches", "points": 20, "description": "Provides parameterized SQL and `Path.resolve().is_relative_to()` remediation patches", "patterns": ["is_relative_to|resolve\\(", "parameterized|\\?|%s|:id"]},
+        {"id": "severity_and_no_fake_cves", "points": 20, "description": "Uses Critical/High severity classification and invents zero fake CVEs", "patterns": ["CRITICAL|HIGH", "Remediation"]}
+      ]
+    },
+    {
+      "id": "eval-terraform-generator",
+      "skill": "terraform-generator",
+      "collection": "premium-skills",
+      "prompt": "Generate a reusable AWS Terraform module for a private S3 data bucket with KMS encryption and least-privilege read-only IAM policy.",
+      "rubric": [
+        {"id": "version_and_module_layout", "points": 20, "description": "Separates `versions.tf`, `variables.tf`, `main.tf`, `outputs.tf` with pinned provider constraints", "patterns": ["required_version", "required_providers", "~> "]},
+        {"id": "s3_public_block_and_kms", "points": 20, "description": "Uses v5 separate resources (`aws_s3_bucket_public_access_block`, `aws_s3_bucket_server_side_encryption_configuration`, versioning)", "patterns": ["aws_s3_bucket_public_access_block", "aws_s3_bucket_server_side_encryption_configuration", "aws_s3_bucket_versioning"]},
+        {"id": "iam_least_privilege", "points": 20, "description": "Uses `data \"aws_iam_policy_document\"` with scoped actions/ARNs (no `*` wildcards)", "patterns": ["aws_iam_policy_document", "s3:GetObject"]},
+        {"id": "lifecycle_and_validation", "points": 20, "description": "Includes variable `validation {}` blocks and `lifecycle { prevent_destroy = true }`", "patterns": ["validation \\{", "prevent_destroy = true"]},
+        {"id": "validation_and_cost", "points": 20, "description": "Includes `terraform fmt -check` / `terraform validate` commands and KMS/storage cost notes", "patterns": ["terraform validate", "cost|KMS"]}
+      ]
+    },
+    {
+      "id": "eval-unit-test-generator",
+      "skill": "unit-test-generator",
+      "collection": "premium-skills",
+      "prompt": "Generate unit tests for `def apply_discount(price: Decimal, pct: int, now: datetime) -> Decimal` which rejects negative prices, rejects pct outside 0..100, and adds 5% extra off on Fridays.",
+      "rubric": [
+        {"id": "branch_inventory", "points": 20, "description": "Maps every branch/guard clause to specific test functions in a coverage checklist", "patterns": ["Branch|Checklist", "Friday|negative|100"]},
+        {"id": "boundary_values", "points": 20, "description": "Tests exact boundaries (`price=0`, `pct=0`, `pct=100`, `pct=-1`, `pct=101`, negative price)", "patterns": ["100", "101|-1", "Decimal\\("]},
+        {"id": "deterministic_clock", "points": 20, "description": "Passes fixed `datetime` values for Friday vs non-Friday instead of calling `datetime.now()`", "patterns": ["datetime\\(202", "Friday|weekday"]},
+        {"id": "exact_exceptions", "points": 20, "description": "Asserts exact exception types and message matches (`pytest.raises(..., match=...)`)", "patterns": ["pytest\\.raises", "ValueError"]},
+        {"id": "execution_command", "points": 20, "description": "Provides runnable `pytest --cov --cov-branch` execution verification", "patterns": ["pytest", "--cov-branch"]}
+      ]
+    }
+  ]
+}
