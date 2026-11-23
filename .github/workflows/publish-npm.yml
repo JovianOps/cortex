@@ -79,3 +79,21 @@ jobs:
             echo "Publishing with npm Trusted Publishing (OIDC, tokenless)..."
           fi
           npm publish --provenance --access public
+
+      - name: Record published tarball SHA-256 & SRI integrity in job summary
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TARBALL_URL="https://registry.npmjs.org/@jovianops/cortex/-/cortex-${PKG_VERSION}.tgz"
+          curl -fsSL "$TARBALL_URL" -o "cortex-${PKG_VERSION}.tgz"
+          SHA256=$(sha256sum "cortex-${PKG_VERSION}.tgz" | awk '{print $1}')
+          SRI=$(npm view "@jovianops/cortex@${PKG_VERSION}" dist.integrity)
+          {
+            echo "## Published \`@jovianops/cortex@${PKG_VERSION}\` Checksums"
+            echo ""
+            echo "| Artifact | Algorithm | Fingerprint |"
+            echo "| :--- | :--- | :--- |"
+            echo "| \`cortex-${PKG_VERSION}.tgz\` | SHA-256 | \`${SHA256}\` |"
+            echo "| \`cortex-${PKG_VERSION}.tgz\` | SHA-512 (SRI) | \`${SRI}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          rm -f "cortex-${PKG_VERSION}.tgz"
