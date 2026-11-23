@@ -1,12 +1,27 @@
 {
   "name": "@jovianops/cortex",
-  "version": "0.1.0",
-  "description": "A collection of 10 core and 10 premium Hermes skills",
+  "version": "0.2.0",
+  "description": "20 modular, deterministic Agent Skills (SKILL.md) for Claude, OpenAI Codex/ChatGPT, Gemini CLI, Cursor, GitHub Copilot/VS Code, OpenCode, OpenClaw, Goose, Aider, Cline, and Hermes Agent",
   "keywords": [
+    "agent-skills",
+    "skill-md",
+    "claude-code",
+    "claude",
+    "codex",
+    "openai",
+    "chatgpt",
+    "gemini-cli",
+    "cursor",
+    "github-copilot",
+    "vscode",
+    "opencode",
+    "openclaw",
+    "goose",
+    "aider",
+    "cline",
     "hermes",
     "skills",
-    "automation",
-    "productivity"
+    "automation"
   ],
   "author": "Athalla Jovian",
   "license": "MIT",
@@ -22,12 +37,18 @@
     "node": ">=14.0.0"
   },
   "scripts": {
-    "test": "python scripts/package_skills.py --check && python scripts/validate_skills.py"
+    "test": "python scripts/package_skills.py --check && python scripts/validate_skills.py && python scripts/validate_manifests.py"
   },
   "files": [
     "skills/",
+    "premium-skills/",
     "scripts/",
-    "templates/",
-    "references/"
+    ".claude-plugin/",
+    ".agents/",
+    ".cursor-plugin/",
+    "plugin.json",
+    "gemini-extension.json",
+    "AGENTS.md",
+    "GEMINI.md"
   ]
 }
