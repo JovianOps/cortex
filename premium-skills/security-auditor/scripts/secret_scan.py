@@ -104,17 +104,13 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: Path not found: {args.target}", file=sys.stderr)
         return 2
     findings = scan_path(args.target)
-    findings_for_output = [
-        {
-            "severity": f["severity"],
-            "cwe": f["cwe"],
-            "title": f["title"],
-            "file": f["file"],
-            "line": f["line"],
-            "evidence": "[REDACTED]",
-        }
-        for f in findings
-    ]
+    findings_for_output = sanitize_findings_for_output(findings)
+    for f in findings_for_output:
+        f["severity"] = str(f.get("severity", "UNKNOWN"))
+        f["cwe"] = str(f.get("cwe", "N/A"))
+        f["title"] = str(f.get("title", "Unknown finding"))[:200]
+        f["file"] = str(f.get("file", ""))[:500]
+        f["line"] = int(f.get("line", 0))
     if args.format == "json":
         print(json.dumps({"target": args.target.as_posix(), "count": len(findings_for_output), "findings": findings_for_output}, indent=2))
     else:
