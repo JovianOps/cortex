@@ -1180,18 +1180,18 @@
 
         <div class="ledger">
           <div class="ledger-row">
-            <span class="ledger-key">npm tarball SHA-256 (v0.3.0)</span>
-            <code class="ledger-val">852506860c9de0f4673a4d7fcda7456f2fa3fe743deadfeb185b95fa50e46117</code>
-            <button type="button" class="btn-sm" data-copy="852506860c9de0f4673a4d7fcda7456f2fa3fe743deadfeb185b95fa50e46117">copy</button>
+            <span class="ledger-key">npm tarball SHA-256 (v1.0.0)</span>
+            <code class="ledger-val">cbb9ce6a26086fc9481052bead73d9ec9f496cc9628341f0c92d1f72fd5e6247</code>
+            <button type="button" class="btn-sm" data-copy="cbb9ce6a26086fc9481052bead73d9ec9f496cc9628341f0c92d1f72fd5e6247">copy</button>
           </div>
           <div class="ledger-row">
-            <span class="ledger-key">npm SRI SHA-512 (v0.3.0)</span>
-            <code class="ledger-val">sha512-s5fzpR6o1vwy5Z0IXr6T0frqY7kRnsw2qIFidMSw+monuHB3JAhAbjJTAP8JBV5jwJTpJeX2zawhmuqztIcxsA==</code>
-            <button type="button" class="btn-sm" data-copy="sha512-s5fzpR6o1vwy5Z0IXr6T0frqY7kRnsw2qIFidMSw+monuHB3JAhAbjJTAP8JBV5jwJTpJeX2zawhmuqztIcxsA==">copy</button>
+            <span class="ledger-key">npm SRI SHA-512 (v1.0.0)</span>
+            <code class="ledger-val">sha512-erM0hXT5nh6M0HcUwqbwqJt2nB7IQjTvXQuAfsJtOQJ+HOoIZ5ez74povVkr/vOkxAeQK1LfZU9388V5fcKKsA==</code>
+            <button type="button" class="btn-sm" data-copy="sha512-erM0hXT5nh6M0HcUwqbwqJt2nB7IQjTvXQuAfsJtOQJ+HOoIZ5ez74povVkr/vOkxAeQK1LfZU9388V5fcKKsA==">copy</button>
           </div>
           <div class="ledger-row">
             <span class="ledger-key">SLSA v1 Provenance</span>
-            <span class="ledger-val"><a href="https://registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@0.3.0" target="_blank" rel="noreferrer">registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@0.3.0</a></span>
+            <span class="ledger-val"><a href="https://registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@1.0.0" target="_blank" rel="noreferrer">registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@1.0.0</a></span>
             <span class="tier core">signed</span>
           </div>
           <div class="ledger-row">
@@ -1729,7 +1729,7 @@
     ]
   }
 ];
-    const NPM_SHA256 = "852506860c9de0f4673a4d7fcda7456f2fa3fe743deadfeb185b95fa50e46117";
+    const NPM_SHA256 = "cbb9ce6a26086fc9481052bead73d9ec9f496cc9628341f0c92d1f72fd5e6247";
 
     const TARGETS = [
       { id: 'cortex-cli', label: 'npx @jovianops/cortex (CLI)', hint: 'Runs Cortex CLI directly from npm — verifies bundled SHA-256 checksums' },
@@ -1983,8 +1983,8 @@ Next steps:
       });
 
       $('verifyCmd').textContent = state.shell === 'powershell'
-        ? `$t="$env:TEMP\\cortex-0.3.0.tgz"\nInvoke-WebRequest https://registry.npmjs.org/@jovianops/cortex/-/cortex-0.3.0.tgz -OutFile $t\n(Get-FileHash $t -Algorithm SHA256).Hash  # expect ${NPM_SHA256.toUpperCase()}\nRemove-Item $t\nnpm audit signatures\nnpx @jovianops/cortex doctor`
-        : `# 1. Verify published npm tarball SHA-256 (expect ${NPM_SHA256})\ncurl -fsSL https://registry.npmjs.org/@jovianops/cortex/-/cortex-0.3.0.tgz | sha256sum\n\n# 2. Verify SLSA v1 provenance signatures & all 24 bundled skill hashes\nnpm audit signatures\nnpx @jovianops/cortex doctor`;
+        ? `$t="$env:TEMP\\cortex-1.0.0.tgz"\nInvoke-WebRequest https://registry.npmjs.org/@jovianops/cortex/-/cortex-1.0.0.tgz -OutFile $t\n(Get-FileHash $t -Algorithm SHA256).Hash  # expect ${NPM_SHA256.toUpperCase()}\nRemove-Item $t\nnpm audit signatures\nnpx @jovianops/cortex doctor`
+        : `# 1. Verify published npm tarball SHA-256 (expect ${NPM_SHA256})\ncurl -fsSL https://registry.npmjs.org/@jovianops/cortex/-/cortex-1.0.0.tgz | sha256sum\n\n# 2. Verify SLSA v1 provenance signatures & all 24 bundled skill hashes\nnpm audit signatures\nnpx @jovianops/cortex doctor`;
     }
 
     function filteredSkills() {
