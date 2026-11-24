@@ -4,13 +4,13 @@
     "name": "Athalla Jovian Maharsa",
     "url": "https://github.com/JovianOps"
   },
-  "description": "Cortex \u2014 24 deterministic v1.0.0 Agent Skills for Cursor.",
+  "description": "Cortex \u2014 24 deterministic v2.0.0 Agent Skills for Cursor.",
   "plugins": [
     {
       "name": "cortex",
       "source": "./",
-      "description": "All 24 Cortex v1.0.0 skill playbooks (10 core + 14 extended).",
-      "version": "1.0.0",
+      "description": "All 36 Cortex v2.0.0 Agent Skills (10 core + 26 extended with 36 bundled zero-dependency Python helper scripts).",
+      "version": "2.0.0",
       "skills": [
         "./skills/academic-assistant",
         "./skills/anti-hallucination",
@@ -24,17 +24,29 @@
         "./skills/web-scraper",
         "./premium-skills/accessibility-auditor",
         "./premium-skills/api-designer",
+        "./premium-skills/architecture-decision-records",
+        "./premium-skills/chaos-resilience-engineer",
         "./premium-skills/code-migration",
         "./premium-skills/db-optimizer",
         "./premium-skills/devops-pipeline",
         "./premium-skills/docker-generator",
+        "./premium-skills/finops-cost-optimizer",
+        "./premium-skills/git-history-surgeon",
+        "./premium-skills/go-backend-engineer",
+        "./premium-skills/graphql-architect",
         "./premium-skills/incident-response",
+        "./premium-skills/kubernetes-architect",
+        "./premium-skills/llm-security-auditor",
         "./premium-skills/observability-setup",
         "./premium-skills/performance-profiler",
+        "./premium-skills/privacy-compliance-auditor",
         "./premium-skills/refactoring-assistant",
         "./premium-skills/release-engineering",
+        "./premium-skills/rust-systems-engineer",
         "./premium-skills/security-auditor",
+        "./premium-skills/supply-chain-sbom",
         "./premium-skills/terraform-generator",
+        "./premium-skills/typescript-architect",
         "./premium-skills/unit-test-generator"
       ]
     }

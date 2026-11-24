@@ -1,7 +1,7 @@
 ---
 name: testing-automation
 description: Build branch-tested pytest suites with CI coverage gates.
-version: 1.0.0
+version: 2.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

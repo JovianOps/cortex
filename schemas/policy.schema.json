@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jovianops.github.io/cortex/schemas/policy.schema.json",
+  "title": "Cortex Unified Scanner Policy (.cortex-policy.json v2.0.0)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "fail_on": {
+      "type": "string",
+      "enum": ["none", "low", "medium", "high", "critical"],
+      "default": "high"
+    },
+    "enabled_scanners": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "disabled_scanners": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "ignore_rules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "ignore_paths": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

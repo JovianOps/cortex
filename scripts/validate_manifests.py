@@ -141,7 +141,12 @@ def main() -> int:
     if len(set(versions.values())) > 1:
         errors.append(f"Version mismatch across manifests: {versions}")
 
-    for schema_rel in ("schemas/checksums.schema.json", "schemas/packs.schema.json", "schemas/cortex-lock.schema.json"):
+    for schema_rel in (
+        "schemas/checksums.schema.json",
+        "schemas/packs.schema.json",
+        "schemas/cortex-lock.schema.json",
+        "schemas/policy.schema.json",
+    ):
         schema_data = load_json(schema_rel, errors)
         if schema_data is not None and "$schema" not in schema_data:
             errors.append(f"{schema_rel}: missing '$schema' key")

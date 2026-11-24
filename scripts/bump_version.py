@@ -28,6 +28,10 @@ JSON_FILES = (
 
 TEXT_FILES = (
     "scripts/cortex.py",
+    "scripts/cortex_mcp.py",
+    "scripts/cortex_studio.py",
+    "scripts/cortex_compile.py",
+    "scripts/cortex_scan.py",
     "scripts/install_skills.py",
     "scripts/package_skills.py",
     "AGENTS.md",
@@ -72,8 +76,9 @@ def bump_all(new_version: str) -> None:
     # 5. Rebuild deterministic ZIP archives & checksums.json
     subprocess.run([sys.executable, str(ROOT / "scripts" / "package_skills.py")], cwd=ROOT, check=True)
 
-    # 6. Sync index.html chrome version, script paths, and all 24 SKILL.md + ZIP SHA-256 digests
+    # 6. Sync index.html chrome version, full SKILLS array (from disk + checksums.json), and PACKS array (from packs.json)
     checksums = json.loads((ROOT / "checksums.json").read_text(encoding="utf-8"))
+    packs_data = json.loads((ROOT / "packs.json").read_text(encoding="utf-8"))
     html_path = ROOT / "index.html"
     html = html_path.read_text(encoding="utf-8")
     for pattern in (
@@ -82,26 +87,57 @@ def bump_all(new_version: str) -> None:
     ):
         html = html.replace(pattern, pattern.replace(old_version, new_version))
 
-    for slug, meta in checksums["skills"].items():
-        script_files = [f for f in meta["files"] if f != "SKILL.md"]
-        script_val = json.dumps(script_files[0]) if script_files else "null"
-        pat = re.compile(
-            r'("slug"\s*:\s*"' + re.escape(slug) + r'"[\s\S]*?"script"\s*:\s*)(null|"[^"]*")([\s\S]*?"sha256"\s*:\s*")([0-9a-f]{64})("[\s\S]*?"zipSha256"\s*:\s*")([0-9a-f]{64})(")'
-        )
-        m = pat.search(html)
-        if not m:
-            raise RuntimeError(f"Missing skill entry in index.html: {slug}")
-        html = (
-            html[: m.start(2)]
-            + script_val
-            + html[m.end(2) : m.start(4)]
-            + meta["files"]["SKILL.md"]
-            + html[m.end(4) : m.start(6)]
-            + meta["zip_sha256"]
-            + html[m.end(6) :]
-        )
+    skills_js: list[dict] = []
+    for folder, tier, zip_dir in (("skills", "core", "zips"), ("premium-skills", "extended", "premium-zips")):
+        for entry in sorted((ROOT / folder).iterdir()):
+            md = entry / "SKILL.md"
+            if not (entry.is_dir() and md.is_file()):
+                continue
+            raw_md = md.read_text(encoding="utf-8")
+            dm = re.search(r"(?m)^description:\s*(.+)$", raw_md)
+            tm = re.search(r"(?m)^\s*tags:\s*\[([^\]]*)\]", raw_md)
+            desc = dm.group(1).strip().strip("\"'") if dm else ""
+            tags = [t.strip().strip("\"'") for t in tm.group(1).split(",") if t.strip()] if tm else []
+            meta = checksums["skills"][entry.name]
+            script_files = [f for f in meta["files"] if f != "SKILL.md"]
+            skills_js.append({
+                "slug": entry.name,
+                "tier": tier,
+                "dir": folder,
+                "zipDir": zip_dir,
+                "desc": desc,
+                "tags": tags,
+                "script": script_files[0] if script_files else None,
+                "sha256": meta["files"]["SKILL.md"],
+                "zipSha256": meta["zip_sha256"],
+            })
+
+    packs_js = [
+        {
+            "id": pid,
+            "label": pinfo["label"],
+            "desc": pinfo["description"],
+            "skills": pinfo["skills"],
+        }
+        for pid, pinfo in packs_data["packs"].items()
+    ]
+
+    html, c1 = re.subn(
+        r"const SKILLS = \[[\s\S]*?\];",
+        f"const SKILLS = {json.dumps(skills_js, indent=2)};",
+        html,
+        count=1,
+    )
+    html, c2 = re.subn(
+        r"const PACKS = \[[\s\S]*?\];",
+        f"const PACKS = {json.dumps(packs_js, indent=2)};",
+        html,
+        count=1,
+    )
+    if c1 != 1 or c2 != 1:
+        raise RuntimeError("Could not sync SKILLS or PACKS arrays in index.html")
     html_path.write_text(html, encoding="utf-8")
-    print(f"Bumped Cortex {old_version} -> {new_version} across all skills, manifests, ZIPs, checksums.json, and index.html.")
+    print(f"Bumped Cortex {old_version} -> {new_version} across {len(skills_js)} skills, {len(packs_js)} packs, manifests, ZIPs, checksums.json, and index.html.")
 
 
 def main(argv: list[str] | None = None) -> int:

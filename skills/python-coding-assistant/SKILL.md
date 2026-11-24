@@ -1,7 +1,7 @@
 ---
 name: python-coding-assistant
 description: Write typed, linted, and tested Python code reliably.
-version: 1.0.0
+version: 2.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

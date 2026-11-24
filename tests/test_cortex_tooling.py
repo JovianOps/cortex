@@ -1,4 +1,4 @@
-"""Comprehensive test suite for Cortex v1.0.0 tooling, manifests, installer, and all 24 bundled helper scripts."""
+"""Comprehensive test suite for Cortex v2.0.0 tooling, manifests, installer, and all 36 bundled helper scripts."""
 from __future__ import annotations
 
 import importlib.util
@@ -32,7 +32,7 @@ class TestPackagingAndManifests(unittest.TestCase):
             text=True,
         )
         self.assertEqual(res.returncode, 0, msg=res.stderr + res.stdout)
-        self.assertIn("24 skill ZIP archives", res.stdout)
+        self.assertIn("36 skill ZIP archives", res.stdout)
 
     def test_validate_manifests_passes(self) -> None:
         res = subprocess.run(
@@ -42,7 +42,7 @@ class TestPackagingAndManifests(unittest.TestCase):
             text=True,
         )
         self.assertEqual(res.returncode, 0, msg=res.stderr + res.stdout)
-        self.assertIn("24 skills verified at v1.0.0", res.stdout)
+        self.assertIn("36 skills verified at v2.0.0", res.stdout)
 
     def test_eval_suite_and_audit_pass(self) -> None:
         res = subprocess.run(
@@ -53,7 +53,7 @@ class TestPackagingAndManifests(unittest.TestCase):
         )
         self.assertEqual(res.returncode, 0, msg=res.stderr + res.stdout)
         self.assertIn("100.0/100", res.stdout)
-        self.assertIn("24 tasks covering all 24 skills", res.stdout)
+        self.assertIn("36 tasks covering all 36 skills", res.stdout)
 
 
 class TestMultiAgentInstaller(unittest.TestCase):
@@ -347,11 +347,11 @@ class TestUnifiedCortexCLI(unittest.TestCase):
 
         srch = subprocess.run([sys.executable, str(cli), "search", "--has-script", "--json"], cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(srch.returncode, 0, msg=srch.stderr)
-        self.assertEqual(json.loads(srch.stdout)["count"], 24)
+        self.assertEqual(json.loads(srch.stdout)["count"], 36)
 
         pks = subprocess.run([sys.executable, str(cli), "packs", "--json"], cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(pks.returncode, 0, msg=pks.stderr)
-        self.assertEqual(len(json.loads(pks.stdout)["packs"]), 6)
+        self.assertEqual(len(json.loads(pks.stdout)["packs"]), 10)
 
     def test_cortex_pack_install_and_new_skill_scaffolder_scores_100(self) -> None:
         cli = SCRIPTS / "cortex.py"
@@ -438,12 +438,12 @@ class TestUnifiedCortexCLI(unittest.TestCase):
         cli = SCRIPTS / "cortex.py"
         ver = subprocess.run([sys.executable, str(cli), "--version"], cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(ver.returncode, 0)
-        self.assertEqual(ver.stdout.strip(), "cortex 1.0.0")
+        self.assertEqual(ver.stdout.strip(), "cortex 2.0.0")
 
         info = subprocess.run([sys.executable, str(cli), "info", "terraform-generator", "--json"], cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(info.returncode, 0, msg=info.stderr)
         info_data = json.loads(info.stdout)
-        self.assertEqual(info_data["version"], "1.0.0")
+        self.assertEqual(info_data["version"], "2.0.0")
         self.assertEqual(info_data["scripts"], ["scripts/lint_terraform.py"])
         self.assertEqual(len(info_data["skill_sha256"]), 64)
 
