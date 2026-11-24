@@ -33,7 +33,8 @@ AGENT_PROBES: tuple[tuple[str, str, str, str, tuple[str, ...]], ...] = (
     ("codex", "OpenAI Codex CLI", ".codex", ".agents", ("codex",)),
     ("gemini-cli", "Gemini CLI", ".gemini", ".gemini", ("gemini",)),
     ("cursor", "Cursor", ".cursor", ".cursor", ("cursor",)),
-    ("copilot", "GitHub Copilot & VS Code", ".copilot", ".github", ("copilot", "code")),
+    ("vscode", "Visual Studio Code", ".vscode", ".vscode", ("code", "code-insiders")),
+    ("copilot", "GitHub Copilot", ".copilot", ".github", ("copilot",)),
     ("opencode", "OpenCode", ".config/opencode", ".opencode", ("opencode",)),
     ("openclaw", "OpenClaw", ".openclaw", ".openclaw", ("openclaw",)),
     ("goose", "Goose", ".config/goose", ".goose", ("goose",)),
@@ -89,7 +90,12 @@ def detect_agents(project_dir: Path) -> list[dict]:
 
         # Count locked Cortex skills if present
         locked = 0
-        for candidate in (global_dir / "skills" / ".cortex-lock.json", project_marker_dir / "skills" / ".cortex-lock.json"):
+        lock_candidates = (
+            (home / ".copilot" / "skills" / ".cortex-lock.json", project_dir / ".github" / "skills" / ".cortex-lock.json")
+            if key == "vscode"
+            else (global_dir / "skills" / ".cortex-lock.json", project_marker_dir / "skills" / ".cortex-lock.json")
+        )
+        for candidate in lock_candidates:
             if candidate.is_file():
                 try:
                     locked += len(json.loads(candidate.read_text(encoding="utf-8")).get("skills", {}))

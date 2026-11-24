@@ -15,7 +15,9 @@ build/
 .env.*.local
 
 # IDE/Editor
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
 .idea/
 *.swp
 *.swo
@@ -62,7 +64,6 @@ env/
 *.ps1.bak
 
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo

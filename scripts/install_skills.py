@@ -85,10 +85,17 @@ AGENT_TARGETS: dict[str, AgentTarget] = {
     ),
     "copilot": AgentTarget(
         key="copilot",
-        label="GitHub Copilot & VS Code",
+        label="GitHub Copilot",
         global_rel=".copilot/skills",
         project_rel=".github/skills",
-        note="Commit .github/skills/ to share skills with VS Code Copilot and Copilot coding agent.",
+        note="Commit .github/skills/ to share skills with GitHub Copilot and Copilot coding agent.",
+    ),
+    "vscode": AgentTarget(
+        key="vscode",
+        label="Visual Studio Code",
+        global_rel=".copilot/skills",
+        project_rel=".github/skills",
+        note='VS Code auto-loads SKILL.md from .github/skills/ and ~/.copilot/skills/. For native plugin installs, add "JovianOps/cortex" to chat.plugins.marketplaces.',
     ),
     "opencode": AgentTarget(
         key="opencode",
@@ -139,7 +146,8 @@ AGENT_ALIASES: dict[str, str] = {
     "openai": "codex",
     "gemini": "gemini-cli",
     "github-copilot": "copilot",
-    "vscode": "copilot",
+    "vs-code": "vscode",
+    "code": "vscode",
 }
 
 
@@ -218,21 +226,26 @@ def resolve_agents(raw_agents: list[str]) -> list[AgentTarget]:
         return []
     resolved: list[AgentTarget] = []
     seen: set[str] = set()
+    seen_paths: set[tuple[str, str]] = set()
     for item in raw_agents:
         token = item.strip().lower()
         if token == "all":
             for key, target in AGENT_TARGETS.items():
-                if key not in seen:
+                path_pair = (target.global_rel, target.project_rel)
+                if key not in seen and path_pair not in seen_paths:
                     resolved.append(target)
                     seen.add(key)
+                    seen_paths.add(path_pair)
             continue
         canonical = AGENT_ALIASES.get(token, token)
         if canonical not in AGENT_TARGETS:
             valid = ", ".join(sorted(AGENT_TARGETS.keys()) + ["all"])
             raise SystemExit(f"ERROR: Unknown agent {item!r}. Supported: {valid}")
         if canonical not in seen:
-            resolved.append(AGENT_TARGETS[canonical])
+            target = AGENT_TARGETS[canonical]
+            resolved.append(target)
             seen.add(canonical)
+            seen_paths.add((target.global_rel, target.project_rel))
     return resolved
 
 
@@ -346,6 +359,36 @@ def update_aider_conf(project_root: Path, installed_files: list[Path], dry_run: 
 
     conf_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
     print(f"  Updated {conf_path} with {len(to_add)} Cortex skill(s).")
+
+
+def update_vscode_settings(project_root: Path, dry_run: bool) -> None:
+    """Safely enable Agent Skills in .vscode/settings.json without clobbering existing keys."""
+    settings_path = project_root / ".vscode" / "settings.json"
+    existing: dict = {}
+    if settings_path.is_file():
+        try:
+            parsed = json.loads(settings_path.read_text(encoding="utf-8"))
+            if isinstance(parsed, dict):
+                existing = parsed
+            else:
+                print(f"  Skipped {settings_path}: expected top-level JSON object.")
+                return
+        except json.JSONDecodeError:
+            print(f"  Skipped {settings_path}: existing file contains comments or non-strict JSON.")
+            return
+
+    if existing.get("chat.useAgentSkills") is True:
+        print(f"  VS Code settings already enable chat.useAgentSkills: {settings_path}")
+        return
+
+    if dry_run:
+        print(f"  [dry-run] Would set chat.useAgentSkills=true in {settings_path}")
+        return
+
+    existing["chat.useAgentSkills"] = True
+    settings_path.parent.mkdir(parents=True, exist_ok=True)
+    settings_path.write_text(json.dumps(existing, indent=2) + "\n", encoding="utf-8")
+    print(f"  Updated {settings_path} with chat.useAgentSkills=true.")
 
 
 def install_single_skill(
@@ -527,14 +570,14 @@ def cmd_uninstall(
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Install, verify, upgrade, and uninstall Cortex v0.3.0 SKILL.md playbooks across 11 AI agents."
+        description="Install, verify, upgrade, and uninstall Cortex v0.3.0 SKILL.md playbooks across 12 AI agent & IDE targets."
     )
     parser.add_argument(
         "--agent",
         "-a",
         action="append",
         default=[],
-        help="Target agent(s): claude-code, codex, gemini-cli, cursor, copilot, opencode, openclaw, goose, cline, aider, agents, or all.",
+        help="Target agent(s): claude-code, codex, gemini-cli, cursor, copilot, vscode, opencode, openclaw, goose, cline, aider, agents, or all.",
     )
     parser.add_argument(
         "--collection",
@@ -593,6 +636,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "--write-aider-conf",
         action="store_true",
         help="When installing for aider, append installed SKILL.md paths to .aider.conf.yml in --project-dir.",
+    )
+    parser.add_argument(
+        "--write-vscode-settings",
+        action="store_true",
+        help="When installing for vscode, ensure chat.useAgentSkills=true in .vscode/settings.json under --project-dir.",
     )
     parser.add_argument("--dry-run", action="store_true", help="Preview changes without writing or deleting files.")
     parser.add_argument("--list", action="store_true", help="List all supported agents and available Cortex skills.")
@@ -674,6 +722,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  Aider usage: aider {sample_flags}{suffix}")
             if args.write_aider_conf:
                 update_aider_conf(project_root, installed_md, args.dry_run)
+        if target.key == "vscode" and args.write_vscode_settings:
+            update_vscode_settings(project_root, args.dry_run)
         if target.note:
             print(f"  Note: {target.note}")
 

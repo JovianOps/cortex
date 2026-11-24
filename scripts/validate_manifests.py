@@ -11,11 +11,13 @@ REPO_URL = "https://github.com/JovianOps/cortex"
 
 PLUGIN_MANIFESTS = (
     ".claude-plugin/plugin.json",
+    ".github/plugin.json",
     "plugin.json",
     ".cursor-plugin/plugin.json",
 )
 MARKETPLACE_MANIFESTS = (
     ".claude-plugin/marketplace.json",
+    ".github/plugin/marketplace.json",
     ".agents/plugins/marketplace.json",
     ".cursor-plugin/marketplace.json",
 )

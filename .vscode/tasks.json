@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Cortex: Doctor",
+      "type": "shell",
+      "command": "python scripts/cortex.py doctor",
+      "problemMatcher": []
+    },
+    {
+      "label": "Cortex: Run Full Validation & Tests",
+      "type": "shell",
+      "command": "npm test",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Cortex: Repackage ZIPs & Checksums",
+      "type": "shell",
+      "command": "python scripts/package_skills.py",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Cortex: Verify Website (index.html)",
+      "type": "shell",
+      "command": "python scripts/verify_site.py",
+      "problemMatcher": []
+    },
+    {
+      "label": "Cortex: Audit GitHub Actions Workflows",
+      "type": "shell",
+      "command": "python premium-skills/devops-pipeline/scripts/lint_actions.py .github/workflows",
+      "problemMatcher": []
+    }
+  ]
+}
