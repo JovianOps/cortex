@@ -325,13 +325,13 @@ done
 
 Every official release of **`@jovianops/cortex`** is published from GitHub Actions with **SLSA v1 Provenance** and deterministic **SHA-256 checksums** so you can verify you installed the real, untampered release before your AI agent reads a single instruction.
 
-### Official `@jovianops/cortex@0.3.0` Package Hashes
+### Official `@jovianops/cortex@1.0.0` Package Hashes
 
 | Artifact | Algorithm | Expected Fingerprint |
 | :--- | :--- | :--- |
-| **`@jovianops/cortex@0.3.0`** npm tarball (`cortex-0.3.0.tgz`) | **SHA-256** | `852506860c9de0f4673a4d7fcda7456f2fa3fe743deadfeb185b95fa50e46117` |
-| **`@jovianops/cortex@0.3.0`** npm tarball (SRI) | **SHA-512** | `sha512-s5fzpR6o1vwy5Z0IXr6T0frqY7kRnsw2qIFidMSw+monuHB3JAhAbjJTAP8JBV5jwJTpJeX2zawhmuqztIcxsA==` |
-| **SLSA v1 Provenance Attestation** | Sigstore / OIDC | [`registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@0.3.0`](https://registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@0.3.0) |
+| **`@jovianops/cortex@1.0.0`** npm tarball (`cortex-1.0.0.tgz`) | **SHA-256** | `cbb9ce6a26086fc9481052bead73d9ec9f496cc9628341f0c92d1f72fd5e6247` |
+| **`@jovianops/cortex@1.0.0`** npm tarball (SRI) | **SHA-512** | `sha512-erM0hXT5nh6M0HcUwqbwqJt2nB7IQjTvXQuAfsJtOQJ+HOoIZ5ez74povVkr/vOkxAeQK1LfZU9388V5fcKKsA==` |
+| **SLSA v1 Provenance Attestation** | Sigstore / OIDC | [`registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@1.0.0`](https://registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@1.0.0) |
 | **All 24 Skills, 24 Bundled Scripts & 24 ZIPs** | **SHA-256** | [`checksums.json`](checksums.json) |
 
 ### 1. Verify the npm Package Tarball SHA-256
@@ -339,16 +339,16 @@ Every official release of **`@jovianops/cortex`** is published from GitHub Actio
 **Linux / macOS (Bash):**
 
 ```bash
-# Should print: 852506860c9de0f4673a4d7fcda7456f2fa3fe743deadfeb185b95fa50e46117
-curl -fsSL https://registry.npmjs.org/@jovianops/cortex/-/cortex-0.3.0.tgz | sha256sum
+# Should print: cbb9ce6a26086fc9481052bead73d9ec9f496cc9628341f0c92d1f72fd5e6247
+curl -fsSL https://registry.npmjs.org/@jovianops/cortex/-/cortex-1.0.0.tgz | sha256sum
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
-# Should print: 852506860C9DE0F4673A4D7FCDA7456F2FA3FE743DEADFEB185B95FA50E46117
-$tmp = "$env:TEMP\cortex-0.3.0.tgz"
-Invoke-WebRequest https://registry.npmjs.org/@jovianops/cortex/-/cortex-0.3.0.tgz -OutFile $tmp
+# Should print: CBB9CE6A26086FC9481052BEAD73D9EC9F496CC9628341F0C92D1F72FD5E6247
+$tmp = "$env:TEMP\cortex-1.0.0.tgz"
+Invoke-WebRequest https://registry.npmjs.org/@jovianops/cortex/-/cortex-1.0.0.tgz -OutFile $tmp
 (Get-FileHash $tmp -Algorithm SHA256).Hash
 Remove-Item $tmp
 ```

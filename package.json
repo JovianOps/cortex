@@ -27,14 +27,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JovianOps/cortex.git"
+    "url": "git+https://github.com/JovianOps/cortex.git"
   },
   "bugs": {
     "url": "https://github.com/JovianOps/cortex/issues"
   },
   "homepage": "https://github.com/JovianOps/cortex#readme",
   "bin": {
-    "cortex": "./bin/cortex.mjs"
+    "cortex": "bin/cortex.mjs"
   },
   "publishConfig": {
     "access": "public"
@@ -63,6 +63,9 @@
     "GEMINI.md",
     "packs.json",
     "checksums.json",
-    "schemas/"
+    "schemas/",
+    "!**/__pycache__/**",
+    "!**/*.pyc",
+    "!**/*.pyo"
   ]
 }
