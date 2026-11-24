@@ -64,7 +64,6 @@ env/
 *.ps1.bak
 
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo
