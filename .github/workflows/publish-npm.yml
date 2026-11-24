@@ -90,15 +90,34 @@ jobs:
         run: |
           PKG_VERSION=$(node -p "require('./package.json').version")
           TARBALL_URL="https://registry.npmjs.org/@jovianops/cortex/-/cortex-${PKG_VERSION}.tgz"
-          curl -fsSL "$TARBALL_URL" -o "cortex-${PKG_VERSION}.tgz"
-          SHA256=$(sha256sum "cortex-${PKG_VERSION}.tgz" | awk '{print $1}')
-          SRI=$(npm view "@jovianops/cortex@${PKG_VERSION}" dist.integrity)
-          {
-            echo "## Published \`@jovianops/cortex@${PKG_VERSION}\` Checksums"
-            echo ""
-            echo "| Artifact | Algorithm | Fingerprint |"
-            echo "| :--- | :--- | :--- |"
-            echo "| \`cortex-${PKG_VERSION}.tgz\` | SHA-256 | \`${SHA256}\` |"
-            echo "| \`cortex-${PKG_VERSION}.tgz\` | SHA-512 (SRI) | \`${SRI}\` |"
-          } >> "$GITHUB_STEP_SUMMARY"
-          rm -f "cortex-${PKG_VERSION}.tgz"
+          DOWNLOADED=false
+          for attempt in 1 2 3 4 5; do
+            if curl -fsSL "$TARBALL_URL" -o "cortex-${PKG_VERSION}.tgz"; then
+              DOWNLOADED=true
+              break
+            fi
+            echo "Attempt ${attempt}/5: tarball not yet public at ${TARBALL_URL}; waiting 5s..."
+            sleep 5
+          done
+
+          if [ "$DOWNLOADED" = "true" ]; then
+            SHA256=$(sha256sum "cortex-${PKG_VERSION}.tgz" | awk '{print $1}')
+            SRI=$(npm view "@jovianops/cortex@${PKG_VERSION}" dist.integrity || echo "pending")
+            {
+              echo "## Published \`@jovianops/cortex@${PKG_VERSION}\` Checksums"
+              echo ""
+              echo "| Artifact | Algorithm | Fingerprint |"
+              echo "| :--- | :--- | :--- |"
+              echo "| \`cortex-${PKG_VERSION}.tgz\` | SHA-256 | \`${SHA256}\` |"
+              echo "| \`cortex-${PKG_VERSION}.tgz\` | SHA-512 (SRI) | \`${SRI}\` |"
+            } >> "$GITHUB_STEP_SUMMARY"
+            rm -f "cortex-${PKG_VERSION}.tgz"
+          else
+            echo "::notice::@jovianops/cortex@${PKG_VERSION} publish succeeded, but the public tarball is not yet live (404). If npm Staged Publishing is enabled on @jovianops/cortex, approve the staged release on npmjs.com."
+            {
+              echo "## \`@jovianops/cortex@${PKG_VERSION}\` Published (Pending Public Availability)"
+              echo ""
+              echo "\`npm publish\` succeeded, but \`${TARBALL_URL}\` returned HTTP 404 after 5 attempts."
+              echo "If **npm Staged Publishing** is enabled for \`@jovianops/cortex\`, approve the staged version in npmjs.com to make it public."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
