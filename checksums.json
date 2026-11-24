@@ -1,33 +1,33 @@
 {
   "schema_version": "1.0.0",
-  "release_version": "0.3.0",
+  "release_version": "0.4.0",
   "skill_count": 24,
   "skills": {
     "academic-assistant": {
       "collection": "core",
       "dir": "skills",
       "zip": "zips/academic-assistant.zip",
-      "zip_sha256": "9187e66263479a9ec66a82becc7d73cee0de5c90593423ea05defa292595b22d",
+      "zip_sha256": "07c0f4860a3d03911d10b63867403f21a5182e4ea16424d8f9cdde9be24a5ae9",
       "files": {
-        "SKILL.md": "345c4a9b39d8490d34b4f2e997ff4ff143ea943312ac9197e1de33308932ab33"
+        "SKILL.md": "ec3c6571b60a6390cb393ebe1f88e6e23fdce998111844784be46a22387bddcd"
       }
     },
     "anti-hallucination": {
       "collection": "core",
       "dir": "skills",
       "zip": "zips/anti-hallucination.zip",
-      "zip_sha256": "8026f70f65c1026d8a2f5a2b585cb5184c30c35a63a93d1948500ed6ee02b6db",
+      "zip_sha256": "8ba30c14d772d71ee97025a8c6ac61bdb6be69bb3f7140f08d4699e44f1c91dd",
       "files": {
-        "SKILL.md": "6539128ed63d0bb07782fbcb1496f87615abce1952358e24ecb60477bca08bd2"
+        "SKILL.md": "80e37a26a6c136da7fa31f27f78adfa58f96784cea447896bc8d386527fb095a"
       }
     },
     "blender-3d-modeling": {
       "collection": "core",
       "dir": "skills",
       "zip": "zips/blender-3d-modeling.zip",
-      "zip_sha256": "798bc22218f68e1c2a90b202c3c67c4f08a610beaaa5806cf5f62085af0dd8ae",
+      "zip_sha256": "9749531b5c6da5511887918c4ffbb89011afd3adab0750e4e8c8555f4a6c4d00",
       "files": {
-        "SKILL.md": "e68253d5ffcc6a5f7f0389b99d7b2a5ca8f0f4cb4b9e6aefe932a35c936b094e",
+        "SKILL.md": "885bdd08d8a89a96d0895dcd183e9791bc8d57694907a0580077956cda05051e",
         "scripts/bmesh_check.py": "f5f0127c02b5692b79a72d365b6ae39f059b3935c3d4b3c54eae38feffd71e78"
       }
     },
@@ -35,18 +35,18 @@
       "collection": "core",
       "dir": "skills",
       "zip": "zips/code-review-assistant.zip",
-      "zip_sha256": "e8645289748f4c31be4a93c9f3064653e70deea8ac20be26aa56e68eb6f07f92",
+      "zip_sha256": "873cda68daa652a2683fb8bf6dfb574ec216e6fca6b68e9d66872a49f6343bd2",
       "files": {
-        "SKILL.md": "c7eb1e0da9b6790133ffe3e8a3311b5011a44303cd5c872349c84f51b20e4778"
+        "SKILL.md": "c45a4523d46d88f21360f27ff9ca94c4d4b120174434c84c3126d41147d560f1"
       }
     },
     "college-report-card": {
       "collection": "core",
       "dir": "skills",
       "zip": "zips/college-report-card.zip",
-      "zip_sha256": "9c0002286d00578241ed3612b1918451488a1994ce65abc3a6874f6f1ef2575e",
+      "zip_sha256": "dcd8e9b5e0c44b64e728c8d3ce96d3e8098cf88404d20dd78b08051db3f68e69",
       "files": {
-        "SKILL.md": "9040e0872e385999f31936edcb9c788a712fe58afb947f3bc53499d0b1a17be7",
+        "SKILL.md": "0880c290436d9eadc10d88e92c22719def2be40e7b96a36df42ad92ae3982fff",
         "scripts/grade_calc.py": "94a8cd70eb8b502e75b839690d9d2789281f2aa3487b2c840ea56272c3c3eff4"
       }
     },
@@ -54,9 +54,9 @@
       "collection": "core",
       "dir": "skills",
       "zip": "zips/documentation-generator.zip",
-      "zip_sha256": "9fb3f9bd0cd147f4cbacf367637649864d7eba0e0c07f61adc579933a73b315c",
+      "zip_sha256": "4aa3d4f3006363132d45163eb4c7ec2202bf1b854cf1977716267ade058688f3",
       "files": {
-        "SKILL.md": "234c5428f3edf30160be5e255aa564b6ec20e407496ecadc2acbd9517f1bc1eb",
+        "SKILL.md": "9de0ee05e1039aabeb370196e49e256f9461b2d2625c59e364baf239e859e38c",
         "scripts/check_docs.py": "ca29ca9f647475935563db1d0d7b9daaa729f992cdb68a6819fbaa9d1296a870"
       }
     },
@@ -64,9 +64,9 @@
       "collection": "core",
       "dir": "skills",
       "zip": "zips/memory-manager.zip",
-      "zip_sha256": "8e85ca135fa4372277e1c5d82cf4284cda5b2b28a71a32bae530f73d30fd08ea",
+      "zip_sha256": "6e61cb2d08823aa741ccf5294541f73ef39b075ff5378d31d11cbc5b7a75e4a7",
       "files": {
-        "SKILL.md": "1e6b58e57f7ebf08e934e39cdac3ba9fea33f09ff1e4a9ffd19fd3777ff58773",
+        "SKILL.md": "52c0c2120719eebc45494561ca6a11ac03fa99977a41fd8c14a8c4bab6cf4059",
         "scripts/memory_store.py": "1ad410509bcd8852c0515224f6eb583794136943fa2336426e5d9a36d5f2122a"
       }
     },
@@ -74,36 +74,36 @@
       "collection": "core",
       "dir": "skills",
       "zip": "zips/python-coding-assistant.zip",
-      "zip_sha256": "8e611dd53cb11cefe7fe885d285031f9478032e8d7983a379fcb39651b9a3c15",
+      "zip_sha256": "ed60a2fcb123e6833e847483060b37f5e0f28658fdc34bc81e92bad9457d4253",
       "files": {
-        "SKILL.md": "1794a3de5e75139854a1f9afaae148bc24a5688c4c02cbb5a372a072d9cc6407"
+        "SKILL.md": "22447380b0ff3163ce5590762f0632486404cfc111fda1578c36ddd23a244949"
       }
     },
     "testing-automation": {
       "collection": "core",
       "dir": "skills",
       "zip": "zips/testing-automation.zip",
-      "zip_sha256": "b7b12b8a8af5e3a8a957035a67e8edc061843428fe15446bbee9d1e48bdcaf6b",
+      "zip_sha256": "e6e7384ade75012456ea20c1ee6d1dceb9f9b372d9017849f68ae92a7962ee11",
       "files": {
-        "SKILL.md": "41bdcf3b5046eb91cdbb541a076567a3ec1b4308c10d93868f74cd8d34cc91d0"
+        "SKILL.md": "de53c6fcd78c8d791e6aa0643cad75da33bd4834f4a10237879c6fec483ffae0"
       }
     },
     "web-scraper": {
       "collection": "core",
       "dir": "skills",
       "zip": "zips/web-scraper.zip",
-      "zip_sha256": "75f1eba451cc10af5a82e968d469b1b0c6bd0f6abd6b9c7bebe0763f8de46463",
+      "zip_sha256": "ac41b2dc255ca81a5998dad3395185bad522533d144314f38915e7c7239eb3ab",
       "files": {
-        "SKILL.md": "a98d493cba265ae490977f23ba585b580b59b072bfd25536a281e791af97c929"
+        "SKILL.md": "5bfc5786eacac82bb338e0a4ab4e818da3dfb866e3e4c42009238d164c1b7210"
       }
     },
     "accessibility-auditor": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/accessibility-auditor.zip",
-      "zip_sha256": "a1fdaedecaebdd55d33f2122305846538d7e21266f6bfdce10814a80c8c802b7",
+      "zip_sha256": "714796dc269f4749448b9891961e177415ea4f4cee3c315cc82b4a2a815a4c0c",
       "files": {
-        "SKILL.md": "c04a276e5dd37e3da51c6e34b0d506ad3b2d57b9199687c31b4b784278273258",
+        "SKILL.md": "1580ed2ebf3727f73f63a62a4fc1b9713bc36c77edf170d3eff29dda4ab0e32d",
         "scripts/a11y_scan.py": "98961b648fbcd4775b0af6df99d0816b1779695cf3fcf7ba3cebd73ad6827a22"
       }
     },
@@ -111,9 +111,9 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/api-designer.zip",
-      "zip_sha256": "f72abfdf150e4f2e6958877c3fa91e370ea5a6752e400f64c27bdbf15392e799",
+      "zip_sha256": "4e239302fea9299948e0bb3d5bdf8e22dc13fdc1258bbea2ed29add7164377bc",
       "files": {
-        "SKILL.md": "baebc137f7744975121df3cefe2a16c594af7840287ac2feafe6662ce6e3d0b0",
+        "SKILL.md": "50ef780d8a9679c44f429e2e568d1961a7960eca095546dd2fcb4152119f1510",
         "scripts/lint_openapi.py": "ffc72306791d7a75ba9aeeff9f5474c3876f0a8ea141f7782467da5456dd441d"
       }
     },
@@ -121,27 +121,27 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/code-migration.zip",
-      "zip_sha256": "9c0b8d96fa54473e83e01ecc1413b6390e65d7af667d97734684aaca4f707813",
+      "zip_sha256": "72f8c5a8c8b43df765b92961ee2d04bdfa8b9ad67a2630b165127576b3f4bd5f",
       "files": {
-        "SKILL.md": "6aa0e80c07caaa23844cd8fc84f234563e9eff2c2a27a7ee19267727b0449af4"
+        "SKILL.md": "8454d195388c6590b7ad35906fd44abf7d114f4b99e19e48b4b376a7136e6ce4"
       }
     },
     "db-optimizer": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/db-optimizer.zip",
-      "zip_sha256": "0223c7809cb01a274d3bc0bc26daf1c354698c48d28697ffb3f5cd100652da0d",
+      "zip_sha256": "5aaac232f9370ae3469d90f55f00173b9962768e396bb6dc920a85eddd62bf89",
       "files": {
-        "SKILL.md": "59a07095ef7ac32c363581c395a3e69ff9192cdde25279d6f70a6dca5750376e"
+        "SKILL.md": "0aab34da34b57a239f34963b11c19b9e433de662122484c245167193bcfd245a"
       }
     },
     "devops-pipeline": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/devops-pipeline.zip",
-      "zip_sha256": "6d7e607cdc419adef343d4d2b2b9ccf5c416384b3ec65a33bc8bd75b813bd597",
+      "zip_sha256": "095839d3184995ada7d6f1ac254ee88adc87def10444e396a1cfd5a60c3a9929",
       "files": {
-        "SKILL.md": "ce8bacb743dd96a19fbb3ae26d376790858715c97193eab03ea72b3e39f2d61a",
+        "SKILL.md": "14d425021e6af9c75953c38644eecede8cb8957895f5d7cf0d9c8ebb6a8e583f",
         "scripts/lint_actions.py": "2172ce7468f315f16a63d2cb29f8cdabe88a6d0725f1fecc8a320bc503837d5e"
       }
     },
@@ -149,9 +149,9 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/docker-generator.zip",
-      "zip_sha256": "58ee0d3205b1a797e82017288e8a9a348b0a74273d675b5d29017a972dcba718",
+      "zip_sha256": "174492e6203129c14924e94e7a4b6e68e27e05457affe514d3caa1fc2af86740",
       "files": {
-        "SKILL.md": "aa8f2700318ea4ce3800b541be80f6f9bbe6e35f4cdc6133bd9babd9bfae18f5",
+        "SKILL.md": "286ae956fba9307fb838c9edce556f4422ad5f1d4e9506d3cce299c681897e97",
         "scripts/lint_dockerfile.py": "7a92f2a4fb2b0a9a4f3fdf42789c1a8e5018aa048517dfe067286a2b328c29bb"
       }
     },
@@ -159,45 +159,45 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/incident-response.zip",
-      "zip_sha256": "01904a3e5626f4166e5859b4d1bc80186dc8369777df6493d9180472d5b18e04",
+      "zip_sha256": "67c6b406f81d8f49b5c1486db97435bb66945b1ef6a826d9ea572adf3355464e",
       "files": {
-        "SKILL.md": "c76cb1635c25352849603763f2a38c0a460e3f7113dc6b1b08889feed5a33876"
+        "SKILL.md": "bebd8cd59ddb905c9868280e7fb28aaf139445fd1c4f1df55488af96645c39e1"
       }
     },
     "observability-setup": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/observability-setup.zip",
-      "zip_sha256": "af8e4faf5aca24d6d8737d02f7c20bd91eb67dfac70dc27df9922a90c0a5d44a",
+      "zip_sha256": "ff7fb54df3e0ccc31037b7f0e438db5e50a415299b3ef751c74dcb2f778ce78a",
       "files": {
-        "SKILL.md": "fd554ba148fd78a214a630c6de26d9c3aa3d8a6bf77f7cef9f238d683e369c30"
+        "SKILL.md": "49fefd83b2748bc2e16433d0ea7286ceb5252303163126e89e6a7dc1523d013d"
       }
     },
     "performance-profiler": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/performance-profiler.zip",
-      "zip_sha256": "c9eb2fe77dcf43c17f8b6568d0a686583e4a7047603c3562a99f3ed46650f92f",
+      "zip_sha256": "64163f9816b64f75dd6de172e2ea9bf8cad34f589bfd0cb06d4e616302350b56",
       "files": {
-        "SKILL.md": "1a09c583a23b8f282aeb983d7cb93ba18c6b4c2e81805976a99288de37fd767d"
+        "SKILL.md": "b455b943a5a319c6bd855157a68a11f240f69f9ead7ede30f6e3bf6b14584f51"
       }
     },
     "refactoring-assistant": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/refactoring-assistant.zip",
-      "zip_sha256": "e6f7e0dd52da086b68b0ce60db74fb0de66882751b5e7b77aaa4c12393d26797",
+      "zip_sha256": "91e135cd38037fa1b39d688d5485433a06933b93af61376d3af7a42dd3262c2a",
       "files": {
-        "SKILL.md": "d8b4cd0ce23b643797a3db3ce7165f91faaa6e96f56983c2c70ffaf941702906"
+        "SKILL.md": "ce7a547846de0579c19c20dc1b6d39adf8dd00bd277cf8cb07e9b03fb876487b"
       }
     },
     "release-engineering": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/release-engineering.zip",
-      "zip_sha256": "902d064f18ca6a53bad0b9e75e0b24c8e2d09c400b79367b4b639da9033c206c",
+      "zip_sha256": "a7a4c910953a971df076086c8f122de2f019f236468e3d421959a5b31a67cc83",
       "files": {
-        "SKILL.md": "6d0b0c39b820d7e620b557904a3bb8b565008d0fc6afa13ce8212e16ee9b1c14",
+        "SKILL.md": "a09dea4754082bf58f64a2f9d92d1e698a0b2cfbb69b263894fb37ec561ce6f6",
         "scripts/semver_bump.py": "565c275376b83084839b21bc703c7ef2ad244f19bcc87ff8d90e49389bde6ff5"
       }
     },
@@ -205,9 +205,9 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/security-auditor.zip",
-      "zip_sha256": "3cf49ece42be867d7f1671cf0b2252a0c42f03dcd0e7cf2b3c2f2b153b7845ee",
+      "zip_sha256": "9b07d995c08fb26909eb42db12e858c072faf8c279cf845646250f7fe83a494b",
       "files": {
-        "SKILL.md": "60d7ca53e917fda9d79c49e54089c6f5536098b7bb403f220ca29fb8efc90ba3",
+        "SKILL.md": "0456300f39d8ad654bda5fb936342e1f33d41802e08f183ea320b012a84aca3e",
         "scripts/secret_scan.py": "3459f9d66eff61e367c21375a2c89b647b91ae71d8179c2b8a4b8325b4c8fd56"
       }
     },
@@ -215,18 +215,18 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/terraform-generator.zip",
-      "zip_sha256": "9c0167e7ecfc2f1bfe3afa6cbd252a95e5d0bba735a8e523d20319c5961e1f9a",
+      "zip_sha256": "af8d5eccc229c781c55c243bbfaf389b5bc26a34b8ae88c2a1aeb2ddcf31f006",
       "files": {
-        "SKILL.md": "f8de12d0e2a5898edc397d62894fe236e4ce7450ab3bdcb31e49504992a98b59"
+        "SKILL.md": "a9c4fbc73a12af1af4987d4018975175b19f3d50a526faac6b7edf9049ab3ebc"
       }
     },
     "unit-test-generator": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/unit-test-generator.zip",
-      "zip_sha256": "2c90fa1a3408a94358558ebfd5e3e4c644a250538fd6fc15bcc5c4a031ff6332",
+      "zip_sha256": "1d9373e6e4a7915b14309e770fb4c420c6698863f3ed923e0280014c48320393",
       "files": {
-        "SKILL.md": "286a444c0e974e8e6c79ca14193aeb2df74776f665c1f123805010b1589f4d48"
+        "SKILL.md": "380b788d4ae7a59ec77ff762ab7f08761275fed82861e065d36ab4ebb79ba892"
       }
     }
   }

@@ -1,7 +1,7 @@
 ---
 name: blender-3d-modeling
 description: Build and validate Blender 3D meshes with bmesh checks.
-version: 0.3.0
+version: 0.4.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

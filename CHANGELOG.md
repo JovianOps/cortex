@@ -2,6 +2,37 @@
 
 All notable changes to **Cortex** are documented in this file. This project follows [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] — 2026-11-24
+
+A major developer-experience, IDE integration, and supply-chain hardening release adding first-class **Visual Studio Code** support, a zero-dependency **Light Swiss editorial website**, and fully SHA-pinned, self-auditing **GitHub Actions CI/CD**.
+
+### Added
+- **First-Class Visual Studio Code Support**:
+  - Added native VS Code Chat Plugin & Marketplace manifests (`.github/plugin.json` and `.github/plugin/marketplace.json`) exposing `cortex`, `cortex-core`, and `cortex-extended` for `chat.plugins.marketplaces: ["JovianOps/cortex"]` and `@agentPlugins`.
+  - Added `.github/copilot-instructions.md` for native VS Code / GitHub Copilot workspace guidance.
+  - Added shared `.vscode/settings.json` (`chat.useAgentSkills: true`, LF line endings, Python `unittest` runner) and `.vscode/tasks.json` (ready-to-run Command Palette tasks for `Cortex: Doctor`, `Cortex: Run Full Validation & Tests`, `Cortex: Repackage ZIPs & Checksums`, `Cortex: Verify Website`, and `Cortex: Audit GitHub Actions Workflows`).
+  - Promoted `vscode` (`Visual Studio Code`, with `vs-code` / `code` aliases) to a first-class target in `scripts/install_skills.py` (with `--agent all` destination deduplication) and added `--write-vscode-settings` to safely merge `"chat.useAgentSkills": true` into `.vscode/settings.json`.
+  - Added a dedicated `vscode` detection probe in `scripts/cortex.py` (`~/.vscode`, `./.vscode`, `code` / `code-insiders` CLIs, and `.cortex-lock.json` counting from `.github/skills/` and `~/.copilot/skills/`).
+- **Light Swiss Editorial Website & Verification (`index.html` + `scripts/verify_site.py`)**:
+  - Rebuilt `index.html` from scratch as a clean, zero-dependency HTML/CSS/JS developer site with a **Light Swiss** default theme (`#F6F5F0` archival paper, sharp `0px` geometry, `1.5–2px` structural rules, International Swiss Red `#D92B1C` accent), Swiss Noir dark mode, and an explicit segmented **`Light | Dark`** toggle switch in the header.
+  - Added 16 install targets (including dedicated **Visual Studio Code**), searchable 24-skill table, slide-over SHA-256 Skill Inspector, 6 one-click role packs, and `#verify` supply-chain ledger.
+  - Added `scripts/verify_site.py` (using stdlib `HTMLParser` + `node --check`, `checksums.json`/`packs.json` parity checks, and WCAG 2.2 AA `a11y_scan.py`).
+- **Hardened & Expanded CI/CD (`.github/workflows/ci.yml` & `publish-npm.yml`)**:
+  - Pinned every GitHub Action across both workflows to verified 40-character release commit SHAs (removing the floating `aquasecurity/trivy-action@master` tag).
+  - Added workflow self-auditing via Cortex's bundled `lint_actions.py`, Python 3.12 & 3.13 matrix testing, strict `compileall` + `ruff check --select E9,F`, hidden-directory YAML validation (including `.github/workflows/*.yml`), `verify_site.py`, `check_docs.py`, and an isolated `npm pack` CLI smoke test on every PR.
+  - Added `concurrency` groups, explicit `timeout-minutes`, `if: always()` Trivy SARIF upload, and fixed the `release` job trigger (`tags: ['v*']`), permissions (`contents: write`), and `needs:` gates.
+- **Expanded Automated Tests (`tests/test_cortex_tooling.py`)**:
+  - Added `test_vscode_install_settings_and_detection` (**17/17 tests** passing in CI).
+
+### Changed
+- Bumped all 24 `SKILL.md` playbooks, `package.json`, `packs.json`, `evals/skill_evals.json`, `checksums.json`, CLI scripts, and all **9** multi-agent manifests (`.claude-plugin/`, `.github/plugin.json`, `.github/plugin/marketplace.json`, `.agents/plugins/`, `.cursor-plugin/`, `plugin.json`, `gemini-extension.json`) to `0.4.0`.
+- Re-packaged all 24 deterministic skill ZIPs (`zips/` and `premium-zips/`) and regenerated `checksums.json` at `v0.4.0`.
+
+### Fixed
+- Fixed CI checksum drift after CodeQL output-sanitization updates to `premium-skills/security-auditor/scripts/secret_scan.py`.
+- Fixed `scripts/validate_yaml.py` so hidden directories (including `.github/workflows/`) are actually validated.
+- Fixed the `--write-aider-conf` flag generated in `index.html` and removed unused Python imports caught by `ruff`.
+
 ## [0.3.0] — 2026-11-23
 
 A major platform release transforming Cortex from a collection of Markdown playbooks into a **complete, verifiable AI-agent skill platform** with a unified CLI, role-based skill packs, 10 bundled deterministic tools, SHA-256 integrity verification, and a live A/B benchmark harness.

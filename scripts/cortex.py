@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cortex Unified CLI (v0.3.0) — detect agents, diagnose installs, search skills, install packs, and scaffold new skills.
+"""Cortex Unified CLI (v0.4.0) — detect agents, diagnose installs, search skills, install packs, and scaffold new skills.
 
 Zero external dependencies (Python 3 stdlib only). Works on Linux, macOS, and Windows.
 
@@ -26,7 +26,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 
 AGENT_PROBES: tuple[tuple[str, str, str, str, tuple[str, ...]], ...] = (
     ("claude-code", "Claude Code", ".claude", ".claude", ("claude",)),
@@ -419,7 +419,7 @@ def main(argv: list[str] | None = None) -> int:
             "  doctor       Run environment, lockfile SHA-256, checksum & manifest diagnostics\n"
             "  search       Search all 24 skills by keyword, tier, or bundled script\n"
             "  packs        List all 6 curated role-based skill packs (packs.json)\n"
-            "  new <slug>   Scaffold a 100/100 audit-ready v0.3.0 skill (+ optional script)\n"
+            "  new <slug>   Scaffold a 100/100 audit-ready v0.4.0 skill (+ optional script)\n"
             "  install      Install skills/packs locally or --remote (SHA-256 verified)\n"
             "  status       Verify installed skills against .cortex-lock.json\n"
             "  upgrade      Upgrade installed skills to latest catalog\n"

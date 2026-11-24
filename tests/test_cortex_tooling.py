@@ -1,4 +1,4 @@
-"""Comprehensive test suite for Cortex v0.3.0 tooling, manifests, installer, and bundled helper scripts."""
+"""Comprehensive test suite for Cortex v0.4.0 tooling, manifests, installer, and bundled helper scripts."""
 from __future__ import annotations
 
 import importlib.util
@@ -42,7 +42,7 @@ class TestPackagingAndManifests(unittest.TestCase):
             text=True,
         )
         self.assertEqual(res.returncode, 0, msg=res.stderr + res.stdout)
-        self.assertIn("24 skills verified at v0.3.0", res.stdout)
+        self.assertIn("24 skills verified at v0.4.0", res.stdout)
 
     def test_eval_suite_and_audit_pass(self) -> None:
         res = subprocess.run(

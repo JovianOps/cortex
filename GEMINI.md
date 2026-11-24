@@ -1,6 +1,6 @@
-# Cortex Skills Extension for Gemini CLI (`v0.3.0`)
+# Cortex Skills Extension for Gemini CLI (`v0.4.0`)
 
-This extension provides **24 deterministic v0.3.0 Agent Skills** organized into two collections:
+This extension provides **24 deterministic v0.4.0 Agent Skills** organized into two collections:
 
 - **Core Skills (`skills/<slug>/SKILL.md`)**: `academic-assistant`, `anti-hallucination`, `blender-3d-modeling`, `code-review-assistant`, `college-report-card`, `documentation-generator`, `memory-manager`, `python-coding-assistant`, `testing-automation`, `web-scraper`.
 - **Extended Engineering Skills (`premium-skills/<slug>/SKILL.md`)**: `accessibility-auditor`, `api-designer`, `code-migration`, `db-optimizer`, `devops-pipeline`, `docker-generator`, `incident-response`, `observability-setup`, `performance-profiler`, `refactoring-assistant`, `release-engineering`, `security-auditor`, `terraform-generator`, `unit-test-generator`.
@@ -19,7 +19,7 @@ Ten skills ship runnable zero-dependency Python scripts inside their skill folde
 - `premium-skills/release-engineering/scripts/semver_bump.py`
 - `premium-skills/security-auditor/scripts/secret_scan.py`
 
-## Role-Based Skill Packs & Unified CLI (`v0.3.0`)
+## Role-Based Skill Packs & Unified CLI (`v0.4.0`)
 
 Install curated 6-skill role packs (`fullstack`, `devops-sre`, `security-hardening`, `python-pro`, `academic`, `clean-migration`) or run diagnostics via `python scripts/cortex.py`:
 - `python scripts/cortex.py detect` / `doctor` / `packs` / `search --has-script`

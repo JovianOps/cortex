@@ -21,7 +21,7 @@
       <img src="https://img.shields.io/npm/dt/%40jovianops%2Fcortex?style=flat&color=CB3837&label=npm%20downloads" alt="npm downloads" />
     </a>
     <a href="CHANGELOG.md">
-      <img src="https://img.shields.io/badge/release-v0.3.0-EA580C?style=flat" alt="Release v0.3.0" />
+      <img src="https://img.shields.io/badge/release-v0.4.0-EA580C?style=flat" alt="Release v0.4.0" />
     </a>
     <a href="#supported-agents--platforms">
       <img src="https://img.shields.io/badge/standard-SKILL.md%20Multi--Agent-2C2B28?style=flat" alt="SKILL.md Multi-Agent Standard" />
@@ -41,7 +41,7 @@
   </p>
 
   <p>
-    <a href="#whats-new-in-v030">What's New in v0.3.0</a>
+    <a href="#whats-new-in-v040">What's New in v0.4.0</a>
     &nbsp;&middot;&nbsp;
     <a href="#quick-start">Quick Start</a>
     &nbsp;&middot;&nbsp;
@@ -63,20 +63,16 @@
 
 ---
 
-**Cortex `v0.3.0`** is a cryptographically verified AI-agent skill platform shipping **24 modular, deterministic Agent Skills (`SKILL.md`)** — organized into **10 core skills** (`skills/`) and **14 extended engineering skills** (`premium-skills/`), complete with a **unified `cortex` CLI** (`detect`, `doctor`, `search`, `packs`, `new`, `install`, `upgrade`), **6 curated Role-Based Skill Packs** (`packs.json`), **10 bundled deterministic helper scripts**, **SHA-256 integrity verification (`checksums.json`)**, and a **24-task live A/B benchmark harness**.
+**Cortex `v0.4.0`** is a cryptographically verified AI-agent skill platform shipping **24 modular, deterministic Agent Skills (`SKILL.md`)** — organized into **10 core skills** (`skills/`) and **14 extended engineering skills** (`premium-skills/`), complete with a **unified `cortex` CLI** (`detect`, `doctor`, `search`, `packs`, `new`, `install`, `upgrade`), **first-class Visual Studio Code support**, **6 curated Role-Based Skill Packs** (`packs.json`), **10 bundled deterministic helper scripts**, **SHA-256 integrity verification (`checksums.json`)**, and a **24-task live A/B benchmark harness**.
 
-Built on the open **`SKILL.md`** standard, Cortex works natively across **Claude** (Claude Code & Claude apps), **OpenAI** (Codex CLI & ChatGPT), **Gemini CLI**, **Cursor**, **GitHub Copilot & VS Code**, **OpenCode**, **OpenClaw**, **Goose**, **Aider**, **Cline**, and **Hermes Agent**.
+Built on the open **`SKILL.md`** standard, Cortex works natively across **Visual Studio Code**, **GitHub Copilot**, **Claude** (Claude Code & Claude apps), **OpenAI** (Codex CLI & ChatGPT), **Gemini CLI**, **Cursor**, **OpenCode**, **OpenClaw**, **Goose**, **Aider**, **Cline**, and **Hermes Agent**.
 
-## What's New in `v0.3.0`
+## What's New in `v0.4.0`
 
-- **Unified `cortex` Developer CLI (`@jovianops/cortex`)**: Published on npm — run `npx @jovianops/cortex <command>` (or `npm i -g @jovianops/cortex` / `python scripts/cortex.py <command>`) to auto-detect installed AI agents (`detect`), run SHA-256 integrity & drift checks (`doctor`), filter the catalog (`search --has-script`), inspect packs (`packs`), or scaffold a 100/100 audit-ready skill (`new my-skill --with-script`).
-- **6 Curated Role-Based Skill Packs (`packs.json`)**: Install tailored workflows in one command with `--pack`: `fullstack`, `devops-sre`, `security-hardening`, `python-pro`, `academic`, and `clean-migration`.
-- **20 → 24 Deterministic Skills**: Added `incident-response`, `release-engineering`, `observability-setup`, and `accessibility-auditor` — all scoring **100/100** on the Cortex structural audit with paired 100-point A/B eval rubrics.
-- **10 Bundled Executable Helper Scripts**: Real, zero-dependency Python tools packaged directly inside skill folders and ZIPs — `grade_calc.py`, `bmesh_check.py`, `memory_store.py`, `check_docs.py`, `secret_scan.py`, `lint_openapi.py`, `a11y_scan.py`, `lint_dockerfile.py`, `lint_actions.py`, and `semver_bump.py`.
-- **Zero-Clone Remote Install + SHA-256 Verification**: `scripts/install_skills.py --remote` fetches directly from GitHub and verifies every file against [`checksums.json`](checksums.json) before writing a single byte.
-- **Lockfile Lifecycle Management**: Tracks installations in `.cortex-lock.json` with `--status` (tamper/drift detection), `--check-updates`, `--upgrade`, and `--uninstall`.
-- **Live A/B Benchmark Runner**: `scripts/eval_skills.py --run` executes paired Without-Skill vs. With-Skill evaluations across OpenAI, Anthropic, Gemini, or OpenAI-compatible APIs and writes a Markdown scorecard.
-- **Automated Test Suite (`tests/`)**: 16 end-to-end `unittest` tests verified in CI covering the `cortex` CLI, role packs, skill scaffolding, packaging, manifests, installer lifecycle, SHA-256 tamper rejection, eval scoring, and all 10 bundled helper scripts.
+- **First-Class Visual Studio Code Support**: Ships native VS Code Chat Plugin manifests (`.github/plugin.json` + `.github/plugin/marketplace.json` for `chat.plugins.marketplaces: ["JovianOps/cortex"]`), `.github/copilot-instructions.md`, shared `.vscode/settings.json` & `.vscode/tasks.json`, a dedicated `--agent vscode` target with `--write-vscode-settings`, and native `vscode` detection in `cortex detect`.
+- **Light Swiss Editorial Website (`index.html`)**: Rebuilt from scratch with zero dependencies, sharp Swiss grid typography, an explicit **`Light | Dark`** segmented toggle switch, 16 install targets, slide-over SHA-256 Skill Inspector, and automated CI parity verification (`scripts/verify_site.py`).
+- **SHA-Pinned, Self-Auditing CI/CD**: Every GitHub Action across `ci.yml` and `publish-npm.yml` is pinned to a verified 40-character release commit SHA (passing Cortex's own `lint_actions.py` with 0 findings), running Python 3.12 & 3.13 matrices, strict `ruff` + `compileall`, WCAG 2.2 AA & site-checksum checks, and an isolated `npm pack` CLI smoke test on every PR.
+- **Unified `cortex` CLI (`@jovianops/cortex`), 24 Skills, 6 Packs & 10 Bundled Tools**: Full `detect`, `doctor`, `search`, `packs`, `new`, `install`, `upgrade`, SHA-256 `--remote` verification, 9 validated multi-agent manifests, and **17/17 automated `unittest` tests**.
 
 ## Quick Start
 

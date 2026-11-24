@@ -1,7 +1,7 @@
 ---
 name: terraform-generator
 description: Generate hardened, validated Terraform and OpenTofu IaC.
-version: 0.3.0
+version: 0.4.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

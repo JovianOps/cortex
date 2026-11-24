@@ -1,7 +1,7 @@
 ---
 name: incident-response
 description: Triage outages, contain blast radius, and write postmortems.
-version: 0.3.0
+version: 0.4.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
