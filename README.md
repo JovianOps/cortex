@@ -120,7 +120,7 @@ hermes skills install JovianOps/cortex/skills/academic-assistant --yes
 
 ## Supported Agents & Platforms
 
-Cortex ships 7 validated native manifests, a zero-dependency multi-agent manager, and upload-ready ZIPs (`<slug>/SKILL.md` + bundled `scripts/`) so every major AI coding agent and chat app works out of the box:
+Cortex ships 9 validated native manifests, a zero-dependency multi-agent manager, and upload-ready ZIPs (`<slug>/SKILL.md` + bundled `scripts/`) so every major AI coding agent, IDE, and chat app works out of the box:
 
 | Platform | Native Manifest / Format | Fast Install / Setup | Local Skills Directory |
 | :--- | :--- | :--- | :--- |
@@ -130,7 +130,8 @@ Cortex ships 7 validated native manifests, a zero-dependency multi-agent manager
 | **ChatGPT** (Web & Desktop) | `SKILL.md` playbooks & `.agents/plugins/marketplace.json` | Upload any `SKILL.md` or ZIP to **ChatGPT Projects** (Project files / instructions) or **Custom GPTs**, or load via ChatGPT Desktop plugins | Project / Custom GPT knowledge |
 | **Gemini CLI** | `gemini-extension.json` + `GEMINI.md` | `gemini extensions install https://github.com/JovianOps/cortex` or `npx skills add JovianOps/cortex -a gemini-cli` | `~/.gemini/skills/` · `.gemini/skills/` |
 | **Cursor** | `.cursor-plugin/marketplace.json` + `plugin.json` | Import `https://github.com/JovianOps/cortex` in **Customize → Plugins**, or `npx skills add JovianOps/cortex -a cursor` | `~/.cursor/skills/` · `.cursor/skills/` |
-| **GitHub Copilot & VS Code** | `plugin.json` + `.claude-plugin/marketplace.json` | VS Code: enable `chat.plugins.enabled` → **Chat: Install Plugin From Source** (`https://github.com/JovianOps/cortex`), or `npx skills add JovianOps/cortex -a github-copilot` | `~/.copilot/skills/` · `.github/skills/` |
+| **Visual Studio Code** | `.github/plugin/marketplace.json` + `.github/plugin.json` + `.github/copilot-instructions.md` | Add `"JovianOps/cortex"` to `chat.plugins.marketplaces` (with `chat.plugins.enabled: true`) & browse `@agentPlugins`, or run `npx @jovianops/cortex install --agent vscode --pack fullstack --scope project --write-vscode-settings` | `~/.copilot/skills/` · `.github/skills/` |
+| **GitHub Copilot** | `.github/plugin.json` + `plugin.json` | `npx @jovianops/cortex install --agent copilot --pack fullstack --scope project` or `npx skills add JovianOps/cortex -a github-copilot` | `~/.copilot/skills/` · `.github/skills/` |
 | **OpenCode** | `SKILL.md` + `AGENTS.md` | `npx skills add JovianOps/cortex -a opencode` or `python scripts/install_skills.py --agent opencode` | `~/.config/opencode/skills/` · `.opencode/skills/` |
 | **OpenClaw** | `SKILL.md` + ZIP packages | `npx skills add JovianOps/cortex -a openclaw`, `python scripts/install_skills.py --agent openclaw`, or unzip `zips/*.zip` into `~/.openclaw/skills/` | `~/.openclaw/skills/` · `.openclaw/skills/` |
 | **Goose** | `SKILL.md` | `npx skills add JovianOps/cortex -a goose` or `python scripts/install_skills.py --agent goose` | `~/.config/goose/skills/` · `.goose/skills/` |
@@ -256,11 +257,36 @@ python scripts/install_skills.py --agent aider --skill security-auditor --skill 
 </details>
 
 <details>
-<summary><strong>Gemini CLI, Cursor, GitHub Copilot & VS Code</strong></summary>
+<summary><strong>Visual Studio Code (Native Chat Plugin Marketplace & CLI)</strong></summary>
+
+1. **Native VS Code Chat Plugin Marketplace** (`.github/plugin/marketplace.json`):
+   Add to your VS Code User `settings.json`, then search `@agentPlugins` in the Extensions view (or run **Chat: Plugins**):
+
+   ```json
+   {
+     "chat.plugins.enabled": true,
+     "chat.plugins.marketplaces": ["JovianOps/cortex"]
+   }
+   ```
+
+2. **CLI Install into `.github/skills/` + workspace settings**:
+
+   ```bash
+   npx @jovianops/cortex install --agent vscode --pack fullstack --scope project --write-vscode-settings
+   ```
+
+   This writes SHA-256 verified skills into `.github/skills/`, records `.cortex-lock.json`, and ensures `"chat.useAgentSkills": true` in `.vscode/settings.json`.
+
+3. **Workspace Tasks**: Opening this repository in VS Code provides ready-to-run Command Palette tasks (`.vscode/tasks.json`) for `Cortex: Doctor`, `Cortex: Run Full Validation & Tests`, `Cortex: Repackage ZIPs & Checksums`, `Cortex: Verify Website`, and `Cortex: Audit GitHub Actions Workflows`.
+
+</details>
+
+<details>
+<summary><strong>Gemini CLI, Cursor & GitHub Copilot</strong></summary>
 
 - **Gemini CLI**: `gemini extensions install https://github.com/JovianOps/cortex` or `npx skills add JovianOps/cortex -a gemini-cli -g`.
 - **Cursor**: Import `https://github.com/JovianOps/cortex` in **Customize → Plugins**, or run `npx skills add JovianOps/cortex -a cursor -g`.
-- **GitHub Copilot & VS Code**: Enable `chat.plugins.enabled` → **Chat: Install Plugin From Source** (`https://github.com/JovianOps/cortex`), or run `npx skills add JovianOps/cortex -a github-copilot`.
+- **GitHub Copilot**: `npx @jovianops/cortex install --agent copilot --pack fullstack --scope project` or `npx skills add JovianOps/cortex -a github-copilot`.
 
 </details>
 

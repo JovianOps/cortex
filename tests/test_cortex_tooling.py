@@ -381,6 +381,56 @@ class TestUnifiedCortexCLI(unittest.TestCase):
             score, issues = eval_mod.audit_skill("graph-debugger", new_md, set(eval_mod.discover_skills()) | {"graph-debugger"})
             self.assertEqual(score, 100, msg=f"Scaffolded skill scored {score}/100: {issues}")
 
+    def test_vscode_install_settings_and_detection(self) -> None:
+        cli = SCRIPTS / "cortex.py"
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = Path(tmp)
+            # Pre-seed an existing .vscode/settings.json key to verify merge preserves user settings
+            vscode_dir = proj / ".vscode"
+            vscode_dir.mkdir()
+            (vscode_dir / "settings.json").write_text('{"editor.tabSize": 2}\n', encoding="utf-8")
+
+            inst = subprocess.run(
+                [
+                    sys.executable,
+                    str(cli),
+                    "install",
+                    "--agent",
+                    "vscode",
+                    "--pack",
+                    "fullstack",
+                    "--scope",
+                    "project",
+                    "--write-vscode-settings",
+                ],
+                cwd=proj,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(inst.returncode, 0, msg=inst.stdout + inst.stderr)
+            self.assertTrue((proj / ".github/skills/security-auditor/SKILL.md").is_file())
+            self.assertTrue((proj / ".github/skills/security-auditor/scripts/secret_scan.py").is_file())
+            self.assertTrue((proj / ".github/skills/.cortex-lock.json").is_file())
+
+            settings = json.loads((vscode_dir / "settings.json").read_text(encoding="utf-8"))
+            self.assertEqual(settings["editor.tabSize"], 2)
+            self.assertTrue(settings["chat.useAgentSkills"])
+
+            det = subprocess.run([sys.executable, str(cli), "detect", "--json"], cwd=proj, capture_output=True, text=True)
+            self.assertEqual(det.returncode, 0, msg=det.stderr)
+            agents = {a["agent"]: a for a in json.loads(det.stdout)["agents"]}
+            self.assertIn("vscode", agents)
+            self.assertTrue(agents["vscode"]["detected"])
+            self.assertGreaterEqual(agents["vscode"]["installed_cortex_skills"], 6)
+
+            st = subprocess.run(
+                [sys.executable, str(cli), "status", "--agent", "vscode", "--scope", "project"],
+                cwd=proj,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(st.returncode, 0, msg=st.stdout + st.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

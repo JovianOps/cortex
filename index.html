@@ -1738,7 +1738,8 @@
       { id: 'codex', label: 'OpenAI Codex CLI', hint: 'Installs into .agents/skills/ or ~/.codex/skills/ (-a codex)' },
       { id: 'gemini-cli', label: 'Gemini CLI', hint: 'Installs into .gemini/skills/ or ~/.gemini/skills/ (-a gemini-cli)' },
       { id: 'cursor', label: 'Cursor', hint: 'Installs into .cursor/skills/ or ~/.cursor/skills/ (-a cursor)' },
-      { id: 'copilot', label: 'GitHub Copilot & VS Code', hint: 'Installs into .github/skills/ or ~/.copilot/skills/ (-a github-copilot)' },
+      { id: 'vscode', label: 'Visual Studio Code', hint: 'Installs into .github/skills/ + enables chat.useAgentSkills in .vscode/settings.json (also supports .github/plugin/marketplace.json)' },
+      { id: 'copilot', label: 'GitHub Copilot', hint: 'Installs into .github/skills/ or ~/.copilot/skills/ (-a github-copilot)' },
       { id: 'opencode', label: 'OpenCode', hint: 'Installs into .opencode/skills/ (-a opencode)' },
       { id: 'openclaw', label: 'OpenClaw', hint: 'Installs into .openclaw/skills/ (-a openclaw)' },
       { id: 'goose', label: 'Goose', hint: 'Installs into .goose/skills/ (-a goose)' },
@@ -1757,7 +1758,7 @@
 <span class="t-ok">[OK]</span>   git found at /usr/bin/git
 <span class="t-ok">[OK]</span>   node found at /usr/local/bin/node
 <span class="t-ok">[OK]</span>   Verified SHA-256 checksums for 24 bundled skills (34 files).
-<span class="t-ok">[OK]</span>   Validated 7 multi-agent manifests (all 24 skills verified at v0.3.0).
+<span class="t-ok">[OK]</span>   Validated 9 multi-agent manifests (all 24 skills verified at v0.3.0).
 
 <span class="t-dim">==> Claude Code (project: ./.claude/skills)</span>
   security-auditor          v0.3.0    <span class="t-ok">[OK]</span>
@@ -1773,7 +1774,8 @@ Agent          Platform                  Status      Locked  Signals
 claude-code    Claude Code               <span class="t-ok">DETECTED</span>         6  ~/.claude, cli:claude
 codex          OpenAI Codex CLI          <span class="t-ok">DETECTED</span>         0  ./.agents
 cursor         Cursor                    <span class="t-ok">DETECTED</span>         0  ~/.cursor
-copilot        GitHub Copilot &amp; VS Code  <span class="t-ok">DETECTED</span>         0  ./.github, cli:code
+vscode         Visual Studio Code        <span class="t-ok">DETECTED</span>         0  ./.vscode, cli:code
+copilot        GitHub Copilot            <span class="t-ok">DETECTED</span>         0  ./.github
 gemini-cli     Gemini CLI                <span class="t-dim">not found</span>        0  —
 
 Suggested install command:
@@ -1894,10 +1896,16 @@ Next steps:
         return `npx skills add JovianOps/cortex -a ${flag} ${list.map((s) => `--skill ${s}`).join(' ')} -y`;
       }
 
+      if (target === 'vscode') {
+        if (pack) return `npx @jovianops/cortex install --agent vscode --pack ${pack.id} --scope project --write-vscode-settings`;
+        if (allSelected) return `npx @jovianops/cortex install --agent vscode --collection all --scope project --write-vscode-settings`;
+        return `npx @jovianops/cortex install --agent vscode ${list.map((s) => `--skill ${s}`).join(' ')} --scope project --write-vscode-settings`;
+      }
+
       if (target === 'aider') {
-        if (pack) return `npx @jovianops/cortex install --agent aider --pack ${pack.id} --write-aider-config`;
-        if (allSelected) return `npx @jovianops/cortex install --agent aider --collection all --write-aider-config`;
-        return `npx @jovianops/cortex install --agent aider ${list.map((s) => `--skill ${s}`).join(' ')} --write-aider-config`;
+        if (pack) return `npx @jovianops/cortex install --agent aider --pack ${pack.id} --write-aider-conf`;
+        if (allSelected) return `npx @jovianops/cortex install --agent aider --collection all --write-aider-conf`;
+        return `npx @jovianops/cortex install --agent aider ${list.map((s) => `--skill ${s}`).join(' ')} --write-aider-conf`;
       }
 
       if (target === 'remote-py') {

@@ -53,6 +53,8 @@
     "scripts/",
     "evals/",
     ".claude-plugin/",
+    ".github/plugin.json",
+    ".github/plugin/",
     ".agents/",
     ".cursor-plugin/",
     "plugin.json",
