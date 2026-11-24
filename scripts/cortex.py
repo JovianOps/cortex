@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cortex Unified CLI (v1.0.0) — detect agents, diagnose installs, search skills, install packs, and scaffold new skills.
+"""Cortex Unified CLI (v2.0.0) — detect agents, diagnose installs, search skills, install packs, and scaffold new skills.
 
 Zero external dependencies (Python 3 stdlib only). Works on Linux, macOS, and Windows.
 
@@ -26,7 +26,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
-VERSION = "1.0.0"
+VERSION = "2.0.0"
 
 AGENT_PROBES: tuple[tuple[str, str, str, str, tuple[str, ...]], ...] = (
     ("claude-code", "Claude Code", ".claude", ".claude", ("claude",)),
@@ -631,14 +631,18 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if not raw or raw[0] in {"-h", "--help"}:
         print(
-            f"Cortex CLI v{VERSION} — Multi-Agent Skill Platform\n\n"
+            f"Cortex CLI v{VERSION} — Multi-Agent Skill & Runtime Platform\n\n"
             "Commands:\n"
             "  init         Auto-detect stack & agents, install recommended pack with SHA-256 checks\n"
+            "  mcp          Start zero-dependency MCP 2025-03-26 stdio server (--print-config)\n"
+            "  studio       Launch local Light/Dark Swiss web workbench (cortex studio --port 4310)\n"
+            "  compile      Compile SKILL.md playbooks to Cursor .mdc, VS Code, Windsurf, Cline & more\n"
+            "  scan         Run unified multi-tool repo scan (Table, JSON, SARIF 2.1.0, JUnit XML)\n"
             "  detect       Auto-detect installed AI agents & locked Cortex skills\n"
             "  doctor       Run environment, lockfile SHA-256, checksum & manifest diagnostics\n"
             "  info <slug>  Inspect a skill's metadata, bundled script, packs, and SHA-256 hashes\n"
-            "  search       Search all 24 skills by keyword, tier, or bundled script\n"
-            "  packs        List all 6 curated role-based skill packs (packs.json)\n"
+            "  search       Search all 36 skills by keyword, tier, or bundled script\n"
+            "  packs        List all 10 curated role-based skill packs (packs.json)\n"
             f"  new <slug>   Scaffold a 100/100 audit-ready v{VERSION} skill (+ optional script)\n"
             "  install      Install skills/packs locally or --remote (SHA-256 verified)\n"
             "  status       Verify installed skills against .cortex-lock.json\n"
@@ -652,6 +656,15 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     cmd, rest = raw[0], raw[1:]
+
+    if cmd == "mcp":
+        return delegate("cortex_mcp", rest)
+    if cmd == "studio":
+        return delegate("cortex_studio", rest)
+    if cmd == "compile":
+        return delegate("cortex_compile", rest)
+    if cmd == "scan":
+        return delegate("cortex_scan", rest)
 
     if cmd == "init":
         p = argparse.ArgumentParser(prog="cortex init")

@@ -1,7 +1,7 @@
 ---
 name: observability-setup
 description: Add structured logs, OTel traces, SLOs, and clean alerts.
-version: 1.0.0
+version: 2.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

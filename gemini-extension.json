@@ -1,6 +1,6 @@
 {
   "name": "cortex",
-  "version": "1.0.0",
-  "description": "24 modular, deterministic v1.0.0 skill playbooks for Gemini CLI (10 core + 14 extended engineering skills).",
+  "version": "2.0.0",
+  "description": "Cortex v2.0.0 \u2014 36 modular Agent Skills, 36 bundled Python verifiers, MCP server, Studio UI, and SHA-256 verification.",
   "contextFileName": "GEMINI.md"
 }

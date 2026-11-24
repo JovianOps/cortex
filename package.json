@@ -1,7 +1,7 @@
 {
   "name": "@jovianops/cortex",
-  "version": "1.0.0",
-  "description": "24 modular, deterministic v1.0.0 Agent Skills (SKILL.md) with bundled helper scripts and SHA-256 verification for Claude, OpenAI Codex/ChatGPT, Gemini CLI, Cursor, GitHub Copilot/VS Code, OpenCode, OpenClaw, Goose, Aider, Cline, and Hermes Agent",
+  "version": "2.0.0",
+  "description": "36 modular, deterministic v2.0.0 Agent Skills (SKILL.md) with 36 bundled Python verifiers, native MCP server, Local Studio UI, Universal Rule Compiler, SARIF scanner, and SHA-256 verification",
   "keywords": [
     "agent-skills",
     "skill-md",

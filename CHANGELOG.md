@@ -2,6 +2,43 @@
 
 All notable changes to **Cortex** are documented in this file. This project follows [Semantic Versioning](https://semver.org/).
 
+## [2.0.0] — 2026-11-24
+
+**Next-Generation Multi-Agent Platform Release.** Transforms Cortex from a static skill repository into a complete zero-dependency multi-agent engineering runtime — introducing a native MCP 2025-03-26 JSON-RPC stdio server (`cortex mcp`), Local Light/Dark Swiss Web Workbench (`cortex studio`), Universal Agent Rule Compiler (`cortex compile`), Unified Policy & SARIF 2.1.0 / JUnit XML Scanner (`cortex scan`), 12 brand-new flagship skills (24 → 36 skills & 36 bundled Python verifiers), 4 new role packs (6 → 10 packs), and a 6-guide `docs/` engineering handbook.
+
+### Added
+- **Native MCP 2025-03-26 Server (`scripts/cortex_mcp.py`, CLI: `cortex mcp`)**:
+  - Zero-dependency JSON-RPC 2.0 stdio server supporting both `Content-Length` framed and newline-delimited messages.
+  - Exposes 8 workspace-confined MCP Tools (`cortex_list_skills`, `cortex_get_skill`, `cortex_search_skills`, `cortex_list_packs`, `cortex_verify_workspace`, `cortex_run_verifier`, `cortex_compile_rules`, `cortex_scan_repo`), 38 MCP Resources (`cortex://skills/<slug>`, `cortex://packs`, `cortex://checksums`), and 36 invocable MCP Prompts (`cortex/<slug>`).
+  - Includes `--print-config <vscode|claude-code|cursor|codex|windsurf>` for instant client setup.
+- **Cortex Studio Local Web Workbench (`scripts/cortex_studio.py`, CLI: `cortex studio`)**:
+  - Zero-dependency Light/Dark Swiss local web UI + 10 REST API endpoints (`/api/overview`, `/api/skills`, `/api/skills/<slug>`, `/api/packs`, `/api/verify`, `/api/mcp-config`, `/api/run-tool`, `/api/compile`, `/api/scan`).
+- **Universal Agent Rule Compiler (`scripts/cortex_compile.py`, CLI: `cortex compile`)**:
+  - Deterministically compiles `SKILL.md` playbooks into 7 native IDE/agent formats: Cursor (`.cursor/rules/*.mdc`), VS Code (`.github/instructions/*.instructions.md`), Windsurf (`.windsurf/rules/*.md`), Cline (`.clinerules/*.md`), `CLAUDE.md`, `AGENTS.md`, and `GEMINI.md`, with `--dry-run`, `--check` CI drift verification, and SHA-256 provenance comments.
+- **Unified Policy & SARIF 2.1.0 Scanner (`scripts/cortex_scan.py`, CLI: `cortex scan`)**:
+  - Runs 14 bundled verifiers in a single pass with `.cortex-policy.json` (`schemas/policy.schema.json`), `--fail-on` severity gates, and Table, JSON, SARIF 2.1.0 (GitHub Code Scanning), and JUnit XML outputs.
+- **12 New Flagship Extended Skills (24 → 36 Skills, 36/36 Bundled Python Verifiers, 36 Eval Rubrics)**:
+  - `kubernetes-architect` (`lint_k8s.py`)
+  - `typescript-architect` (`lint_ts.py`)
+  - `rust-systems-engineer` (`lint_rust.py`)
+  - `go-backend-engineer` (`lint_go.py`)
+  - `graphql-architect` (`lint_graphql.py`)
+  - `llm-security-auditor` (`audit_prompts.py`)
+  - `supply-chain-sbom` (`audit_sbom.py`)
+  - `privacy-compliance-auditor` (`scan_pii.py`)
+  - `finops-cost-optimizer` (`audit_finops.py`)
+  - `chaos-resilience-engineer` (`audit_resilience.py`)
+  - `architecture-decision-records` (`check_adrs.py`)
+  - `git-history-surgeon` (`audit_git_hygiene.py`)
+- **4 New Curated Role-Based Skill Packs (6 → 10 Packs in `packs.json`)**: `cloud-native`, `ai-red-team`, `polyglot-systems`, and `platform-architecture`.
+- **Comprehensive Reference Docs (`docs/`)**: `architecture.md`, `mcp-guide.md`, `studio-guide.md`, `compiler-guide.md`, `policy-and-sarif.md`, and `skill-authoring.md`.
+- **Expanded Automated Tests (`tests/test_cortex_v2.py`)**: End-to-end tests for MCP JSON-RPC protocol, Studio HTTP server API, Universal Compiler (all 7 targets + drift checks), Unified Policy/SARIF/JUnit Scanner, and all 12 new bundled helper scripts.
+
+### Changed
+- Upgraded `scripts/bump_version.py` to regenerate the entire `SKILLS` and `PACKS` arrays in `index.html` atomically from disk, `checksums.json`, and `packs.json`.
+- Pinned `.github/workflows/dependency-review.yml` to 40-character commit SHAs (`actions/checkout`, `actions/dependency-review-action`) so all 3 workflows pass `lint_actions.py`.
+- Graduated all 36 skills, 36 deterministic multi-file ZIPs (72 verified files in `checksums.json`), all 9 multi-agent manifests, `package.json`, `packs.json`, `evals/skill_evals.json`, `index.html`, and CLI engines to **`2.0.0`**.
+
 ## [1.0.0] — 2026-11-24
 
 **First Stable General Availability (GA) release of Cortex.** Graduates Cortex out of `0.x` beta with 100% bundled executable tool coverage across all 24 skills, a complete `cortex` CLI (`init`, `info`, `verify`), formal `1.0.0` JSON Schemas, atomic release tooling, first-class Visual Studio Code support, a zero-dependency Light Swiss editorial site, and SHA-pinned cross-platform CI (Linux, macOS, Windows).

@@ -5,8 +5,8 @@
     "url": "https://github.com/JovianOps"
   },
   "metadata": {
-    "description": "Cortex — 24 modular, deterministic v1.0.0 Agent Skills for Visual Studio Code, GitHub Copilot, and multi-agent coding harnesses.",
-    "version": "1.0.0",
+    "description": "Cortex v2.0.0 \u2014 36 modular Agent Skills, 36 bundled Python verifiers, MCP server, Local Studio UI, and Universal Rule Compiler.",
+    "version": "2.0.0",
     "homepage": "https://jovianops.github.io/cortex/",
     "repository": "https://github.com/JovianOps/cortex"
   },
@@ -14,8 +14,8 @@
     {
       "name": "cortex",
       "source": "./",
-      "description": "All 24 Cortex v1.0.0 Agent Skills (10 core + 14 extended engineering playbooks with 10 bundled helper scripts).",
-      "version": "1.0.0",
+      "description": "All 36 Cortex v2.0.0 Agent Skills (10 core + 26 extended with 36 bundled zero-dependency Python helper scripts).",
+      "version": "2.0.0",
       "author": {
         "name": "Athalla Jovian Maharsa",
         "url": "https://github.com/JovianOps"
@@ -49,17 +49,29 @@
         "./skills/web-scraper",
         "./premium-skills/accessibility-auditor",
         "./premium-skills/api-designer",
+        "./premium-skills/architecture-decision-records",
+        "./premium-skills/chaos-resilience-engineer",
         "./premium-skills/code-migration",
         "./premium-skills/db-optimizer",
         "./premium-skills/devops-pipeline",
         "./premium-skills/docker-generator",
+        "./premium-skills/finops-cost-optimizer",
+        "./premium-skills/git-history-surgeon",
+        "./premium-skills/go-backend-engineer",
+        "./premium-skills/graphql-architect",
         "./premium-skills/incident-response",
+        "./premium-skills/kubernetes-architect",
+        "./premium-skills/llm-security-auditor",
         "./premium-skills/observability-setup",
         "./premium-skills/performance-profiler",
+        "./premium-skills/privacy-compliance-auditor",
         "./premium-skills/refactoring-assistant",
         "./premium-skills/release-engineering",
+        "./premium-skills/rust-systems-engineer",
         "./premium-skills/security-auditor",
+        "./premium-skills/supply-chain-sbom",
         "./premium-skills/terraform-generator",
+        "./premium-skills/typescript-architect",
         "./premium-skills/unit-test-generator"
       ]
     },
@@ -67,8 +79,8 @@
       "name": "cortex-core",
       "source": "./",
       "strict": false,
-      "description": "10 core Cortex v1.0.0 skills: code review, anti-hallucination, Python, pytest automation, docs, memory, web scraping, academic grading, and Blender 3D.",
-      "version": "1.0.0",
+      "description": "10 core Cortex v2.0.0 skills with 10 bundled helper scripts.",
+      "version": "2.0.0",
       "author": {
         "name": "Athalla Jovian Maharsa",
         "url": "https://github.com/JovianOps"
@@ -103,8 +115,8 @@
       "name": "cortex-extended",
       "source": "./",
       "strict": false,
-      "description": "14 extended engineering Cortex v1.0.0 skills: API design, code migration, SQL optimization, CI/CD, Docker, profiling, refactoring, OWASP security, Terraform, unit tests, incident response, release engineering, observability, and WCAG accessibility.",
-      "version": "1.0.0",
+      "description": "26 extended Cortex v2.0.0 engineering skills (K8s, TypeScript, Rust, Go, GraphQL, LLM Security, SBOM, PII, FinOps, Chaos, ADRs, Git, plus full DevOps/API/DB/Security suite).",
+      "version": "2.0.0",
       "author": {
         "name": "Athalla Jovian Maharsa",
         "url": "https://github.com/JovianOps"
@@ -128,17 +140,29 @@
       "skills": [
         "./premium-skills/accessibility-auditor",
         "./premium-skills/api-designer",
+        "./premium-skills/architecture-decision-records",
+        "./premium-skills/chaos-resilience-engineer",
         "./premium-skills/code-migration",
         "./premium-skills/db-optimizer",
         "./premium-skills/devops-pipeline",
         "./premium-skills/docker-generator",
+        "./premium-skills/finops-cost-optimizer",
+        "./premium-skills/git-history-surgeon",
+        "./premium-skills/go-backend-engineer",
+        "./premium-skills/graphql-architect",
         "./premium-skills/incident-response",
+        "./premium-skills/kubernetes-architect",
+        "./premium-skills/llm-security-auditor",
         "./premium-skills/observability-setup",
         "./premium-skills/performance-profiler",
+        "./premium-skills/privacy-compliance-auditor",
         "./premium-skills/refactoring-assistant",
         "./premium-skills/release-engineering",
+        "./premium-skills/rust-systems-engineer",
         "./premium-skills/security-auditor",
+        "./premium-skills/supply-chain-sbom",
         "./premium-skills/terraform-generator",
+        "./premium-skills/typescript-architect",
         "./premium-skills/unit-test-generator"
       ]
     }

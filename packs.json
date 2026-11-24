@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.0.0",
-  "release_version": "1.0.0",
+  "schema_version": "2.0.0",
+  "release_version": "2.0.0",
   "packs": {
     "fullstack": {
       "label": "Full-Stack Web",
@@ -24,6 +24,54 @@
         "observability-setup",
         "release-engineering",
         "incident-response"
+      ]
+    },
+    "cloud-native": {
+      "label": "Cloud-Native Platform",
+      "description": "Kubernetes Restricted PSS, Terraform IaC, Docker, FinOps cost audits, chaos resilience, and observability.",
+      "skills": [
+        "kubernetes-architect",
+        "terraform-generator",
+        "docker-generator",
+        "finops-cost-optimizer",
+        "chaos-resilience-engineer",
+        "observability-setup"
+      ]
+    },
+    "ai-red-team": {
+      "label": "AI Security & Compliance",
+      "description": "OWASP LLM prompt-injection defense, supply-chain SBOMs, GDPR/PII redaction, secrets, and verification.",
+      "skills": [
+        "llm-security-auditor",
+        "supply-chain-sbom",
+        "privacy-compliance-auditor",
+        "security-auditor",
+        "anti-hallucination",
+        "devops-pipeline"
+      ]
+    },
+    "polyglot-systems": {
+      "label": "Polyglot Systems & APIs",
+      "description": "Strict TypeScript, safe Rust, production Go, Relay GraphQL, profiling, and branch-covering unit tests.",
+      "skills": [
+        "typescript-architect",
+        "rust-systems-engineer",
+        "go-backend-engineer",
+        "graphql-architect",
+        "performance-profiler",
+        "unit-test-generator"
+      ]
+    },
+    "platform-architecture": {
+      "label": "Architecture & Governance",
+      "description": "MADR ADRs, Git history hygiene, clean migrations, refactoring, code reviews, and verified docs.",
+      "skills": [
+        "architecture-decision-records",
+        "git-history-surgeon",
+        "code-migration",
+        "refactoring-assistant",
+        "code-review-assistant",
+        "documentation-generator"
       ]
     },
     "security-hardening": {

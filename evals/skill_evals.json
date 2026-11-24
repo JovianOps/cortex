@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.0.0",
-  "description": "Paired 100-point A/B evaluation rubrics for all 24 Cortex v1.0.0 skills (Without-Skill vs. With-Skill).",
+  "schema_version": "2.0.0",
+  "description": "Paired 100-point A/B evaluation rubrics for all 36 Cortex v2.0.0 skills (Without-Skill vs. With-Skill).",
   "tasks": [
     {
       "id": "eval-academic-assistant",
@@ -51,6 +51,50 @@
           "patterns": [
             "Evidence|Verification",
             "Next Step|open_tasks"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-accessibility-auditor",
+      "skill": "accessibility-auditor",
+      "collection": "premium-skills",
+      "prompt": "Audit a modal form with `<div onclick='submit()'>Save</div>`, `<input placeholder='Email'>`, `outline: none` in CSS, and `tabindex='5'`. Provide WCAG 2.2 AA fixes.",
+      "rubric": [
+        {
+          "id": "semantic_button_fix",
+          "points": 30,
+          "description": "Replaces clickable <div> with native <button type='button'> for keyboard access (WCAG 2.1.1)",
+          "patterns": [
+            "<button",
+            "2\\.1\\.1|keyboard"
+          ]
+        },
+        {
+          "id": "programmatic_label",
+          "points": 25,
+          "description": "Flags placeholder-only input and adds explicit <label for> or aria-label",
+          "patterns": [
+            "<label|aria-label",
+            "placeholder"
+          ]
+        },
+        {
+          "id": "focus_and_tabindex",
+          "points": 25,
+          "description": "Removes positive tabindex=5 and restores visible :focus-visible styling",
+          "patterns": [
+            "focus-visible",
+            "tabindex"
+          ]
+        },
+        {
+          "id": "wcag_22_and_manual_checks",
+          "points": 20,
+          "description": "Covers WCAG 2.2 target size / forced-colors / reduced-motion and manual screen-reader verification",
+          "patterns": [
+            "forced-colors|prefers-reduced-motion|24",
+            "screen.?reader|manual"
           ]
         }
       ]
@@ -108,6 +152,112 @@
       ]
     },
     {
+      "id": "eval-api-designer",
+      "skill": "api-designer",
+      "collection": "premium-skills",
+      "prompt": "Design an OpenAPI 3.1 REST API for creating and listing payment orders (`/v1/orders`) with safe retries and error handling.",
+      "rubric": [
+        {
+          "id": "cursor_pagination",
+          "points": 20,
+          "description": "Uses cursor-based pagination with capped limit instead of unbounded lists",
+          "patterns": [
+            "cursor",
+            "next_cursor|has_more"
+          ]
+        },
+        {
+          "id": "rfc9457_errors",
+          "points": 20,
+          "description": "Uses RFC 9457 `application/problem+json` ProblemDetails error schema",
+          "patterns": [
+            "application/problem\\+json",
+            "ProblemDetails"
+          ]
+        },
+        {
+          "id": "idempotency_key",
+          "points": 20,
+          "description": "Requires `Idempotency-Key` header on POST /v1/orders and returns 201 + Location",
+          "patterns": [
+            "Idempotency-Key",
+            "201",
+            "Location"
+          ]
+        },
+        {
+          "id": "strict_schema",
+          "points": 20,
+          "description": "Uses `additionalProperties: false`, explicit formats/bounds, and rate-limit headers",
+          "patterns": [
+            "additionalProperties:\\s*false",
+            "RateLimit-"
+          ]
+        },
+        {
+          "id": "contract_tests",
+          "points": 20,
+          "description": "Provides OpenAPI validation command and executable contract test cases",
+          "patterns": [
+            "redocly|safe_load",
+            "contract|401|422"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-architecture-decision-records",
+      "skill": "architecture-decision-records",
+      "collection": "premium-skills",
+      "prompt": "Write ADR 0004 deciding between PostgreSQL and DynamoDB for our event ledger and superseding ADR 0002.",
+      "rubric": [
+        {
+          "id": "madr_filename",
+          "points": 20,
+          "description": "Uses NNNN-kebab-title.md format (0004-...)",
+          "patterns": [
+            "0004-[a-z0-9-]+\\.md"
+          ]
+        },
+        {
+          "id": "required_sections",
+          "points": 25,
+          "description": "Includes Status, Context, Decision, and Consequences sections",
+          "patterns": [
+            "## Status",
+            "## Context",
+            "## Decision",
+            "## Consequences"
+          ]
+        },
+        {
+          "id": "alternatives_compared",
+          "points": 20,
+          "description": "Compares concrete alternatives with explicit trade-offs",
+          "patterns": [
+            "PostgreSQL",
+            "DynamoDB"
+          ]
+        },
+        {
+          "id": "immutability_supersede",
+          "points": 20,
+          "description": "Marks ADR 0002 as Superseded instead of rewriting it",
+          "patterns": [
+            "Superseded"
+          ]
+        },
+        {
+          "id": "check_adrs_gate",
+          "points": 15,
+          "description": "Validates with check_adrs.py",
+          "patterns": [
+            "check_adrs\\.py"
+          ]
+        }
+      ]
+    },
+    {
       "id": "eval-blender-3d-modeling",
       "skill": "blender-3d-modeling",
       "collection": "skills",
@@ -156,6 +306,109 @@
           "patterns": [
             "Shift\\+N|Face Orientation|normals",
             "Pack Islands|uv_layers"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-chaos-resilience-engineer",
+      "skill": "chaos-resilience-engineer",
+      "collection": "premium-skills",
+      "prompt": "Harden a checkout service making Python requests.post() without timeouts to a single-replica payment deployment, and design a chaos Game Day.",
+      "rubric": [
+        {
+          "id": "explicit_timeouts",
+          "points": 25,
+          "description": "Adds bounded connect/read timeout= to outbound requests",
+          "patterns": [
+            "timeout="
+          ]
+        },
+        {
+          "id": "jitter_and_idempotency",
+          "points": 20,
+          "description": "Uses exponential backoff with jitter and Idempotency-Key",
+          "patterns": [
+            "jitter|backoff",
+            "Idempotency"
+          ]
+        },
+        {
+          "id": "ha_and_pdb",
+          "points": 20,
+          "description": "Scales replicas >= 2 and adds PodDisruptionBudget",
+          "patterns": [
+            "replicas",
+            "PodDisruptionBudget"
+          ]
+        },
+        {
+          "id": "chaos_hypothesis",
+          "points": 20,
+          "description": "Defines steady-state SLI hypothesis, blast-radius cap, and abort trigger",
+          "patterns": [
+            "hypothesis|steady-state",
+            "abort|kill switch|blast"
+          ]
+        },
+        {
+          "id": "audit_resilience_gate",
+          "points": 15,
+          "description": "Runs audit_resilience.py verification",
+          "patterns": [
+            "audit_resilience\\.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-code-migration",
+      "skill": "code-migration",
+      "collection": "premium-skills",
+      "prompt": "Plan and execute migrating a legacy Python 2.7 CSV billing module (using `/`, `dict.keys()`, `str`/`unicode`, and `round()`) to Python 3.12.",
+      "rubric": [
+        {
+          "id": "golden_master_first",
+          "points": 20,
+          "description": "Captures golden-master / characterization tests BEFORE modifying source code",
+          "patterns": [
+            "golden-master|characterization"
+          ]
+        },
+        {
+          "id": "py2_semantic_traps",
+          "points": 20,
+          "description": "Explicitly audits `/` vs `//` division, `bytes` vs `str`, iterator views, and banker's rounding",
+          "patterns": [
+            "//",
+            "bytes.*str|str.*bytes",
+            "iterator|list\\("
+          ]
+        },
+        {
+          "id": "no_feature_creep",
+          "points": 20,
+          "description": "Separates mechanical syntax vs semantic fixes and forbids speculative feature additions",
+          "patterns": [
+            "mechanical|semantic",
+            "Behavioral Deltas|feature"
+          ]
+        },
+        {
+          "id": "parity_verification",
+          "points": 20,
+          "description": "Runs side-by-side parity tests plus static checks (`mypy`/`ruff`)",
+          "patterns": [
+            "parity",
+            "mypy|ruff|pytest"
+          ]
+        },
+        {
+          "id": "rollback_plan",
+          "points": 20,
+          "description": "Includes an explicit rollback and cutover checklist",
+          "patterns": [
+            "Rollback|rollback"
           ]
         }
       ]
@@ -259,374 +512,6 @@
           "patterns": [
             "audit_summary\\.json|reconcil",
             "VERIFIED|count"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "eval-documentation-generator",
-      "skill": "documentation-generator",
-      "collection": "skills",
-      "prompt": "Document a Python FastAPI service with two routes (`GET /health`, `POST /items`), an env var `API_KEY` (no default), and a Mermaid diagram.",
-      "rubric": [
-        {
-          "id": "env_table_required",
-          "points": 20,
-          "description": "Documents API_KEY in an env table explicitly marked Required (no default)",
-          "patterns": [
-            "API_KEY",
-            "Required.*no default|no default"
-          ]
-        },
-        {
-          "id": "request_and_error_examples",
-          "points": 20,
-          "description": "Includes concrete 2xx success AND error response payload examples",
-          "patterns": [
-            "200|201",
-            "400|401|422"
-          ]
-        },
-        {
-          "id": "mermaid_diagram",
-          "points": 20,
-          "description": "Provides a concise Mermaid diagram using a fenced mermaid block",
-          "patterns": [
-            "```mermaid"
-          ]
-        },
-        {
-          "id": "drift_verification",
-          "points": 20,
-          "description": "Includes code-truth / relative-link / command verification steps",
-          "patterns": [
-            "link check|drift|Source Inventory|Verification"
-          ]
-        },
-        {
-          "id": "no_phantom_commands",
-          "points": 20,
-          "description": "Avoids inventing unverified scripts or non-existent directories",
-          "patterns": [
-            "GET /health",
-            "POST /items"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "eval-memory-manager",
-      "skill": "memory-manager",
-      "collection": "skills",
-      "prompt": "Design a cross-session context.json update flow when we change our database choice from SQLite to PostgreSQL while preserving prior decision history safely.",
-      "rubric": [
-        {
-          "id": "versioned_schema",
-          "points": 20,
-          "description": "Uses versioned JSON schema with schema_version, updated_at, constraints, decisions, tasks",
-          "patterns": [
-            "schema_version",
-            "updated_at",
-            "file_pointers"
-          ]
-        },
-        {
-          "id": "append_only_decisions",
-          "points": 20,
-          "description": "Marks the old SQLite decision superseded and appends a new decision instead of deleting",
-          "patterns": [
-            "superseded",
-            "DEC-"
-          ]
-        },
-        {
-          "id": "staleness_check",
-          "points": 20,
-          "description": "Checks referenced file paths/hashes and tags changed facts as STALE",
-          "patterns": [
-            "STALE|sha256|staleness"
-          ]
-        },
-        {
-          "id": "atomic_write",
-          "points": 20,
-          "description": "Writes via temporary file + json.loads sanity check + os.replace",
-          "patterns": [
-            "\\.tmp|tmp",
-            "os\\.replace"
-          ]
-        },
-        {
-          "id": "secret_scrub",
-          "points": 20,
-          "description": "Explicitly forbids storing secrets/API keys/passwords in context.json",
-          "patterns": [
-            "secret|password|API key|scrub"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "eval-python-coding-assistant",
-      "skill": "python-coding-assistant",
-      "collection": "skills",
-      "prompt": "Write a Python script that loads a YAML config file, runs a user-selected subcommand with a timeout, and totals currency values from a CSV file.",
-      "rubric": [
-        {
-          "id": "strict_typing",
-          "points": 20,
-          "description": "Uses `from __future__ import annotations` and full parameter/return type annotations",
-          "patterns": [
-            "from __future__ import annotations",
-            "-> "
-          ]
-        },
-        {
-          "id": "safe_yaml",
-          "points": 20,
-          "description": "Uses `yaml.safe_load` instead of unsafe `yaml.load`",
-          "patterns": [
-            "safe_load"
-          ]
-        },
-        {
-          "id": "safe_subprocess",
-          "points": 20,
-          "description": "Uses `subprocess.run` with list args (no shell=True), check=True, and explicit timeout",
-          "patterns": [
-            "subprocess\\.run",
-            "timeout=",
-            "check=True"
-          ]
-        },
-        {
-          "id": "decimal_currency",
-          "points": 20,
-          "description": "Uses `Decimal` for currency math and `pathlib.Path` with explicit UTF-8 encoding",
-          "patterns": [
-            "Decimal",
-            "Path",
-            "utf-8"
-          ]
-        },
-        {
-          "id": "verification_commands",
-          "points": 20,
-          "description": "Includes verification commands (`py_compile`, `ruff`/`mypy`, and edge-case tests)",
-          "patterns": [
-            "py_compile",
-            "ruff|mypy|pytest"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "eval-testing-automation",
-      "skill": "testing-automation",
-      "collection": "skills",
-      "prompt": "Set up a pytest suite and pyproject.toml configuration for a Python CSV parser module that reads files and checks an environment variable `MAX_ROWS`.",
-      "rubric": [
-        {
-          "id": "branch_coverage_config",
-          "points": 20,
-          "description": "Configures branch=true, show_missing=true, and fail_under in pyproject.toml",
-          "patterns": [
-            "branch = true",
-            "fail_under"
-          ]
-        },
-        {
-          "id": "strict_pytest_opts",
-          "points": 20,
-          "description": "Uses strict pytest options (`--strict-markers`, `--strict-config`)",
-          "patterns": [
-            "--strict-markers|--strict-config"
-          ]
-        },
-        {
-          "id": "parametrized_boundaries",
-          "points": 20,
-          "description": "Uses `@pytest.mark.parametrize` and `pytest.raises(..., match=...)` for boundaries",
-          "patterns": [
-            "parametrize",
-            "pytest\\.raises"
-          ]
-        },
-        {
-          "id": "isolated_fixtures",
-          "points": 20,
-          "description": "Uses `tmp_path` and `monkeypatch` for zero-flakiness file and env isolation",
-          "patterns": [
-            "tmp_path",
-            "monkeypatch"
-          ]
-        },
-        {
-          "id": "coverage_command",
-          "points": 20,
-          "description": "Provides exact branch coverage verification command (`--cov-branch --cov-report=term-missing`)",
-          "patterns": [
-            "--cov-branch",
-            "term-missing"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "eval-web-scraper",
-      "skill": "web-scraper",
-      "collection": "skills",
-      "prompt": "Build a Python scraper for paginated product catalog pages at `https://shop.example.com/catalog` that extracts title, price, and stock status to JSONL.",
-      "rubric": [
-        {
-          "id": "robots_txt_check",
-          "points": 20,
-          "description": "Checks robots.txt via RobotFileParser with an explicit User-Agent before fetching",
-          "patterns": [
-            "RobotFileParser|robots\\.txt",
-            "User-Agent"
-          ]
-        },
-        {
-          "id": "timeouts_and_backoff",
-          "points": 20,
-          "description": "Enforces explicit request timeout, per-domain rate limit/jitter, and bounded backoff honoring Retry-After",
-          "patterns": [
-            "timeout=",
-            "Retry-After|backoff|sleep"
-          ]
-        },
-        {
-          "id": "pagination_cycle_guard",
-          "points": 20,
-          "description": "Prevents infinite pagination via visited URL set and max_pages cap",
-          "patterns": [
-            "visited|seen",
-            "max_pages"
-          ]
-        },
-        {
-          "id": "no_fabricated_fields",
-          "points": 20,
-          "description": "Stores None for missing fields, uses Decimal for price, and quarantines invalid rows",
-          "patterns": [
-            "Decimal",
-            "rejected\\.jsonl|quarantine|None"
-          ]
-        },
-        {
-          "id": "offline_fixture_test",
-          "points": 20,
-          "description": "Includes provenance fields (source_url, fetched_at) and an offline HTML fixture test",
-          "patterns": [
-            "source_url",
-            "fetched_at"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "eval-api-designer",
-      "skill": "api-designer",
-      "collection": "premium-skills",
-      "prompt": "Design an OpenAPI 3.1 REST API for creating and listing payment orders (`/v1/orders`) with safe retries and error handling.",
-      "rubric": [
-        {
-          "id": "cursor_pagination",
-          "points": 20,
-          "description": "Uses cursor-based pagination with capped limit instead of unbounded lists",
-          "patterns": [
-            "cursor",
-            "next_cursor|has_more"
-          ]
-        },
-        {
-          "id": "rfc9457_errors",
-          "points": 20,
-          "description": "Uses RFC 9457 `application/problem+json` ProblemDetails error schema",
-          "patterns": [
-            "application/problem\\+json",
-            "ProblemDetails"
-          ]
-        },
-        {
-          "id": "idempotency_key",
-          "points": 20,
-          "description": "Requires `Idempotency-Key` header on POST /v1/orders and returns 201 + Location",
-          "patterns": [
-            "Idempotency-Key",
-            "201",
-            "Location"
-          ]
-        },
-        {
-          "id": "strict_schema",
-          "points": 20,
-          "description": "Uses `additionalProperties: false`, explicit formats/bounds, and rate-limit headers",
-          "patterns": [
-            "additionalProperties:\\s*false",
-            "RateLimit-"
-          ]
-        },
-        {
-          "id": "contract_tests",
-          "points": 20,
-          "description": "Provides OpenAPI validation command and executable contract test cases",
-          "patterns": [
-            "redocly|safe_load",
-            "contract|401|422"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "eval-code-migration",
-      "skill": "code-migration",
-      "collection": "premium-skills",
-      "prompt": "Plan and execute migrating a legacy Python 2.7 CSV billing module (using `/`, `dict.keys()`, `str`/`unicode`, and `round()`) to Python 3.12.",
-      "rubric": [
-        {
-          "id": "golden_master_first",
-          "points": 20,
-          "description": "Captures golden-master / characterization tests BEFORE modifying source code",
-          "patterns": [
-            "golden-master|characterization"
-          ]
-        },
-        {
-          "id": "py2_semantic_traps",
-          "points": 20,
-          "description": "Explicitly audits `/` vs `//` division, `bytes` vs `str`, iterator views, and banker's rounding",
-          "patterns": [
-            "//",
-            "bytes.*str|str.*bytes",
-            "iterator|list\\("
-          ]
-        },
-        {
-          "id": "no_feature_creep",
-          "points": 20,
-          "description": "Separates mechanical syntax vs semantic fixes and forbids speculative feature additions",
-          "patterns": [
-            "mechanical|semantic",
-            "Behavioral Deltas|feature"
-          ]
-        },
-        {
-          "id": "parity_verification",
-          "points": 20,
-          "description": "Runs side-by-side parity tests plus static checks (`mypy`/`ruff`)",
-          "patterns": [
-            "parity",
-            "mypy|ruff|pytest"
-          ]
-        },
-        {
-          "id": "rollback_plan",
-          "points": 20,
-          "description": "Includes an explicit rollback and cutover checklist",
-          "patterns": [
-            "Rollback|rollback"
           ]
         }
       ]
@@ -791,6 +676,502 @@
       ]
     },
     {
+      "id": "eval-documentation-generator",
+      "skill": "documentation-generator",
+      "collection": "skills",
+      "prompt": "Document a Python FastAPI service with two routes (`GET /health`, `POST /items`), an env var `API_KEY` (no default), and a Mermaid diagram.",
+      "rubric": [
+        {
+          "id": "env_table_required",
+          "points": 20,
+          "description": "Documents API_KEY in an env table explicitly marked Required (no default)",
+          "patterns": [
+            "API_KEY",
+            "Required.*no default|no default"
+          ]
+        },
+        {
+          "id": "request_and_error_examples",
+          "points": 20,
+          "description": "Includes concrete 2xx success AND error response payload examples",
+          "patterns": [
+            "200|201",
+            "400|401|422"
+          ]
+        },
+        {
+          "id": "mermaid_diagram",
+          "points": 20,
+          "description": "Provides a concise Mermaid diagram using a fenced mermaid block",
+          "patterns": [
+            "```mermaid"
+          ]
+        },
+        {
+          "id": "drift_verification",
+          "points": 20,
+          "description": "Includes code-truth / relative-link / command verification steps",
+          "patterns": [
+            "link check|drift|Source Inventory|Verification"
+          ]
+        },
+        {
+          "id": "no_phantom_commands",
+          "points": 20,
+          "description": "Avoids inventing unverified scripts or non-existent directories",
+          "patterns": [
+            "GET /health",
+            "POST /items"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-finops-cost-optimizer",
+      "skill": "finops-cost-optimizer",
+      "collection": "premium-skills",
+      "prompt": "Optimize AWS Terraform and Kubernetes configs running m6i.16xlarge instances, gp2 volumes, untagged buckets, and pods without resource requests.",
+      "rubric": [
+        {
+          "id": "rightsize_compute",
+          "points": 25,
+          "description": "Flags oversized m6i.16xlarge and proposes right-sizing/autoscaling",
+          "patterns": [
+            "16xlarge|right-siz",
+            "autoscal|Spot|Savings"
+          ]
+        },
+        {
+          "id": "gp3_and_lifecycle",
+          "points": 20,
+          "description": "Migrates gp2 -> gp3 and adds S3 lifecycle policies",
+          "patterns": [
+            "gp3",
+            "lifecycle"
+          ]
+        },
+        {
+          "id": "cost_tags",
+          "points": 20,
+          "description": "Enforces owner, environment, and cost_center tags",
+          "patterns": [
+            "cost_center|owner|environment"
+          ]
+        },
+        {
+          "id": "k8s_requests",
+          "points": 20,
+          "description": "Sets Kubernetes resources.requests for bin-packing",
+          "patterns": [
+            "resources\\.requests|requests"
+          ]
+        },
+        {
+          "id": "audit_finops_gate",
+          "points": 15,
+          "description": "Runs audit_finops.py verification",
+          "patterns": [
+            "audit_finops\\.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-git-history-surgeon",
+      "skill": "git-history-surgeon",
+      "collection": "premium-skills",
+      "prompt": "Find which commit broke checkout using git bisect, squash my messy local branch safely, and audit the repo for conflict markers.",
+      "rubric": [
+        {
+          "id": "backup_stop_gate",
+          "points": 25,
+          "description": "Records starting SHA / safety branch and uses --force-with-lease (never --force on main)",
+          "patterns": [
+            "force-with-lease",
+            "rev-parse|backup|reflog"
+          ]
+        },
+        {
+          "id": "automated_bisect",
+          "points": 25,
+          "description": "Provides git bisect run script with exit codes 0/1/125 and git bisect reset",
+          "patterns": [
+            "git bisect",
+            "bisect reset"
+          ]
+        },
+        {
+          "id": "conventional_commits",
+          "points": 20,
+          "description": "Uses Conventional Commits format for squashed commit",
+          "patterns": [
+            "feat|fix|refactor",
+            "Conventional"
+          ]
+        },
+        {
+          "id": "conflict_check",
+          "points": 15,
+          "description": "Checks for unresolved <<<<<<< merge conflict markers",
+          "patterns": [
+            "conflict|<<<<<<<"
+          ]
+        },
+        {
+          "id": "audit_git_gate",
+          "points": 15,
+          "description": "Runs audit_git_hygiene.py verification",
+          "patterns": [
+            "audit_git_hygiene\\.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-go-backend-engineer",
+      "skill": "go-backend-engineer",
+      "collection": "premium-skills",
+      "prompt": "Review a Go HTTP service using http.ListenAndServe, http.Get, ignored '_ =' errors, and panic() inside request handlers.",
+      "rubric": [
+        {
+          "id": "http_timeouts",
+          "points": 25,
+          "description": "Replaces bare ListenAndServe/Get with explicit http.Server and http.Client timeouts",
+          "patterns": [
+            "ReadHeaderTimeout|ReadTimeout",
+            "http\\.Client"
+          ]
+        },
+        {
+          "id": "context_propagation",
+          "points": 20,
+          "description": "Propagates context.Context and uses NewRequestWithContext",
+          "patterns": [
+            "context\\.Context|NewRequestWithContext"
+          ]
+        },
+        {
+          "id": "error_wrapping",
+          "points": 20,
+          "description": "Replaces panic() and ignored errors with fmt.Errorf %w",
+          "patterns": [
+            "%w|errors\\.Is",
+            "panic"
+          ]
+        },
+        {
+          "id": "graceful_shutdown",
+          "points": 20,
+          "description": "Adds signal.NotifyContext and server.Shutdown",
+          "patterns": [
+            "Shutdown|NotifyContext"
+          ]
+        },
+        {
+          "id": "race_and_lint",
+          "points": 15,
+          "description": "Verifies with go test -race and lint_go.py",
+          "patterns": [
+            "go test -race|lint_go\\.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-graphql-architect",
+      "skill": "graphql-architect",
+      "collection": "premium-skills",
+      "prompt": "Design a GraphQL schema for orders and customers avoiding N+1 queries, unbounded lists, and breaking changes.",
+      "rubric": [
+        {
+          "id": "relay_pagination",
+          "points": 25,
+          "description": "Uses Relay cursor pagination (first, after, edges, pageInfo)",
+          "patterns": [
+            "Connection|pageInfo",
+            "first|after"
+          ]
+        },
+        {
+          "id": "input_payload",
+          "points": 20,
+          "description": "Wraps mutations in Input and Payload types with userErrors",
+          "patterns": [
+            "Input",
+            "Payload|userErrors"
+          ]
+        },
+        {
+          "id": "dataloader_batching",
+          "points": 20,
+          "description": "Prevents N+1 via per-request DataLoader",
+          "patterns": [
+            "DataLoader"
+          ]
+        },
+        {
+          "id": "depth_and_deprecation",
+          "points": 20,
+          "description": "Enforces depth/complexity limits and @deprecated(reason:)",
+          "patterns": [
+            "depth|complexity",
+            "deprecated"
+          ]
+        },
+        {
+          "id": "lint_graphql_gate",
+          "points": 15,
+          "description": "Verifies schema with lint_graphql.py",
+          "patterns": [
+            "lint_graphql\\.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-incident-response",
+      "skill": "incident-response",
+      "collection": "premium-skills",
+      "prompt": "Checkout API 5xx jumped from 0.1% to 38% 12 minutes after deploy v2.14.0. Pods are OOMKilling and the team wants to drop the dead-letter queue and restart Postgres. Give me the incident plan and postmortem template.",
+      "rubric": [
+        {
+          "id": "severity_and_stop_gate",
+          "points": 30,
+          "description": "Classifies SEV-1/SEV-2 and blocks destructive queue purge / Postgres restart before evidence snapshot and confirmation",
+          "patterns": [
+            "SEV-[12]",
+            "snapshot|evidence|confirm"
+          ]
+        },
+        {
+          "id": "stabilize_rollback_first",
+          "points": 30,
+          "description": "Prioritizes immediate reversible rollback of v2.14.0 over deep root-cause debugging",
+          "patterns": [
+            "rollback|revert|rollout undo",
+            "v2\\.14\\.0"
+          ]
+        },
+        {
+          "id": "utc_timeline_and_recovery_signal",
+          "points": 20,
+          "description": "Specifies UTC timeline and objective recovery verification signal",
+          "patterns": [
+            "UTC",
+            "5xx|baseline|recovery"
+          ]
+        },
+        {
+          "id": "blameless_postmortem_actions",
+          "points": 20,
+          "description": "Includes blameless postmortem with contributing factors, owner, priority, and verification criterion",
+          "patterns": [
+            "blameless",
+            "owner|priority|verification"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-kubernetes-architect",
+      "skill": "kubernetes-architect",
+      "collection": "premium-skills",
+      "prompt": "Harden a Kubernetes Deployment for our payments API running image payments:latest as root with no limits, probes, or PDB.",
+      "rubric": [
+        {
+          "id": "pinned_image",
+          "points": 20,
+          "description": "Replaces :latest with pinned SemVer tag or sha256 digest",
+          "patterns": [
+            "sha256:|:\\d+\\.\\d+"
+          ]
+        },
+        {
+          "id": "restricted_secctx",
+          "points": 25,
+          "description": "Enforces runAsNonRoot, readOnlyRootFilesystem, allowPrivilegeEscalation: false, drop ALL",
+          "patterns": [
+            "runAsNonRoot",
+            "readOnlyRootFilesystem",
+            "allowPrivilegeEscalation"
+          ]
+        },
+        {
+          "id": "resources_defined",
+          "points": 20,
+          "description": "Specifies both resources.requests and resources.limits",
+          "patterns": [
+            "requests",
+            "limits"
+          ]
+        },
+        {
+          "id": "probes_and_pdb",
+          "points": 20,
+          "description": "Adds readinessProbe, livenessProbe, and PodDisruptionBudget",
+          "patterns": [
+            "readinessProbe",
+            "PodDisruptionBudget"
+          ]
+        },
+        {
+          "id": "lint_k8s_gate",
+          "points": 15,
+          "description": "Runs lint_k8s.py or kubectl/helm validation",
+          "patterns": [
+            "lint_k8s\\.py|helm lint|kubectl"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-llm-security-auditor",
+      "skill": "llm-security-auditor",
+      "collection": "premium-skills",
+      "prompt": "Security-audit an AI coding agent that injects scraped web pages into an f-string system prompt and enables auto_approve: true on shell tools.",
+      "rubric": [
+        {
+          "id": "prompt_separation",
+          "points": 25,
+          "description": "Separates untrusted data from system instructions (LLM01)",
+          "patterns": [
+            "LLM01|prompt injection",
+            "delimiter|separate|untrusted"
+          ]
+        },
+        {
+          "id": "least_privilege_tools",
+          "points": 25,
+          "description": "Removes auto_approve and enforces allowlists + confirmation (LLM06)",
+          "patterns": [
+            "allowlist|confirmation|human-in-the-loop",
+            "LLM06|Excessive Agency"
+          ]
+        },
+        {
+          "id": "unicode_and_checksums",
+          "points": 20,
+          "description": "Checks for hidden Unicode/BiDi chars and SHA-256 verification",
+          "patterns": [
+            "Unicode|zero-width|SHA-256"
+          ]
+        },
+        {
+          "id": "output_guardrails",
+          "points": 15,
+          "description": "Prevents raw LLM output execution in eval/shell/SQL",
+          "patterns": [
+            "eval|sanitize|validate"
+          ]
+        },
+        {
+          "id": "audit_prompts_gate",
+          "points": 15,
+          "description": "Runs audit_prompts.py verification",
+          "patterns": [
+            "audit_prompts\\.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-memory-manager",
+      "skill": "memory-manager",
+      "collection": "skills",
+      "prompt": "Design a cross-session context.json update flow when we change our database choice from SQLite to PostgreSQL while preserving prior decision history safely.",
+      "rubric": [
+        {
+          "id": "versioned_schema",
+          "points": 20,
+          "description": "Uses versioned JSON schema with schema_version, updated_at, constraints, decisions, tasks",
+          "patterns": [
+            "schema_version",
+            "updated_at",
+            "file_pointers"
+          ]
+        },
+        {
+          "id": "append_only_decisions",
+          "points": 20,
+          "description": "Marks the old SQLite decision superseded and appends a new decision instead of deleting",
+          "patterns": [
+            "superseded",
+            "DEC-"
+          ]
+        },
+        {
+          "id": "staleness_check",
+          "points": 20,
+          "description": "Checks referenced file paths/hashes and tags changed facts as STALE",
+          "patterns": [
+            "STALE|sha256|staleness"
+          ]
+        },
+        {
+          "id": "atomic_write",
+          "points": 20,
+          "description": "Writes via temporary file + json.loads sanity check + os.replace",
+          "patterns": [
+            "\\.tmp|tmp",
+            "os\\.replace"
+          ]
+        },
+        {
+          "id": "secret_scrub",
+          "points": 20,
+          "description": "Explicitly forbids storing secrets/API keys/passwords in context.json",
+          "patterns": [
+            "secret|password|API key|scrub"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-observability-setup",
+      "skill": "observability-setup",
+      "collection": "premium-skills",
+      "prompt": "Instrument our Python FastAPI payment service with logs, Prometheus metrics (someone suggested labeling by user_id and request_id), tracing, and PagerDuty alerts on CPU > 70%.",
+      "rubric": [
+        {
+          "id": "reject_high_cardinality",
+          "points": 30,
+          "description": "Explicitly rejects user_id and request_id as metric labels to prevent cardinality explosion",
+          "patterns": [
+            "cardinality",
+            "user_id|request_id"
+          ]
+        },
+        {
+          "id": "structured_logs_redaction",
+          "points": 25,
+          "description": "Specifies structured JSON logs with trace_id correlation and PII/secret redaction",
+          "patterns": [
+            "trace_id",
+            "JSON|structured",
+            "redact|PII|secret"
+          ]
+        },
+        {
+          "id": "red_use_and_slo",
+          "points": 25,
+          "description": "Defines RED/USE metrics and measurable SLI/SLO with error budget",
+          "patterns": [
+            "SLO|error budget",
+            "RED|histogram|duration"
+          ]
+        },
+        {
+          "id": "symptom_burn_rate_alerts",
+          "points": 20,
+          "description": "Replaces noisy CPU > 70% page with symptom-based SLO burn-rate alert and runbook",
+          "patterns": [
+            "burn.?rate|symptom",
+            "runbook"
+          ]
+        }
+      ]
+    },
+    {
       "id": "eval-performance-profiler",
       "skill": "performance-profiler",
       "collection": "premium-skills",
@@ -839,6 +1220,110 @@
           "description": "Verifies exact functional output equality (`baseline == optimized`) after optimization",
           "patterns": [
             "parity|equality|=="
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-privacy-compliance-auditor",
+      "skill": "privacy-compliance-auditor",
+      "collection": "premium-skills",
+      "prompt": "Audit a checkout service that logs user SSNs and credit card numbers in info logs and stores raw prod emails in test fixtures.",
+      "rubric": [
+        {
+          "id": "log_redaction",
+          "points": 25,
+          "description": "Removes PII from logs and enforces allowlist redaction",
+          "patterns": [
+            "redact|mask",
+            "log"
+          ]
+        },
+        {
+          "id": "synthetic_fixtures",
+          "points": 20,
+          "description": "Replaces real fixtures with synthetic @example.com data",
+          "patterns": [
+            "example\\.com|synthetic"
+          ]
+        },
+        {
+          "id": "erasure_and_ttl",
+          "points": 25,
+          "description": "Defines retention TTL and GDPR right-to-erasure/DSAR path",
+          "patterns": [
+            "TTL|retention",
+            "erasure|DSAR|GDPR"
+          ]
+        },
+        {
+          "id": "pseudonymization",
+          "points": 15,
+          "description": "Uses tokenization/HMAC separation for analytics",
+          "patterns": [
+            "tokeniz|pseudonym|HMAC"
+          ]
+        },
+        {
+          "id": "scan_pii_gate",
+          "points": 15,
+          "description": "Runs scan_pii.py verification",
+          "patterns": [
+            "scan_pii\\.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-python-coding-assistant",
+      "skill": "python-coding-assistant",
+      "collection": "skills",
+      "prompt": "Write a Python script that loads a YAML config file, runs a user-selected subcommand with a timeout, and totals currency values from a CSV file.",
+      "rubric": [
+        {
+          "id": "strict_typing",
+          "points": 20,
+          "description": "Uses `from __future__ import annotations` and full parameter/return type annotations",
+          "patterns": [
+            "from __future__ import annotations",
+            "-> "
+          ]
+        },
+        {
+          "id": "safe_yaml",
+          "points": 20,
+          "description": "Uses `yaml.safe_load` instead of unsafe `yaml.load`",
+          "patterns": [
+            "safe_load"
+          ]
+        },
+        {
+          "id": "safe_subprocess",
+          "points": 20,
+          "description": "Uses `subprocess.run` with list args (no shell=True), check=True, and explicit timeout",
+          "patterns": [
+            "subprocess\\.run",
+            "timeout=",
+            "check=True"
+          ]
+        },
+        {
+          "id": "decimal_currency",
+          "points": 20,
+          "description": "Uses `Decimal` for currency math and `pathlib.Path` with explicit UTF-8 encoding",
+          "patterns": [
+            "Decimal",
+            "Path",
+            "utf-8"
+          ]
+        },
+        {
+          "id": "verification_commands",
+          "points": 20,
+          "description": "Includes verification commands (`py_compile`, `ruff`/`mypy`, and edge-case tests)",
+          "patterns": [
+            "py_compile",
+            "ruff|mypy|pytest"
           ]
         }
       ]
@@ -894,6 +1379,102 @@
       ]
     },
     {
+      "id": "eval-release-engineering",
+      "skill": "release-engineering",
+      "collection": "premium-skills",
+      "prompt": "We merged 4 new features, 2 bug fixes, and bumped package.json to 0.3.0 while plugin.json is still 0.2.0. Prepare the release plan, changelog, and rollback steps.",
+      "rubric": [
+        {
+          "id": "semver_rationale",
+          "points": 25,
+          "description": "Computes SemVer minor bump deterministically from commit history",
+          "patterns": [
+            "SemVer|MINOR",
+            "0\\.3\\.0"
+          ]
+        },
+        {
+          "id": "version_parity_gate",
+          "points": 30,
+          "description": "Catches and blocks release on package.json (0.3.0) vs plugin.json (0.2.0) version mismatch",
+          "patterns": [
+            "plugin\\.json",
+            "parity|mismatch|0\\.2\\.0"
+          ]
+        },
+        {
+          "id": "checksums_and_gates",
+          "points": 25,
+          "description": "Requires real pre-release verification gates and SHA-256 checksums",
+          "patterns": [
+            "SHA-?256|checksum",
+            "test|gate"
+          ]
+        },
+        {
+          "id": "rollback_no_force_tag",
+          "points": 20,
+          "description": "Provides rollback/hotfix procedure without mutating immutable published tags",
+          "patterns": [
+            "rollback|hotfix|yank",
+            "tag|release"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-rust-systems-engineer",
+      "skill": "rust-systems-engineer",
+      "collection": "premium-skills",
+      "prompt": "Audit a Rust parser crate using .unwrap(), an undocumented unsafe block with mem::transmute, and wildcard '*' Cargo.toml versions.",
+      "rubric": [
+        {
+          "id": "result_propagation",
+          "points": 25,
+          "description": "Replaces .unwrap() with structured Result error propagation",
+          "patterns": [
+            "Result<",
+            "\\?"
+          ]
+        },
+        {
+          "id": "safety_comment",
+          "points": 25,
+          "description": "Eliminates transmute or documents // SAFETY: invariants",
+          "patterns": [
+            "SAFETY:",
+            "TryFrom|from_ne_bytes|transmute"
+          ]
+        },
+        {
+          "id": "cargo_pinning",
+          "points": 20,
+          "description": "Pins Cargo.toml dependency versions instead of '*'",
+          "patterns": [
+            "Cargo\\.toml",
+            "pin|SemVer"
+          ]
+        },
+        {
+          "id": "clippy_and_test",
+          "points": 15,
+          "description": "Runs cargo clippy -D warnings and cargo test",
+          "patterns": [
+            "cargo clippy",
+            "cargo test"
+          ]
+        },
+        {
+          "id": "lint_rust_gate",
+          "points": 15,
+          "description": "References lint_rust.py verification",
+          "patterns": [
+            "lint_rust\\.py"
+          ]
+        }
+      ]
+    },
+    {
       "id": "eval-security-auditor",
       "skill": "security-auditor",
       "collection": "premium-skills",
@@ -943,6 +1524,58 @@
           "patterns": [
             "CRITICAL|HIGH",
             "Remediation"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-supply-chain-sbom",
+      "skill": "supply-chain-sbom",
+      "collection": "premium-skills",
+      "prompt": "Audit a Node + Python monorepo with missing package-lock.json, '*' dependency specs, unpinned requirements.txt, and a curl postinstall hook.",
+      "rubric": [
+        {
+          "id": "lockfiles",
+          "points": 25,
+          "description": "Requires committed lockfiles and frozen CI installs",
+          "patterns": [
+            "lockfile|package-lock",
+            "npm ci|frozen"
+          ]
+        },
+        {
+          "id": "pin_versions",
+          "points": 20,
+          "description": "Pins floating '*' npm specs and Python '==' versions",
+          "patterns": [
+            "==",
+            "SemVer|pin"
+          ]
+        },
+        {
+          "id": "lifecycle_hooks",
+          "points": 20,
+          "description": "Flags suspicious postinstall curl download and recommends --ignore-scripts",
+          "patterns": [
+            "postinstall",
+            "ignore-scripts"
+          ]
+        },
+        {
+          "id": "sbom_and_slsa",
+          "points": 20,
+          "description": "Generates CycloneDX SBOM and verifies npm audit signatures / SLSA",
+          "patterns": [
+            "CycloneDX|SBOM",
+            "SLSA|audit signatures"
+          ]
+        },
+        {
+          "id": "audit_sbom_gate",
+          "points": 15,
+          "description": "Runs audit_sbom.py --sbom",
+          "patterns": [
+            "audit_sbom\\.py"
           ]
         }
       ]
@@ -1003,6 +1636,108 @@
       ]
     },
     {
+      "id": "eval-testing-automation",
+      "skill": "testing-automation",
+      "collection": "skills",
+      "prompt": "Set up a pytest suite and pyproject.toml configuration for a Python CSV parser module that reads files and checks an environment variable `MAX_ROWS`.",
+      "rubric": [
+        {
+          "id": "branch_coverage_config",
+          "points": 20,
+          "description": "Configures branch=true, show_missing=true, and fail_under in pyproject.toml",
+          "patterns": [
+            "branch = true",
+            "fail_under"
+          ]
+        },
+        {
+          "id": "strict_pytest_opts",
+          "points": 20,
+          "description": "Uses strict pytest options (`--strict-markers`, `--strict-config`)",
+          "patterns": [
+            "--strict-markers|--strict-config"
+          ]
+        },
+        {
+          "id": "parametrized_boundaries",
+          "points": 20,
+          "description": "Uses `@pytest.mark.parametrize` and `pytest.raises(..., match=...)` for boundaries",
+          "patterns": [
+            "parametrize",
+            "pytest\\.raises"
+          ]
+        },
+        {
+          "id": "isolated_fixtures",
+          "points": 20,
+          "description": "Uses `tmp_path` and `monkeypatch` for zero-flakiness file and env isolation",
+          "patterns": [
+            "tmp_path",
+            "monkeypatch"
+          ]
+        },
+        {
+          "id": "coverage_command",
+          "points": 20,
+          "description": "Provides exact branch coverage verification command (`--cov-branch --cov-report=term-missing`)",
+          "patterns": [
+            "--cov-branch",
+            "term-missing"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eval-typescript-architect",
+      "skill": "typescript-architect",
+      "collection": "premium-skills",
+      "prompt": "Refactor a React + TypeScript checkout module that uses : any, @ts-ignore, dangerouslySetInnerHTML, and untyped fetch() responses.",
+      "rubric": [
+        {
+          "id": "strict_tsconfig",
+          "points": 20,
+          "description": "Enforces strict and noUncheckedIndexedAccess in tsconfig",
+          "patterns": [
+            "strict",
+            "noUncheckedIndexedAccess"
+          ]
+        },
+        {
+          "id": "unknown_narrowing",
+          "points": 25,
+          "description": "Replaces any with unknown + runtime schema guard and discriminated unions",
+          "patterns": [
+            "unknown",
+            "discriminated|union|type guard"
+          ]
+        },
+        {
+          "id": "xss_safe",
+          "points": 20,
+          "description": "Removes or sanitizes dangerouslySetInnerHTML",
+          "patterns": [
+            "DOMPurify|sanitiz|dangerouslySetInnerHTML"
+          ]
+        },
+        {
+          "id": "abort_signal",
+          "points": 20,
+          "description": "Uses AbortSignal/AbortController with cleanup",
+          "patterns": [
+            "AbortSignal|AbortController"
+          ]
+        },
+        {
+          "id": "lint_ts_gate",
+          "points": 15,
+          "description": "Runs lint_ts.py and tsc --noEmit",
+          "patterns": [
+            "lint_ts\\.py|tsc --noEmit"
+          ]
+        }
+      ]
+    },
+    {
       "id": "eval-unit-test-generator",
       "skill": "unit-test-generator",
       "collection": "premium-skills",
@@ -1057,178 +1792,54 @@
       ]
     },
     {
-      "id": "eval-incident-response",
-      "skill": "incident-response",
-      "collection": "premium-skills",
-      "prompt": "Checkout API 5xx jumped from 0.1% to 38% 12 minutes after deploy v2.14.0. Pods are OOMKilling and the team wants to drop the dead-letter queue and restart Postgres. Give me the incident plan and postmortem template.",
+      "id": "eval-web-scraper",
+      "skill": "web-scraper",
+      "collection": "skills",
+      "prompt": "Build a Python scraper for paginated product catalog pages at `https://shop.example.com/catalog` that extracts title, price, and stock status to JSONL.",
       "rubric": [
         {
-          "id": "severity_and_stop_gate",
-          "points": 30,
-          "description": "Classifies SEV-1/SEV-2 and blocks destructive queue purge / Postgres restart before evidence snapshot and confirmation",
-          "patterns": [
-            "SEV-[12]",
-            "snapshot|evidence|confirm"
-          ]
-        },
-        {
-          "id": "stabilize_rollback_first",
-          "points": 30,
-          "description": "Prioritizes immediate reversible rollback of v2.14.0 over deep root-cause debugging",
-          "patterns": [
-            "rollback|revert|rollout undo",
-            "v2\\.14\\.0"
-          ]
-        },
-        {
-          "id": "utc_timeline_and_recovery_signal",
+          "id": "robots_txt_check",
           "points": 20,
-          "description": "Specifies UTC timeline and objective recovery verification signal",
+          "description": "Checks robots.txt via RobotFileParser with an explicit User-Agent before fetching",
           "patterns": [
-            "UTC",
-            "5xx|baseline|recovery"
+            "RobotFileParser|robots\\.txt",
+            "User-Agent"
           ]
         },
         {
-          "id": "blameless_postmortem_actions",
+          "id": "timeouts_and_backoff",
           "points": 20,
-          "description": "Includes blameless postmortem with contributing factors, owner, priority, and verification criterion",
+          "description": "Enforces explicit request timeout, per-domain rate limit/jitter, and bounded backoff honoring Retry-After",
           "patterns": [
-            "blameless",
-            "owner|priority|verification"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "eval-release-engineering",
-      "skill": "release-engineering",
-      "collection": "premium-skills",
-      "prompt": "We merged 4 new features, 2 bug fixes, and bumped package.json to 0.3.0 while plugin.json is still 0.2.0. Prepare the release plan, changelog, and rollback steps.",
-      "rubric": [
-        {
-          "id": "semver_rationale",
-          "points": 25,
-          "description": "Computes SemVer minor bump deterministically from commit history",
-          "patterns": [
-            "SemVer|MINOR",
-            "0\\.3\\.0"
+            "timeout=",
+            "Retry-After|backoff|sleep"
           ]
         },
         {
-          "id": "version_parity_gate",
-          "points": 30,
-          "description": "Catches and blocks release on package.json (0.3.0) vs plugin.json (0.2.0) version mismatch",
-          "patterns": [
-            "plugin\\.json",
-            "parity|mismatch|0\\.2\\.0"
-          ]
-        },
-        {
-          "id": "checksums_and_gates",
-          "points": 25,
-          "description": "Requires real pre-release verification gates and SHA-256 checksums",
-          "patterns": [
-            "SHA-?256|checksum",
-            "test|gate"
-          ]
-        },
-        {
-          "id": "rollback_no_force_tag",
+          "id": "pagination_cycle_guard",
           "points": 20,
-          "description": "Provides rollback/hotfix procedure without mutating immutable published tags",
+          "description": "Prevents infinite pagination via visited URL set and max_pages cap",
           "patterns": [
-            "rollback|hotfix|yank",
-            "tag|release"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "eval-observability-setup",
-      "skill": "observability-setup",
-      "collection": "premium-skills",
-      "prompt": "Instrument our Python FastAPI payment service with logs, Prometheus metrics (someone suggested labeling by user_id and request_id), tracing, and PagerDuty alerts on CPU > 70%.",
-      "rubric": [
-        {
-          "id": "reject_high_cardinality",
-          "points": 30,
-          "description": "Explicitly rejects user_id and request_id as metric labels to prevent cardinality explosion",
-          "patterns": [
-            "cardinality",
-            "user_id|request_id"
+            "visited|seen",
+            "max_pages"
           ]
         },
         {
-          "id": "structured_logs_redaction",
-          "points": 25,
-          "description": "Specifies structured JSON logs with trace_id correlation and PII/secret redaction",
-          "patterns": [
-            "trace_id",
-            "JSON|structured",
-            "redact|PII|secret"
-          ]
-        },
-        {
-          "id": "red_use_and_slo",
-          "points": 25,
-          "description": "Defines RED/USE metrics and measurable SLI/SLO with error budget",
-          "patterns": [
-            "SLO|error budget",
-            "RED|histogram|duration"
-          ]
-        },
-        {
-          "id": "symptom_burn_rate_alerts",
+          "id": "no_fabricated_fields",
           "points": 20,
-          "description": "Replaces noisy CPU > 70% page with symptom-based SLO burn-rate alert and runbook",
+          "description": "Stores None for missing fields, uses Decimal for price, and quarantines invalid rows",
           "patterns": [
-            "burn.?rate|symptom",
-            "runbook"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "eval-accessibility-auditor",
-      "skill": "accessibility-auditor",
-      "collection": "premium-skills",
-      "prompt": "Audit a modal form with `<div onclick='submit()'>Save</div>`, `<input placeholder='Email'>`, `outline: none` in CSS, and `tabindex='5'`. Provide WCAG 2.2 AA fixes.",
-      "rubric": [
-        {
-          "id": "semantic_button_fix",
-          "points": 30,
-          "description": "Replaces clickable <div> with native <button type='button'> for keyboard access (WCAG 2.1.1)",
-          "patterns": [
-            "<button",
-            "2\\.1\\.1|keyboard"
+            "Decimal",
+            "rejected\\.jsonl|quarantine|None"
           ]
         },
         {
-          "id": "programmatic_label",
-          "points": 25,
-          "description": "Flags placeholder-only input and adds explicit <label for> or aria-label",
-          "patterns": [
-            "<label|aria-label",
-            "placeholder"
-          ]
-        },
-        {
-          "id": "focus_and_tabindex",
-          "points": 25,
-          "description": "Removes positive tabindex=5 and restores visible :focus-visible styling",
-          "patterns": [
-            "focus-visible",
-            "tabindex"
-          ]
-        },
-        {
-          "id": "wcag_22_and_manual_checks",
+          "id": "offline_fixture_test",
           "points": 20,
-          "description": "Covers WCAG 2.2 target size / forced-colors / reduced-motion and manual screen-reader verification",
+          "description": "Includes provenance fields (source_url, fetched_at) and an offline HTML fixture test",
           "patterns": [
-            "forced-colors|prefers-reduced-motion|24",
-            "screen.?reader|manual"
+            "source_url",
+            "fetched_at"
           ]
         }
       ]

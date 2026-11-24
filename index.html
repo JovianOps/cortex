@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cortex — deterministic agent skills (v1.0.0)</title>
-  <meta name="description" content="24 versioned SKILL.md playbooks, 24 zero-dependency Python helper scripts, 6 role packs, and SHA-256 verification for Visual Studio Code, Claude, Codex, Gemini CLI, Cursor, Copilot, and more." />
+  <title>cortex — deterministic agent skills (v2.0.0)</title>
+  <meta name="description" content="36 versioned SKILL.md playbooks, 36 zero-dependency Python helper scripts, native MCP server, Local Studio UI, Universal Rule Compiler, 10 role packs, and SHA-256 verification." />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230e0e0d'/%3E%3Crect x='22' y='6' width='4' height='4' fill='%23d92b1c'/%3E%3Cpath d='M7 11l6 5-6 5M15 21h10' stroke='%23f6f5f0' stroke-width='2.5' stroke-linecap='square' fill='none'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -983,7 +983,7 @@
       <a href="#top" class="brand">
         <span class="brand-mark" aria-hidden="true"></span>
         <span>cortex</span>
-        <span class="ver">v1.0.0</span>
+        <span class="ver">v2.0.0</span>
       </a>
       <nav aria-label="Primary">
         <a href="#skills">Index</a>
@@ -1021,7 +1021,7 @@
           </p>
           <h1>Deterministic skills for AI coding agents.</h1>
           <p class="lead">
-            24 versioned <code>SKILL.md</code> playbooks with stop gates, 24 zero-dependency Python helper scripts, 6 role packs, and lockfile SHA-256 verification. Built for Visual Studio Code, Claude Code, Codex, Gemini CLI, Cursor, Copilot, OpenCode, Goose, Cline, Aider, and Hermes.
+            36 versioned <code>SKILL.md</code> playbooks, 36 zero-dependency Python verifiers, native MCP 2025-03-26 server (<code>cortex mcp</code>), Local Studio Web Workbench (<code>cortex studio</code>), Universal Agent Rule Compiler (<code>cortex compile</code>), SARIF 2.1.0 scanner (<code>cortex scan</code>), 10 role packs, and SHA-256 verification.
           </p>
 
           <div class="quick-box">
@@ -1061,20 +1061,20 @@
     <div class="wrap">
       <div class="specs" aria-label="Release summary">
         <div class="spec">
-          <div class="spec-val">24</div>
-          <div class="spec-label">SKILL.md playbooks (10 core / 14 extended)</div>
+          <div class="spec-val">36</div>
+          <div class="spec-label">SKILL.md playbooks (10 core / 26 extended)</div>
         </div>
         <div class="spec">
-          <div class="spec-val">24</div>
-          <div class="spec-label">Bundled Python stdlib scripts (100%)</div>
+          <div class="spec-val">36</div>
+          <div class="spec-label">Bundled Python stdlib verifiers (100%)</div>
         </div>
         <div class="spec">
-          <div class="spec-val">6</div>
+          <div class="spec-val">10</div>
           <div class="spec-label">Curated role packs in <code>packs.json</code></div>
         </div>
         <div class="spec">
           <div class="spec-val">100/100</div>
-          <div class="spec-label">Structural audit &middot; 24 eval rubrics</div>
+          <div class="spec-label">Structural audit &middot; MCP + Studio + Compiler</div>
         </div>
       </div>
     </div>
@@ -1088,16 +1088,16 @@
             <p class="sec-desc">Click any row to inspect its <code>SKILL.md</code> SHA-256, bundled helper script, and install command. Check rows to stage them in the builder.</p>
           </div>
           <div class="mono" style="font-size:12px;color:var(--muted);">
-            <span id="countLabel">24 shown</span>
+            <span id="countLabel">36 shown</span>
           </div>
         </div>
 
         <div class="toolbar">
           <div class="tabs" role="group" aria-label="Filter skills">
-            <button type="button" data-filter="all" aria-pressed="true">all (24)</button>
+            <button type="button" data-filter="all" aria-pressed="true">all (36)</button>
             <button type="button" data-filter="core" aria-pressed="false">core (10)</button>
-            <button type="button" data-filter="extended" aria-pressed="false">extended (14)</button>
-            <button type="button" data-filter="scripts" aria-pressed="false">with scripts (24)</button>
+            <button type="button" data-filter="extended" aria-pressed="false">extended (26)</button>
+            <button type="button" data-filter="scripts" aria-pressed="false">with scripts (36)</button>
           </div>
           <div class="search-wrap">
             <input id="searchInput" class="ctrl" type="search" placeholder="filter by slug, tag, script..." aria-label="Search skills" />
@@ -1197,7 +1197,7 @@
           <div class="ledger-row">
             <span class="ledger-key">Skill &amp; ZIP Manifest</span>
             <span class="ledger-val"><a href="https://github.com/JovianOps/cortex/blob/main/checksums.json" target="_blank" rel="noreferrer">github.com/JovianOps/cortex/blob/main/checksums.json</a></span>
-            <span class="tier">24 skills</span>
+            <span class="tier">36 skills</span>
           </div>
         </div>
 
@@ -1220,7 +1220,7 @@
 
   <footer>
     <div class="wrap foot">
-      <div>JovianOps / cortex &middot; v1.0.0 &middot; MIT License</div>
+      <div>JovianOps / cortex &middot; v2.0.0 &middot; MIT License</div>
       <div class="foot-links">
         <a href="https://github.com/JovianOps/cortex" target="_blank" rel="noreferrer">repository</a>
         <a href="https://www.npmjs.com/package/@jovianops/cortex" target="_blank" rel="noreferrer">npm</a>
@@ -1260,8 +1260,8 @@
       "memory"
     ],
     "script": "scripts/citation_check.py",
-    "sha256": "ee3e4f97aa05195c4ec11730d2c00ce0e7534365928a58609046f5e93949ea38",
-    "zipSha256": "09979c34ff239873a1f1a5fc9b1fe8446055f9250e28e1011cbbf106d235af2a"
+    "sha256": "dddff527fe53bd86a9123a57ce5d0ccdea94518682120d1e69454bae44f6f961",
+    "zipSha256": "b5afc78b46157fbb3a94a2ca09c5a46545c04c9c3277542cd1ddb27b5c940c5c"
   },
   {
     "slug": "anti-hallucination",
@@ -1276,8 +1276,8 @@
       "fact-checking"
     ],
     "script": "scripts/verify_claims.py",
-    "sha256": "6696b93c8b931c315f718adfa8e87d1aaa166b4f690071d54bca675cba227b8c",
-    "zipSha256": "64dbe62ebf4278f224a2e6e781b3fa36e54bc524083c60374f9457a179e889ac"
+    "sha256": "77a9ba465691c81ab8047bfe7a3cd7c5832d1d51a7d7eca7f008843d38bad522",
+    "zipSha256": "dc81bc1cdba909a0fc9cc36839e28b63230e15d3a0a89c40357dd8c6063a5700"
   },
   {
     "slug": "blender-3d-modeling",
@@ -1292,8 +1292,8 @@
       "validation"
     ],
     "script": "scripts/bmesh_check.py",
-    "sha256": "98beb57c4db7f792de5452c8be879a51bd5ed7c3d2b83fb731b9756ff8203fa7",
-    "zipSha256": "77099f677bec51af1acb16fdd9e1cbf5c94e7b74719b9c36ecd03e531f8da9c6"
+    "sha256": "5ffc66a8eaa0ed7a92d7efbd8065fc9a3a9e8cac11cd156049992d5b13a6001e",
+    "zipSha256": "830ab98e9b8cfc119dd889d4f025373799095eda32268984d95e1cd1f4f80f10"
   },
   {
     "slug": "code-review-assistant",
@@ -1308,8 +1308,8 @@
       "quality"
     ],
     "script": "scripts/diff_review.py",
-    "sha256": "1736751a8df4a49735ad976b6a2b9a93e92d5c34b6c5583eaeedf960e464e4e0",
-    "zipSha256": "90a4cacdcd903f6c9bf1f65255ced349b23809c933b06312753e5243686eb34c"
+    "sha256": "2db2345510e619bb30209a851a770f6d4dbcdaecf590953a118fd7f24904ba49",
+    "zipSha256": "8236717afaf0de7afa704f647b29af9e7c99c1bfa2abc26b9241d72c3c700455"
   },
   {
     "slug": "college-report-card",
@@ -1325,8 +1325,8 @@
       "memory"
     ],
     "script": "scripts/grade_calc.py",
-    "sha256": "9097c657ffe55957d6502d4a9281ba511b7903205725ba518f813b8fa24f7ae6",
-    "zipSha256": "4f89633b14f3824c2e09e0969577d61ab44756014f0025a007f23e5c42ec66e3"
+    "sha256": "626796450b9ba2957b8f1205a921da43a5130c03b01aacd7186a6dc700b17442",
+    "zipSha256": "36d747e3ff183c05dc3eb66b5e7dbcea7a9966f2b15e642ac0736c9908657263"
   },
   {
     "slug": "documentation-generator",
@@ -1342,8 +1342,8 @@
       "validation"
     ],
     "script": "scripts/check_docs.py",
-    "sha256": "c3f7f84f6bdeaf3a3cef996b67fab921af91595cf53ea95cc3ba9ea25d645f4c",
-    "zipSha256": "d861b36fd8e224553d3ad46048e5f9c3dd0005a262085845a10ea41bb3c3d34f"
+    "sha256": "deb26d2ad98169b6a4ead7a6e9ac325c0d2fae488a751d0f280b869081fa071d",
+    "zipSha256": "6f49466a25232a38a96edff5edaed9afea993f45b0fc53ef660a355f16a5fa38"
   },
   {
     "slug": "memory-manager",
@@ -1358,8 +1358,8 @@
       "anti-forgetting"
     ],
     "script": "scripts/memory_store.py",
-    "sha256": "fdcfcd7802d0f286c3dcc57c0b8aa9d73d5a780d2edb43c99fe95d6e2217b935",
-    "zipSha256": "e06bc07bf4b5552fb1e72ff5bd8d8faca5ab375a943e0ced35b9233daca87469"
+    "sha256": "edcb6d5e5f92f6760f4e392b6bae94d2f2c8c452718078f1be1d39a11573c5cc",
+    "zipSha256": "f9c41c863a93b29cf6a2c77e16f45459ecffcab323fe9490c5859683961ce6eb"
   },
   {
     "slug": "python-coding-assistant",
@@ -1374,8 +1374,8 @@
       "anti-hallucination"
     ],
     "script": "scripts/check_python_ast.py",
-    "sha256": "fb71ffea057c2816bd9ccad9e2ef4df7e5b5bb417bcb537ec1d82719041f0ca7",
-    "zipSha256": "4edd43ebd27c62c70111b91d248eb68f8fb13b391d64dc44ab9f5ea0a9fd0b74"
+    "sha256": "972b4a4a1a644e82a50b3ebfa43d7d155a3881876f933df2fdb72606b4777069",
+    "zipSha256": "6bf4d4b97c88315290b01aba61ea8eb18c9d1305f09a72b15b8fa95807fc2d88"
   },
   {
     "slug": "testing-automation",
@@ -1391,8 +1391,8 @@
       "coverage"
     ],
     "script": "scripts/check_test_coverage_map.py",
-    "sha256": "3ae4cfd2ed24ecd63036bb02ed3c4831d9334850dad0a2141f88f19e6edaa7a7",
-    "zipSha256": "cce36d63529f573588f76ebfaa7fdc2e12751d8657adc921db70b206648f1896"
+    "sha256": "8b51bec53b495e4b25954cd4e40ea78e26a743c0a9b3a60282f180f43e32c87b",
+    "zipSha256": "fb4c163aee8bccb53e4aa99a4cd108b4a26cc19e71e4635b58e80efef5e68ba5"
   },
   {
     "slug": "web-scraper",
@@ -1407,8 +1407,8 @@
       "validation"
     ],
     "script": "scripts/check_robots.py",
-    "sha256": "d31f7f16ca102a30637adda4fe7514abb0b75ea83c1de3cfe17ea96820311dca",
-    "zipSha256": "fb7ac19479387a6658ab0d53a34130a870eb36b1eeb704efa2debb19f623a96c"
+    "sha256": "b20d9428ab5ccfe96007231ea48be98a0e534c1c982a734ea53f14ab9f36741b",
+    "zipSha256": "eaad9c7d0cde6081aac284d458f93cc952c9019dbbaf3c8d1b48e27e7ca7b648"
   },
   {
     "slug": "accessibility-auditor",
@@ -1424,8 +1424,8 @@
       "frontend"
     ],
     "script": "scripts/a11y_scan.py",
-    "sha256": "da9355a66a506d33c5663a405ee4b1f134bb46244325eb173a732d6d908d9353",
-    "zipSha256": "863867f93f09b5f999b7bd57f7a07af308fc8c78abc4574c69f5bf175110d1db"
+    "sha256": "19875a4eb86fc213cbbc30bd54af91019984b6a2ea22f64e2fb1f34e2ad90ba6",
+    "zipSha256": "fcad27e22ee736931c3c8ccae51029828182f7ae1942f0ed8dede6e11fc602ea"
   },
   {
     "slug": "api-designer",
@@ -1441,8 +1441,43 @@
       "contract-testing"
     ],
     "script": "scripts/lint_openapi.py",
-    "sha256": "fc803efc9c0a6f4e200263cb29da27e80c546548e440794153ea4002456507a9",
-    "zipSha256": "e36792cb00147a56b56776eb507183b73a54500c0e4f13953a31a0c228d3a8a4"
+    "sha256": "e1325a78880f207649d37fefdee4294e22936dd5ff43a23657e7278567b50628",
+    "zipSha256": "f622be3214e6d7d8c4fa15bd21097a8a2a4531c39c5d1a90f33af87cb1963abe"
+  },
+  {
+    "slug": "architecture-decision-records",
+    "tier": "extended",
+    "dir": "premium-skills",
+    "zipDir": "premium-zips",
+    "desc": "Author and validate MADR Architecture Decision Records.",
+    "tags": [
+      "adr",
+      "architecture",
+      "madr",
+      "documentation",
+      "governance"
+    ],
+    "script": "scripts/check_adrs.py",
+    "sha256": "cfcfed1deccac1ce95311f0404fdfffcc7886ad5dc7892b76c80f9042baa1bf3",
+    "zipSha256": "0a0e5785da5901231bee105197747b316b68861888deb80b8ad554e9de275515"
+  },
+  {
+    "slug": "chaos-resilience-engineer",
+    "tier": "extended",
+    "dir": "premium-skills",
+    "zipDir": "premium-zips",
+    "desc": "Design fault-tolerant timeouts, retries, and game days.",
+    "tags": [
+      "chaos",
+      "resilience",
+      "sre",
+      "timeouts",
+      "retries",
+      "availability"
+    ],
+    "script": "scripts/audit_resilience.py",
+    "sha256": "8d8dcf2beb0a89653964c8a05c709b2fe1d9f309d8be60017fa9293edb864aa6",
+    "zipSha256": "e679987f02931c98cb6bb55bc1956d8669a98c80f105cf09a124df751b8d8f8c"
   },
   {
     "slug": "code-migration",
@@ -1457,8 +1492,8 @@
       "parity-testing"
     ],
     "script": "scripts/migration_inventory.py",
-    "sha256": "eb715b8d7e7b9729eb9d64bea157e7e3852d383894ff909b7dc4a14938d747fd",
-    "zipSha256": "c87cb75723617172194a3d1195cb9b2d30b45330728dc989bc4b96b588a0faa2"
+    "sha256": "8904b9a67d58a86261e9ebd6ad76e3a0ed25baeb101619ef93d97031e28d22b9",
+    "zipSha256": "66319b7a98d2b14e4f28a96dadf0beb1052a7a5e923329204d1f90d1506c31ce"
   },
   {
     "slug": "db-optimizer",
@@ -1474,8 +1509,8 @@
       "query-optimization"
     ],
     "script": "scripts/lint_sql.py",
-    "sha256": "945983607280c0ca82af668933750cc9f0264aacd996b4c0c35fc934d85818d7",
-    "zipSha256": "f896decc9f91295b6d93f8bef77cbd07c3983f2908fefac1e3e22305f143613f"
+    "sha256": "a9d66cf3065587a4149bc50e0744022ae2a893c382274c2e1eb49f7b5f1842e4",
+    "zipSha256": "8f48b9927d1d157e74a58c99208629fdd3245a8f72a2c4a620fbe0adf2b095e0"
   },
   {
     "slug": "devops-pipeline",
@@ -1491,8 +1526,8 @@
       "security"
     ],
     "script": "scripts/lint_actions.py",
-    "sha256": "2fa333cff3c7b5e347f4c85d25d5621cacd5b5907b068fff52c49f74aaacf7ac",
-    "zipSha256": "d0ee0af1a5cf114814582c717ee2b3d2638f24178f0b7f3b1fded3c1c92c1262"
+    "sha256": "6cde83f292b5880ea574712d394ce7c9e98396f1473ba7be81db76e306dc1b8b",
+    "zipSha256": "5d3287463df31fed9378a989a47a1d322f9719acf3fa8a4b9fcb4fe76b7e232e"
   },
   {
     "slug": "docker-generator",
@@ -1508,8 +1543,79 @@
       "security"
     ],
     "script": "scripts/lint_dockerfile.py",
-    "sha256": "84a6ec863ae02e23c3e5266c6c7aced3a8b5970914b19ed93850bfd0f744f885",
-    "zipSha256": "eb7718e7b9bf2508cdbe52a3fc7570ecfe8b73ef339e62ac1335563de5289de2"
+    "sha256": "9e2dee7969fb2c39c675b590614bbc25fcd19dad14a189a55da0d590fca428aa",
+    "zipSha256": "21035d450346dbdb2c4e35d553e1d09175653d8513a4dd0193a56d3d1984bd59"
+  },
+  {
+    "slug": "finops-cost-optimizer",
+    "tier": "extended",
+    "dir": "premium-skills",
+    "zipDir": "premium-zips",
+    "desc": "Audit Terraform and K8s configs for cloud cost waste.",
+    "tags": [
+      "finops",
+      "cloud-cost",
+      "terraform",
+      "kubernetes",
+      "aws",
+      "optimization"
+    ],
+    "script": "scripts/audit_finops.py",
+    "sha256": "50a1dfada62f5cae905c5ee1bfd38566304de1b81a80c1374fec2f35932e5345",
+    "zipSha256": "3f5f23b2b1828e681fcf536bca37d6c54dbeab8b319c5b37db32c66ffe4bb3f6"
+  },
+  {
+    "slug": "git-history-surgeon",
+    "tier": "extended",
+    "dir": "premium-skills",
+    "zipDir": "premium-zips",
+    "desc": "Execute safe Git rebases, bisects, and repo hygiene audits.",
+    "tags": [
+      "git",
+      "rebase",
+      "bisect",
+      "hygiene",
+      "conventional-commits",
+      "workflow"
+    ],
+    "script": "scripts/audit_git_hygiene.py",
+    "sha256": "166bb7f8668fac97f876a96260d6e971c0d0ddd36113f0a6418917554f3e0b97",
+    "zipSha256": "c808ef609899bc95b1a57ca75734cb0a175a221bf3dbdc1d8d486c8e7333c403"
+  },
+  {
+    "slug": "go-backend-engineer",
+    "tier": "extended",
+    "dir": "premium-skills",
+    "zipDir": "premium-zips",
+    "desc": "Build production Go services with context and timeouts.",
+    "tags": [
+      "go",
+      "golang",
+      "backend",
+      "concurrency",
+      "microservices"
+    ],
+    "script": "scripts/lint_go.py",
+    "sha256": "b0a41a766a9ac1d0db8768d3a87ec82d65b2072abf3d49dcc3363085c9c4ed58",
+    "zipSha256": "7689ef31fa4b52487a6ba266fce2997036a0d84ba84b2f0f2b6e844bb1cc0f7b"
+  },
+  {
+    "slug": "graphql-architect",
+    "tier": "extended",
+    "dir": "premium-skills",
+    "zipDir": "premium-zips",
+    "desc": "Design schema-first GraphQL APIs with Relay pagination.",
+    "tags": [
+      "graphql",
+      "api",
+      "schema",
+      "relay",
+      "dataloader",
+      "security"
+    ],
+    "script": "scripts/lint_graphql.py",
+    "sha256": "e353e0a013983672e10a5409bdba3adf5b18f9013e2ece6c01a29018cc398d8a",
+    "zipSha256": "54d19282167aac6cad752b6f63c51e730ef17b9ea6db3eecfdb1ca0e5991d7ea"
   },
   {
     "slug": "incident-response",
@@ -1525,8 +1631,44 @@
       "triage"
     ],
     "script": "scripts/incident_timeline.py",
-    "sha256": "85b539b2aa44f1d1f6652857ad17e49d9762ed3ac365b3742d143af1d280a7fb",
-    "zipSha256": "bb2482b7ae0d595732e01abdba7067ab23c9b84baac8c775505e73e730eae0a9"
+    "sha256": "089c282ffe19be9f43174127e0f79c39de4efc448e7677d3af014a6f76ef55a4",
+    "zipSha256": "81feb1d72c9d0dd0265f9f709be7cc4e64cd67013d0d9e397a642dc0bebe14a7"
+  },
+  {
+    "slug": "kubernetes-architect",
+    "tier": "extended",
+    "dir": "premium-skills",
+    "zipDir": "premium-zips",
+    "desc": "Design hardened Kubernetes and Helm workloads with probes.",
+    "tags": [
+      "kubernetes",
+      "k8s",
+      "helm",
+      "containers",
+      "security",
+      "sre"
+    ],
+    "script": "scripts/lint_k8s.py",
+    "sha256": "a932149c2445e346889346330821eb8920532288eee5782ff6b2cb8f57a3179d",
+    "zipSha256": "4fd04511cf8d7aaa5896d6e528f45db2f1fb6c6949f9fe778a690595620bd523"
+  },
+  {
+    "slug": "llm-security-auditor",
+    "tier": "extended",
+    "dir": "premium-skills",
+    "zipDir": "premium-zips",
+    "desc": "Audit AI agents and prompts against OWASP LLM Top 10.",
+    "tags": [
+      "llm",
+      "ai-security",
+      "owasp",
+      "prompt-injection",
+      "red-team",
+      "agents"
+    ],
+    "script": "scripts/audit_prompts.py",
+    "sha256": "a49024fe23eb7a6d8107d303f6c5be6549b8f57c7c24623851888355e24b6463",
+    "zipSha256": "59de955ab6e6f3c39435acd017724d5e5126c21675d39fec28dab3a83359f20e"
   },
   {
     "slug": "observability-setup",
@@ -1542,8 +1684,8 @@
       "slo"
     ],
     "script": "scripts/check_slo.py",
-    "sha256": "5f9449111dacccc327860d62b1aeddfd971f66bd03b52411ac3d8744002fa7bb",
-    "zipSha256": "92166ed5a4881915566e2ffd826d0c9f2f45149b71b9b2aaa9f441d336b5d2a4"
+    "sha256": "1a84bc55c624212fcb459c64fc6aa5d15e59c490f7d618ac219974066987e4d8",
+    "zipSha256": "cea3f57f858cef220a4273204a380cfc3f56802c3bcfc6d91cbe11fde537a08e"
   },
   {
     "slug": "performance-profiler",
@@ -1559,8 +1701,26 @@
       "memory"
     ],
     "script": "scripts/bench_compare.py",
-    "sha256": "752ec7dbe8e06081e65fd2c57fcf9600eccd06533505d041b7deb0b626722e08",
-    "zipSha256": "8eab762bddc37ed448077062da9025778bef86eaee4df0af822c8764ebde69fb"
+    "sha256": "c206c1ead738e002ddb7a16f655569d9ac016ec53b54853dd4ef502b1824ecad",
+    "zipSha256": "2738459e6726d32b693ae96442dd2d3dc539057c0dbf5b7754e8eefa60b7e483"
+  },
+  {
+    "slug": "privacy-compliance-auditor",
+    "tier": "extended",
+    "dir": "premium-skills",
+    "zipDir": "premium-zips",
+    "desc": "Audit code and logs for GDPR, CCPA, and raw PII leaks.",
+    "tags": [
+      "privacy",
+      "gdpr",
+      "ccpa",
+      "pii",
+      "compliance",
+      "security"
+    ],
+    "script": "scripts/scan_pii.py",
+    "sha256": "54acf76d70f9927f0250e2d05143fb70b169742de39814e0ec4f025fab2e7423",
+    "zipSha256": "be806bdc6e4d71e9cc40abc87c1c630d9ff1fa97b78cdd9af61ff6e7941efca9"
   },
   {
     "slug": "refactoring-assistant",
@@ -1576,8 +1736,8 @@
       "maintainability"
     ],
     "script": "scripts/complexity_scan.py",
-    "sha256": "120901371ffcb15b9b756d577f1e5c9733893c69d5e7d5a9ff452eb74ec2f848",
-    "zipSha256": "29ed77f6f71bd948f55ae04e4f7fa0876a24d79668c43b8fe791cde470eb3d98"
+    "sha256": "02f15fb02b9a652db95963c424ff8a5645eb4654d30c821c326a6b08cf25ee0a",
+    "zipSha256": "7cf1ee451a8b34c66962703c849e07a4ee481c9de2d33017aca6485b55969199"
   },
   {
     "slug": "release-engineering",
@@ -1593,8 +1753,25 @@
       "devops"
     ],
     "script": "scripts/semver_bump.py",
-    "sha256": "79769548c8f70f434dc24231872814588de34a960f09b3dff29b48d090c67620",
-    "zipSha256": "471d008ab656994c2a963b798d1bbfb170ee0ade31b1e4d881e341857bd5584e"
+    "sha256": "0674caa4bc41128a045d18a07b063f7f89fd7a35b1f6911a1ee30e4d29959c29",
+    "zipSha256": "4bff694d5b41fe77588861eef10b27727c84c3e6703062de290574f98536ec04"
+  },
+  {
+    "slug": "rust-systems-engineer",
+    "tier": "extended",
+    "dir": "premium-skills",
+    "zipDir": "premium-zips",
+    "desc": "Write safe, idiomatic Rust with verified unsafe invariants.",
+    "tags": [
+      "rust",
+      "systems",
+      "memory-safety",
+      "concurrency",
+      "cargo"
+    ],
+    "script": "scripts/lint_rust.py",
+    "sha256": "e87818213da6e61123b4b53fae8a5e557791514990519a43fb5d45ab49dbac3d",
+    "zipSha256": "cffc704524bc87f38acb51c3b43eb5f2a5c84f4d3ed61f54e516809668bdc9f3"
   },
   {
     "slug": "security-auditor",
@@ -1610,8 +1787,26 @@
       "vulnerability-scanning"
     ],
     "script": "scripts/secret_scan.py",
-    "sha256": "619950c361a710115cf848d2676f980051d739ae02d658892908da66cd3d33b2",
-    "zipSha256": "721c5b017f7ad3c7b66912e656c9c7cc14e68423c213cb20d4aacf041b35f563"
+    "sha256": "f798bee2f84e1b058e9f6c3edc5af4dbebb09864cecf439737fe6d8f8e39492c",
+    "zipSha256": "6cd5e80f91c1b32c4924b9489cbe78722e1bcd275c73d992bf426e468008d897"
+  },
+  {
+    "slug": "supply-chain-sbom",
+    "tier": "extended",
+    "dir": "premium-skills",
+    "zipDir": "premium-zips",
+    "desc": "Audit dependencies, lockfiles, SLSA provenance, and SBOMs.",
+    "tags": [
+      "sbom",
+      "supply-chain",
+      "slsa",
+      "security",
+      "dependencies",
+      "cyclonedx"
+    ],
+    "script": "scripts/audit_sbom.py",
+    "sha256": "cab05052e796b1ae6c02f5ac093d72a3ded88b0037ca1899b8d7aacbc6f0c41a",
+    "zipSha256": "50c2189c8a1165801b76a260c8b1e7a2476733f89ceed0b16fe387ee8c058397"
   },
   {
     "slug": "terraform-generator",
@@ -1628,8 +1823,26 @@
       "security"
     ],
     "script": "scripts/lint_terraform.py",
-    "sha256": "7f5b13a5b1a9e4bf576818f0efa7eb13ddcc8d359d5e403ce12f129156914524",
-    "zipSha256": "4c7d09c811cd7f515b174f0c91b59e9f8200ac916063a4b66f757841519cc03d"
+    "sha256": "33ebe627afa6e9dcb27856f1e382e5c77bdb6e6a8c1df2b48ac606b6912676ac",
+    "zipSha256": "f57f4bff055b01a25bd2a4bf0a417cfac18c265cd51496681afcf5313eb4211b"
+  },
+  {
+    "slug": "typescript-architect",
+    "tier": "extended",
+    "dir": "premium-skills",
+    "zipDir": "premium-zips",
+    "desc": "Build strict TypeScript and React apps with runtime safety.",
+    "tags": [
+      "typescript",
+      "react",
+      "node",
+      "frontend",
+      "architecture",
+      "testing"
+    ],
+    "script": "scripts/lint_ts.py",
+    "sha256": "7169afa86e43c775c41c0278f339cc02a67bdcba4ba38b44613bbc01a62a7deb",
+    "zipSha256": "657602ef24545b30f7e640ede6e551d324795239fa8dd423c0eae2e5c51c69f9"
   },
   {
     "slug": "unit-test-generator",
@@ -1645,8 +1858,8 @@
       "tdd"
     ],
     "script": "scripts/test_skeleton.py",
-    "sha256": "7dfaa933b64d1bdc6758a438240057dc58a36e214aebd1dd1b14a7cb402c1d1b",
-    "zipSha256": "b73f94fdb205b68dca61a0d324ae9a8ede2f1b4207c4d9f07f214c66f3353159"
+    "sha256": "d5d0256ee237bdb2c19c123773621b7faf10e42d3968f08c5c245817de4ca20f",
+    "zipSha256": "f19969c2bfc76c4d6819da6f6de68f4d5d18b136730d04ffeef91231ce6f9d51"
   }
 ];
     const PACKS = [
@@ -1674,6 +1887,58 @@
       "observability-setup",
       "release-engineering",
       "incident-response"
+    ]
+  },
+  {
+    "id": "cloud-native",
+    "label": "Cloud-Native Platform",
+    "desc": "Kubernetes Restricted PSS, Terraform IaC, Docker, FinOps cost audits, chaos resilience, and observability.",
+    "skills": [
+      "kubernetes-architect",
+      "terraform-generator",
+      "docker-generator",
+      "finops-cost-optimizer",
+      "chaos-resilience-engineer",
+      "observability-setup"
+    ]
+  },
+  {
+    "id": "ai-red-team",
+    "label": "AI Security & Compliance",
+    "desc": "OWASP LLM prompt-injection defense, supply-chain SBOMs, GDPR/PII redaction, secrets, and verification.",
+    "skills": [
+      "llm-security-auditor",
+      "supply-chain-sbom",
+      "privacy-compliance-auditor",
+      "security-auditor",
+      "anti-hallucination",
+      "devops-pipeline"
+    ]
+  },
+  {
+    "id": "polyglot-systems",
+    "label": "Polyglot Systems & APIs",
+    "desc": "Strict TypeScript, safe Rust, production Go, Relay GraphQL, profiling, and branch-covering unit tests.",
+    "skills": [
+      "typescript-architect",
+      "rust-systems-engineer",
+      "go-backend-engineer",
+      "graphql-architect",
+      "performance-profiler",
+      "unit-test-generator"
+    ]
+  },
+  {
+    "id": "platform-architecture",
+    "label": "Architecture & Governance",
+    "desc": "MADR ADRs, Git history hygiene, clean migrations, refactoring, code reviews, and verified docs.",
+    "skills": [
+      "architecture-decision-records",
+      "git-history-surgeon",
+      "code-migration",
+      "refactoring-assistant",
+      "code-review-assistant",
+      "documentation-generator"
     ]
   },
   {
@@ -1752,22 +2017,22 @@
 
     const TERM_VIEWS = {
       doctor: `<span class="t-dim">$ npx @jovianops/cortex doctor</span>
-<span class="t-hi">Cortex v1.0.0 — Environment &amp; Integrity Doctor</span>
+<span class="t-hi">Cortex v2.0.0 — Environment &amp; Integrity Doctor</span>
 
 <span class="t-ok">[OK]</span>   Python 3.12.4 (/usr/bin/python3)
 <span class="t-ok">[OK]</span>   git found at /usr/bin/git
 <span class="t-ok">[OK]</span>   node found at /usr/local/bin/node
 <span class="t-ok">[OK]</span>   Verified SHA-256 checksums for 24 bundled skills (48 files).
-<span class="t-ok">[OK]</span>   Validated 9 multi-agent manifests (all 24 skills verified at v1.0.0).
+<span class="t-ok">[OK]</span>   Validated 9 multi-agent manifests (all 24 skills verified at v2.0.0).
 
 <span class="t-dim">==> Claude Code (project: ./.claude/skills)</span>
-  security-auditor          v1.0.0    <span class="t-ok">[OK]</span>
-  accessibility-auditor     v1.0.0    <span class="t-ok">[OK]</span>
+  security-auditor          v2.0.0    <span class="t-ok">[OK]</span>
+  accessibility-auditor     v2.0.0    <span class="t-ok">[OK]</span>
 
 Doctor finished with <span class="t-ok">0 issue(s)</span>.`,
 
       detect: `<span class="t-dim">$ npx @jovianops/cortex detect</span>
-<span class="t-hi">Cortex v1.0.0 — Agent Environment Detection</span>
+<span class="t-hi">Cortex v2.0.0 — Agent Environment Detection</span>
 
 Agent          Platform                  Status      Locked  Signals
 -----------------------------------------------------------------------------
@@ -2071,7 +2336,7 @@ Next steps:
         <p style="margin:0;color:var(--muted);">${s.desc}</p>
         <div class="kv-list">
           <div class="kv"><span class="kv-k">path</span><span class="kv-v">${s.dir}/${s.slug}/SKILL.md</span></div>
-          <div class="kv"><span class="kv-k">version</span><span class="kv-v">1.0.0</span></div>
+          <div class="kv"><span class="kv-k">version</span><span class="kv-v">2.0.0</span></div>
           ${scriptRow}
           <div class="kv"><span class="kv-k">tags</span><span class="kv-v">${s.tags.join(', ')}</span></div>
           <div class="kv"><span class="kv-k">SKILL.md SHA</span><span class="kv-v">${s.sha256}</span></div>

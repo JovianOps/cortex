@@ -1,7 +1,7 @@
 {
   "name": "cortex",
-  "version": "1.0.0",
-  "description": "24 modular, deterministic v1.0.0 Agent Skills (SKILL.md) with bundled helper scripts for Claude, OpenAI Codex/ChatGPT, Gemini CLI, Cursor, GitHub Copilot/VS Code, OpenCode, OpenClaw, Goose, Aider, Cline, and Hermes Agent.",
+  "version": "2.0.0",
+  "description": "36 modular, deterministic v2.0.0 Agent Skills (10 core + 26 extended) with 36 bundled Python helper scripts, MCP server, Studio UI, and SHA-256 verification.",
   "author": {
     "name": "Athalla Jovian Maharsa",
     "url": "https://github.com/JovianOps"
@@ -42,17 +42,29 @@
     "./skills/web-scraper",
     "./premium-skills/accessibility-auditor",
     "./premium-skills/api-designer",
+    "./premium-skills/architecture-decision-records",
+    "./premium-skills/chaos-resilience-engineer",
     "./premium-skills/code-migration",
     "./premium-skills/db-optimizer",
     "./premium-skills/devops-pipeline",
     "./premium-skills/docker-generator",
+    "./premium-skills/finops-cost-optimizer",
+    "./premium-skills/git-history-surgeon",
+    "./premium-skills/go-backend-engineer",
+    "./premium-skills/graphql-architect",
     "./premium-skills/incident-response",
+    "./premium-skills/kubernetes-architect",
+    "./premium-skills/llm-security-auditor",
     "./premium-skills/observability-setup",
     "./premium-skills/performance-profiler",
+    "./premium-skills/privacy-compliance-auditor",
     "./premium-skills/refactoring-assistant",
     "./premium-skills/release-engineering",
+    "./premium-skills/rust-systems-engineer",
     "./premium-skills/security-auditor",
+    "./premium-skills/supply-chain-sbom",
     "./premium-skills/terraform-generator",
+    "./premium-skills/typescript-architect",
     "./premium-skills/unit-test-generator"
   ]
 }

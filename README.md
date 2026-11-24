@@ -21,16 +21,16 @@
       <img src="https://img.shields.io/npm/dt/%40jovianops%2Fcortex?style=flat&color=CB3837&label=npm%20downloads" alt="npm downloads" />
     </a>
     <a href="CHANGELOG.md">
-      <img src="https://img.shields.io/badge/release-v1.0.0-EA580C?style=flat" alt="Release v1.0.0" />
+      <img src="https://img.shields.io/badge/release-v2.0.0-EA580C?style=flat" alt="Release v2.0.0" />
     </a>
     <a href="#supported-agents--platforms">
-      <img src="https://img.shields.io/badge/standard-SKILL.md%20Multi--Agent-2C2B28?style=flat" alt="SKILL.md Multi-Agent Standard" />
+      <img src="https://img.shields.io/badge/standard-SKILL.md%20%2B%20MCP-2C2B28?style=flat" alt="SKILL.md and MCP Standard" />
     </a>
     <a href="#core-skills">
       <img src="https://img.shields.io/badge/core_skills-10-2C2B28?style=flat" alt="10 Core Skills" />
     </a>
     <a href="#extended-skills">
-      <img src="https://img.shields.io/badge/extended_skills-14-B8421B?style=flat" alt="14 Extended Skills" />
+      <img src="https://img.shields.io/badge/extended_skills-26-B8421B?style=flat" alt="26 Extended Skills" />
     </a>
     <a href="#verify-authenticity-sha-256--provenance">
       <img src="https://img.shields.io/badge/integrity-SHA--256%20Verified-16A34A?style=flat" alt="SHA-256 Verified" />
@@ -41,21 +41,19 @@
   </p>
 
   <p>
-    <a href="#whats-new-in-v100">What's New in v1.0.0</a>
+    <a href="#whats-new-in-v200">What's New in v2.0.0</a>
     &nbsp;&middot;&nbsp;
     <a href="#quick-start">Quick Start</a>
     &nbsp;&middot;&nbsp;
-    <a href="#supported-agents--platforms">Supported Agents</a>
+    <a href="docs/mcp-guide.md">MCP Server</a>
     &nbsp;&middot;&nbsp;
-    <a href="#core-skills">Core Skills</a>
+    <a href="docs/studio-guide.md">Studio UI</a>
     &nbsp;&middot;&nbsp;
-    <a href="#extended-skills">Extended Skills</a>
+    <a href="docs/compiler-guide.md">Rule Compiler</a>
     &nbsp;&middot;&nbsp;
-    <a href="#installation">Installation</a>
+    <a href="docs/policy-and-sarif.md">SARIF Scanner</a>
     &nbsp;&middot;&nbsp;
     <a href="#verify-authenticity-sha-256--provenance">Verify SHA-256</a>
-    &nbsp;&middot;&nbsp;
-    <a href="#validation-packaging--benchmarks">Development</a>
     &nbsp;&middot;&nbsp;
     <a href="CHANGELOG.md">Changelog</a>
   </p>
@@ -63,16 +61,18 @@
 
 ---
 
-**Cortex `v1.0.0`** is the first stable GA release of our cryptographically verified AI-agent skill platform — shipping **24 modular, deterministic Agent Skills (`SKILL.md`)** across **10 core skills** (`skills/`) and **14 extended engineering skills** (`premium-skills/`), with **24/24 bundled zero-dependency Python helper scripts (100% coverage)**, a **unified `cortex` CLI** (`init`, `detect`, `doctor`, `info`, `search`, `packs`, `new`, `install`, `upgrade`, `verify`), **first-class Visual Studio Code support**, **6 curated Role-Based Skill Packs** (`packs.json`), **stable `1.0.0` JSON Schemas (`schemas/`)**, **SHA-256 integrity verification (`checksums.json`)**, and a **24-task live A/B benchmark harness**.
+**Cortex `v2.0.0`** is the next-generation, zero-dependency AI-agent skill & runtime platform shipping **36 modular, deterministic Agent Skills (`SKILL.md`)** across **10 core skills** (`skills/`) and **26 extended engineering skills** (`premium-skills/`), with **36/36 bundled zero-dependency Python verifiers (100% coverage)**, a **native MCP 2025-03-26 JSON-RPC stdio server (`cortex mcp`)**, a **local Light/Dark Swiss Web Workbench (`cortex studio`)**, a **Universal Agent Rule Compiler (`cortex compile`)**, a **Unified Policy & SARIF 2.1.0 / JUnit XML Scanner (`cortex scan`)**, **10 curated Role-Based Skill Packs** (`packs.json`), **4 stable JSON Schemas (`schemas/`)**, **SHA-256 integrity verification (`checksums.json`, 72 files)**, and a **36-task live A/B benchmark harness**.
 
-Built on the open **`SKILL.md`** standard, Cortex works natively across **Visual Studio Code**, **GitHub Copilot**, **Claude** (Claude Code & Claude apps), **OpenAI** (Codex CLI & ChatGPT), **Gemini CLI**, **Cursor**, **OpenCode**, **OpenClaw**, **Goose**, **Aider**, **Cline**, and **Hermes Agent**.
+Built on the open **`SKILL.md`** and **MCP** standards, Cortex works natively across **Visual Studio Code**, **GitHub Copilot**, **Claude** (Claude Code & Claude apps), **OpenAI** (Codex CLI & ChatGPT), **Gemini CLI**, **Cursor**, **Windsurf**, **OpenCode**, **OpenClaw**, **Goose**, **Aider**, **Cline**, and **Hermes Agent**.
 
-## What's New in `v1.0.0`
+## What's New in `v2.0.0`
 
-- **24/24 Bundled Zero-Dependency Helper Scripts (100% Skill Coverage)**: Every single Cortex skill now ships an executable offline Python 3 verifier inside its skill folder and ZIP — adding `lint_terraform.py`, `lint_sql.py`, `check_slo.py`, `incident_timeline.py`, `diff_review.py`, `verify_claims.py`, `check_python_ast.py`, `check_test_coverage_map.py`, `test_skeleton.py`, `citation_check.py`, `check_robots.py`, `migration_inventory.py`, `bench_compare.py`, and `complexity_scan.py` alongside the original 10 tools.
-- **Production `cortex` CLI (`init`, `info`, `verify`, `--version`)**: Run `npx @jovianops/cortex init` to auto-detect your project stack and installed agents, install the matching role pack with SHA-256 checks, and configure `.vscode/settings.json` / `.aider.conf.yml`; inspect any skill via `cortex info <slug> --json`; and run machine-readable offline supply-chain audits with `cortex verify --json`.
-- **First-Class Visual Studio Code Support**: Ships native VS Code Chat Plugin manifests (`.github/plugin.json` + `.github/plugin/marketplace.json` for `chat.plugins.marketplaces: ["JovianOps/cortex"]`), `.github/copilot-instructions.md`, shared `.vscode/settings.json` & `.vscode/tasks.json`, `--agent vscode --write-vscode-settings`, and native `vscode` detection in `cortex detect`.
-- **Stable `1.0.0` Schemas, Atomic Release Tooling & Cross-Platform CI**: Added formal JSON Schemas (`schemas/checksums.schema.json`, `schemas/packs.schema.json`, `schemas/cortex-lock.schema.json`), atomic `scripts/bump_version.py`, `SECURITY.md`, `CONTRIBUTING.md`, SHA-pinned GitHub Actions verified on **Linux, macOS, and Windows**, and a rebuilt zero-dependency **Light Swiss** website (`index.html`) with an explicit `Light | Dark` switch.
+- **Native Model Context Protocol Server (`cortex mcp`)**: Zero-dependency MCP 2025-03-26 JSON-RPC 2.0 stdio server exposing **8 tools**, **38 resources** (`cortex://skills/<slug>`, `cortex://packs`, `cortex://checksums`), and **36 invocable prompts** (`cortex/<slug>`), plus `--print-config <vscode|claude-code|cursor|codex|windsurf>`. See [docs/mcp-guide.md](docs/mcp-guide.md).
+- **Cortex Studio Local Web Workbench (`cortex studio`)**: Zero-dependency Light/Dark Swiss local web UI & 10-endpoint REST API for inspecting all 36 skills and scripts, running any bundled verifier live against your workspace, compiling native agent rules, running SARIF scans, and generating MCP configs. See [docs/studio-guide.md](docs/studio-guide.md).
+- **Universal Agent Rule Compiler (`cortex compile`)**: Deterministically transpiles `SKILL.md` playbooks into **7 native IDE/agent formats** — Cursor (`.cursor/rules/*.mdc`), VS Code (`.github/instructions/*.instructions.md`), Windsurf (`.windsurf/rules/*.md`), Cline (`.clinerules/*.md`), `CLAUDE.md`, `AGENTS.md`, and `GEMINI.md` — with `--check` CI drift verification. See [docs/compiler-guide.md](docs/compiler-guide.md).
+- **Unified Policy & SARIF 2.1.0 Scanner (`cortex scan`)**: Orchestrates 14 bundled verifiers in one pass with `.cortex-policy.json` (`schemas/policy.schema.json`), severity gates (`--fail-on`), **SARIF 2.1.0** (GitHub Code Scanning), and **JUnit XML** output. See [docs/policy-and-sarif.md](docs/policy-and-sarif.md).
+- **24 → 36 Skills, 36/36 Bundled Python Verifiers & 6 → 10 Role Packs**: Added 12 flagship extended skills (`kubernetes-architect`, `typescript-architect`, `rust-systems-engineer`, `go-backend-engineer`, `graphql-architect`, `llm-security-auditor`, `supply-chain-sbom`, `privacy-compliance-auditor`, `finops-cost-optimizer`, `chaos-resilience-engineer`, `architecture-decision-records`, `git-history-surgeon`) — all scoring **100.0/100** with paired 100-point A/B eval rubrics and 4 new packs (`cloud-native`, `ai-red-team`, `polyglot-systems`, `platform-architecture`).
+- **Complete Technical Documentation (`docs/`)**: Added [architecture.md](docs/architecture.md), [mcp-guide.md](docs/mcp-guide.md), [studio-guide.md](docs/studio-guide.md), [compiler-guide.md](docs/compiler-guide.md), [policy-and-sarif.md](docs/policy-and-sarif.md), and [skill-authoring.md](docs/skill-authoring.md).
 
 ## Quick Start
 
@@ -332,7 +332,7 @@ Every official release of **`@jovianops/cortex`** is published from GitHub Actio
 | **`@jovianops/cortex@1.0.0`** npm tarball (`cortex-1.0.0.tgz`) | **SHA-256** | `cbb9ce6a26086fc9481052bead73d9ec9f496cc9628341f0c92d1f72fd5e6247` |
 | **`@jovianops/cortex@1.0.0`** npm tarball (SRI) | **SHA-512** | `sha512-erM0hXT5nh6M0HcUwqbwqJt2nB7IQjTvXQuAfsJtOQJ+HOoIZ5ez74povVkr/vOkxAeQK1LfZU9388V5fcKKsA==` |
 | **SLSA v1 Provenance Attestation** | Sigstore / OIDC | [`registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@1.0.0`](https://registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@1.0.0) |
-| **All 24 Skills, 24 Bundled Scripts & 24 ZIPs** | **SHA-256** | [`checksums.json`](checksums.json) |
+| **All 36 Skills, 36 Bundled Scripts & 36 ZIPs** | **SHA-256** | [`checksums.json`](checksums.json) |
 
 ### 1. Verify the npm Package Tarball SHA-256
 

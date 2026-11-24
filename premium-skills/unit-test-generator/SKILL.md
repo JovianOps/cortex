@@ -1,7 +1,7 @@
 ---
 name: unit-test-generator
 description: Generate branch-covering unit tests from source code.
-version: 1.0.0
+version: 2.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
