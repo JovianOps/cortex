@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jovianops.github.io/cortex/schemas/checksums.schema.json",
+  "title": "Cortex Checksums Manifest (v1.0.0)",
+  "type": "object",
+  "required": ["schema_version", "release_version", "skill_count", "skills"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "release_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$"
+    },
+    "skill_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "skills": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["collection", "dir", "zip", "zip_sha256", "files"],
+        "additionalProperties": false,
+        "properties": {
+          "collection": { "type": "string", "enum": ["core", "extended"] },
+          "dir": { "type": "string", "enum": ["skills", "premium-skills"] },
+          "zip": { "type": "string", "pattern": "\\.zip$" },
+          "zip_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "files": {
+            "type": "object",
+            "required": ["SKILL.md"],
+            "additionalProperties": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+          }
+        }
+      }
+    }
+  }
+}

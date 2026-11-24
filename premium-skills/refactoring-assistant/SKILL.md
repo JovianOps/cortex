@@ -1,7 +1,7 @@
 ---
 name: refactoring-assistant
 description: Refactor complex code safely with parity verification.
-version: 0.3.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -28,6 +28,8 @@ Simplify complex, duplicated, or brittle code through small, measurable, behavio
 - Performance tuning hot paths (use `performance-profiler`)
 
 ## How to Run
+
+> **Bundled Helper Script (`v1.0.0`):** Run `python premium-skills/refactoring-assistant/scripts/complexity_scan.py src/` to locate Python cyclomatic complexity and function-length hotspots before refactoring.
 
 ```bash
 hermes skills tap add JovianOps/cortex

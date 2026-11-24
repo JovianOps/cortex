@@ -1,7 +1,7 @@
 ---
 name: python-coding-assistant
 description: Write typed, linted, and tested Python code reliably.
-version: 0.3.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Write production-grade, strictly typed, cross-platform Python code with mandator
 - Deep CPU/memory flamegraph profiling (use `performance-profiler`)
 
 ## How to Run
+
+> **Bundled Helper Script (`v1.0.0`):** Run `python skills/python-coding-assistant/scripts/check_python_ast.py src/` to audit Python ASTs for mutable default args, bare `except:`, and missing return annotations.
 
 ```bash
 hermes skills tap add JovianOps/cortex

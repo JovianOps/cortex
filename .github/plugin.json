@@ -1,7 +1,7 @@
 {
   "name": "cortex",
-  "version": "0.3.0",
-  "description": "24 modular, deterministic v0.3.0 Agent Skills (SKILL.md) with bundled helper scripts for Visual Studio Code, GitHub Copilot, Claude, OpenAI Codex/ChatGPT, Gemini CLI, Cursor, OpenCode, OpenClaw, Goose, Aider, Cline, and Hermes Agent.",
+  "version": "1.0.0",
+  "description": "24 modular, deterministic v1.0.0 Agent Skills (SKILL.md) with bundled helper scripts for Visual Studio Code, GitHub Copilot, Claude, OpenAI Codex/ChatGPT, Gemini CLI, Cursor, OpenCode, OpenClaw, Goose, Aider, Cline, and Hermes Agent.",
   "author": {
     "name": "Athalla Jovian Maharsa",
     "url": "https://github.com/JovianOps"

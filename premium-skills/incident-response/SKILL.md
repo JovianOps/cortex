@@ -1,7 +1,7 @@
 ---
 name: incident-response
 description: Triage outages, contain blast radius, and write postmortems.
-version: 0.3.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -28,6 +28,8 @@ Run calm, deterministic incident triage and recovery: classify severity, stabili
 - Speculative architecture redesigns unrelated to stabilizing or preventing an incident
 
 ## How to Run
+
+> **Bundled Helper Script (`v1.0.0`):** Run `python premium-skills/incident-response/scripts/incident_timeline.py timeline.json` to validate monotonic UTC ISO-8601 timelines, action-item owners/dates, and compute MTTD/MTTR.
 
 ```bash
 # Universal CLI (Claude Code, Codex, Gemini CLI, Cursor, Copilot, OpenCode, OpenClaw, Goose, Cline)

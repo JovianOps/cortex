@@ -1,6 +1,6 @@
 # Cortex — VS Code & GitHub Copilot Workspace Instructions
 
-This repository houses **Cortex v0.3.0** — 24 modular, deterministic `SKILL.md` Agent Skills (10 core in `skills/` and 14 extended in `premium-skills/`), 10 zero-dependency Python helper scripts, 6 role packs (`packs.json`), and SHA-256 verification tooling (`checksums.json`).
+This repository houses **Cortex v1.0.0** — 24 modular, deterministic `SKILL.md` Agent Skills (10 core in `skills/` and 14 extended in `premium-skills/`), 24 zero-dependency Python helper scripts, 6 role packs (`packs.json`), stable `1.0.0` JSON Schemas (`schemas/`), and SHA-256 verification tooling (`checksums.json`).
 
 ## Essential Rules for Contributors & Coding Agents
 

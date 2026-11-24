@@ -5,8 +5,8 @@
     "url": "https://github.com/JovianOps"
   },
   "metadata": {
-    "description": "Cortex — 24 modular, deterministic v0.3.0 Agent Skills for Visual Studio Code, GitHub Copilot, and multi-agent coding harnesses.",
-    "version": "0.3.0",
+    "description": "Cortex — 24 modular, deterministic v1.0.0 Agent Skills for Visual Studio Code, GitHub Copilot, and multi-agent coding harnesses.",
+    "version": "1.0.0",
     "homepage": "https://jovianops.github.io/cortex/",
     "repository": "https://github.com/JovianOps/cortex"
   },
@@ -14,8 +14,8 @@
     {
       "name": "cortex",
       "source": "./",
-      "description": "All 24 Cortex v0.3.0 Agent Skills (10 core + 14 extended engineering playbooks with 10 bundled helper scripts).",
-      "version": "0.3.0",
+      "description": "All 24 Cortex v1.0.0 Agent Skills (10 core + 14 extended engineering playbooks with 10 bundled helper scripts).",
+      "version": "1.0.0",
       "author": {
         "name": "Athalla Jovian Maharsa",
         "url": "https://github.com/JovianOps"
@@ -67,8 +67,8 @@
       "name": "cortex-core",
       "source": "./",
       "strict": false,
-      "description": "10 core Cortex v0.3.0 skills: code review, anti-hallucination, Python, pytest automation, docs, memory, web scraping, academic grading, and Blender 3D.",
-      "version": "0.3.0",
+      "description": "10 core Cortex v1.0.0 skills: code review, anti-hallucination, Python, pytest automation, docs, memory, web scraping, academic grading, and Blender 3D.",
+      "version": "1.0.0",
       "author": {
         "name": "Athalla Jovian Maharsa",
         "url": "https://github.com/JovianOps"
@@ -103,8 +103,8 @@
       "name": "cortex-extended",
       "source": "./",
       "strict": false,
-      "description": "14 extended engineering Cortex v0.3.0 skills: API design, code migration, SQL optimization, CI/CD, Docker, profiling, refactoring, OWASP security, Terraform, unit tests, incident response, release engineering, observability, and WCAG accessibility.",
-      "version": "0.3.0",
+      "description": "14 extended engineering Cortex v1.0.0 skills: API design, code migration, SQL optimization, CI/CD, Docker, profiling, refactoring, OWASP security, Terraform, unit tests, incident response, release engineering, observability, and WCAG accessibility.",
+      "version": "1.0.0",
       "author": {
         "name": "Athalla Jovian Maharsa",
         "url": "https://github.com/JovianOps"

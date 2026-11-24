@@ -1,7 +1,7 @@
 {
   "name": "cortex",
-  "version": "0.3.0",
-  "description": "24 modular, deterministic v0.3.0 skill playbooks with bundled helper scripts for Claude Code, Codex, Gemini CLI, Cursor, GitHub Copilot, OpenCode, OpenClaw, Goose, Aider, Cline, and Hermes Agent.",
+  "version": "1.0.0",
+  "description": "24 modular, deterministic v1.0.0 skill playbooks with bundled helper scripts for Claude Code, Codex, Gemini CLI, Cursor, GitHub Copilot, OpenCode, OpenClaw, Goose, Aider, Cline, and Hermes Agent.",
   "author": {
     "name": "Athalla Jovian Maharsa",
     "url": "https://github.com/JovianOps"

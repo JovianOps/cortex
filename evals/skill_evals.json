@@ -1,6 +1,6 @@
 {
-  "schema_version": "0.3.0",
-  "description": "Paired 100-point A/B evaluation rubrics for all 24 Cortex v0.3.0 skills (Without-Skill vs. With-Skill).",
+  "schema_version": "1.0.0",
+  "description": "Paired 100-point A/B evaluation rubrics for all 24 Cortex v1.0.0 skills (Without-Skill vs. With-Skill).",
   "tasks": [
     {
       "id": "eval-academic-assistant",

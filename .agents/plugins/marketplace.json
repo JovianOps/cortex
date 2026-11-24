@@ -4,13 +4,13 @@
     "name": "Athalla Jovian Maharsa",
     "url": "https://github.com/JovianOps"
   },
-  "description": "Cortex \u2014 24 deterministic v0.3.0 Agent Skills for Codex CLI, ChatGPT, and Agent Plugins 1.0 hosts.",
+  "description": "Cortex \u2014 24 deterministic v1.0.0 Agent Skills for Codex CLI, ChatGPT, and Agent Plugins 1.0 hosts.",
   "plugins": [
     {
       "name": "cortex",
       "source": "./",
-      "description": "All 24 Cortex v0.3.0 skill playbooks (10 core + 14 extended).",
-      "version": "0.3.0",
+      "description": "All 24 Cortex v1.0.0 skill playbooks (10 core + 14 extended).",
+      "version": "1.0.0",
       "skills": [
         "./skills/academic-assistant",
         "./skills/anti-hallucination",
@@ -41,8 +41,8 @@
     {
       "name": "cortex-core",
       "source": "./",
-      "description": "10 core Cortex v0.3.0 skills (skills/).",
-      "version": "0.3.0",
+      "description": "10 core Cortex v1.0.0 skills (skills/).",
+      "version": "1.0.0",
       "skills": [
         "./skills/academic-assistant",
         "./skills/anti-hallucination",
@@ -59,8 +59,8 @@
     {
       "name": "cortex-extended",
       "source": "./",
-      "description": "14 extended engineering Cortex v0.3.0 skills (premium-skills/).",
-      "version": "0.3.0",
+      "description": "14 extended engineering Cortex v1.0.0 skills (premium-skills/).",
+      "version": "1.0.0",
       "skills": [
         "./premium-skills/accessibility-auditor",
         "./premium-skills/api-designer",

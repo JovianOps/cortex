@@ -1,18 +1,17 @@
 ## Summary
-
-<!-- Briefly describe what this pull request adds, updates, or fixes. -->
+<!-- Briefly describe what changed and why. -->
 
 ## Type of Change
+- [ ] Bug fix
+- [ ] New skill or bundled helper script
+- [ ] CLI / installer / manifest improvement
+- [ ] Documentation or website (`index.html`) update
+- [ ] CI / security hardening
 
-- [ ] New skill (`skills/` or `premium-skills/`)
-- [ ] Skill update or bug fix
-- [ ] Documentation or catalog update (`README.md`, `index.html`, `CONTRIBUTING.md`)
-- [ ] Tooling, scripts, or CI improvement
-
-## Checklist
-
-- [ ] `SKILL.md` frontmatter includes all required fields (`name`, `description`, `version`, `author`, `license`, `platforms`)
-- [ ] Required sections (`## When to Use` and `## How to Run`) are present
-- [ ] Rebuilt ZIP distributions with `python scripts/package_skills.py` (if any `SKILL.md` changed)
-- [ ] Verified all checks pass locally (`npm test` and `python scripts/validate_yaml.py`)
-- [ ] Updated `README.md` and `index.html` if adding or renaming a skill
+## Verification Checklist
+- [ ] `python3 scripts/package_skills.py --check` passes (re-ran `package_skills.py` if any skill/script changed)
+- [ ] `python3 scripts/validate_skills.py` and `python3 scripts/validate_manifests.py` pass
+- [ ] `python3 scripts/eval_skills.py` scores 100/100 across all skills
+- [ ] `python3 scripts/verify_site.py` passes (JS syntax, `checksums.json` parity, WCAG 2.2 AA)
+- [ ] `python3 -m unittest discover -s tests -v` passes
+- [ ] Any GitHub Actions edits are pinned to 40-char commit SHAs (`lint_actions.py` passes)

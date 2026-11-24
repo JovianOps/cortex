@@ -1,7 +1,7 @@
 ---
 name: db-optimizer
 description: Optimize SQL queries and indexes using EXPLAIN plans.
-version: 0.3.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Analyze slow SQL queries, ORM access patterns, and schemas using `EXPLAIN` execu
 - Application-level CPU/memory profiling unrelated to database queries (use `performance-profiler`)
 
 ## How to Run
+
+> **Bundled Helper Script (`v1.0.0`):** Run `python premium-skills/db-optimizer/scripts/lint_sql.py queries.sql` to catch `SELECT *`, `UPDATE`/`DELETE` without `WHERE`, leading-wildcard `LIKE`, and deep `OFFSET` anti-patterns.
 
 ```bash
 hermes skills tap add JovianOps/cortex

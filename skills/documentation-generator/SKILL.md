@@ -1,7 +1,7 @@
 ---
 name: documentation-generator
 description: Generate code-verified docs, API specs, and diagrams.
-version: 0.3.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

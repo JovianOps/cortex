@@ -1,7 +1,7 @@
 {
   "name": "@jovianops/cortex",
-  "version": "0.3.0",
-  "description": "24 modular, deterministic v0.3.0 Agent Skills (SKILL.md) with bundled helper scripts and SHA-256 verification for Claude, OpenAI Codex/ChatGPT, Gemini CLI, Cursor, GitHub Copilot/VS Code, OpenCode, OpenClaw, Goose, Aider, Cline, and Hermes Agent",
+  "version": "1.0.0",
+  "description": "24 modular, deterministic v1.0.0 Agent Skills (SKILL.md) with bundled helper scripts and SHA-256 verification for Claude, OpenAI Codex/ChatGPT, Gemini CLI, Cursor, GitHub Copilot/VS Code, OpenCode, OpenClaw, Goose, Aider, Cline, and Hermes Agent",
   "keywords": [
     "agent-skills",
     "skill-md",
@@ -62,6 +62,7 @@
     "AGENTS.md",
     "GEMINI.md",
     "packs.json",
-    "checksums.json"
+    "checksums.json",
+    "schemas/"
   ]
 }

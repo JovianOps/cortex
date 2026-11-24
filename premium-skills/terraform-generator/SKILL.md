@@ -1,7 +1,7 @@
 ---
 name: terraform-generator
 description: Generate hardened, validated Terraform and OpenTofu IaC.
-version: 0.3.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Generate modular, secure-by-default, validated Terraform/OpenTofu HCL configurat
 - Application container builds (use `docker-generator`) or CI/CD pipeline authoring (use `devops-pipeline`)
 
 ## How to Run
+
+> **Bundled Helper Script (`v1.0.0`):** Run `python premium-skills/terraform-generator/scripts/lint_terraform.py infra/` to audit `.tf` files for unpinned providers, `0.0.0.0/0` admin ports, hardcoded secrets, and disabled encryption.
 
 ```bash
 hermes skills tap add JovianOps/cortex

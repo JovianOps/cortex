@@ -1,7 +1,7 @@
 ---
 name: testing-automation
 description: Build branch-tested pytest suites with CI coverage gates.
-version: 0.3.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Design, implement, and wire deterministic `pytest` test suites with branch cover
 - Generating quick unit tests for a single isolated module in JS/Go/Java (use `unit-test-generator`)
 
 ## How to Run
+
+> **Bundled Helper Script (`v1.0.0`):** Run `python skills/testing-automation/scripts/check_test_coverage_map.py tests/` to detect assertion-free test functions across a Python test suite.
 
 ```bash
 hermes skills tap add JovianOps/cortex

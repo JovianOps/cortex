@@ -1,7 +1,7 @@
 ---
 name: release-engineering
 description: Cut SemVer releases with changelogs, checksums, and gates.
-version: 0.3.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
