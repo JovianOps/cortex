@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cortex Unified CLI (v0.4.0) — detect agents, diagnose installs, search skills, install packs, and scaffold new skills.
+"""Cortex Unified CLI (v1.0.0) — detect agents, diagnose installs, search skills, install packs, and scaffold new skills.
 
 Zero external dependencies (Python 3 stdlib only). Works on Linux, macOS, and Windows.
 
@@ -26,7 +26,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
-VERSION = "0.4.0"
+VERSION = "1.0.0"
 
 AGENT_PROBES: tuple[tuple[str, str, str, str, tuple[str, ...]], ...] = (
     ("claude-code", "Claude Code", ".claude", ".claude", ("claude",)),
@@ -403,23 +403,243 @@ Implement minimal targeted changes, re-run verification checks, and report any r
     return 0
 
 
+def detect_project_stack(project_dir: Path) -> tuple[str, list[str]]:
+    """Recommend a Cortex role pack based on files present in project_dir."""
+    signals: list[str] = []
+    has_tf = any(project_dir.glob("*.tf")) or (project_dir / "terraform").is_dir()
+    has_docker = (project_dir / "Dockerfile").is_file() or (project_dir / "docker-compose.yml").is_file()
+    has_ci = (project_dir / ".github" / "workflows").is_dir()
+    has_node = (project_dir / "package.json").is_file()
+    has_py = (project_dir / "pyproject.toml").is_file() or (project_dir / "requirements.txt").is_file() or (project_dir / "setup.py").is_file()
+
+    if has_tf:
+        signals.append("terraform")
+    if has_docker:
+        signals.append("docker")
+    if has_ci:
+        signals.append("github-actions")
+    if has_node:
+        signals.append("node/web")
+    if has_py:
+        signals.append("python")
+
+    if has_tf or (has_docker and has_ci and not has_node):
+        return "devops-sre", signals
+    if has_py and not has_node:
+        return "python-pro", signals
+    return "fullstack", signals
+
+
+def cmd_init(args: argparse.Namespace) -> int:
+    project_dir = args.project_dir.resolve()
+    detected = detect_agents(project_dir)
+    recommended_pack, stack_signals = detect_project_stack(project_dir)
+    pack = args.pack or recommended_pack
+
+    if args.agent:
+        chosen_agents = list(args.agent)
+    else:
+        installer = load_script("install_skills")
+        supported = set(installer.AGENT_TARGETS.keys())
+        chosen_agents = [a["agent"] for a in detected if a["detected"] and a["agent"] in supported]
+        if not chosen_agents:
+            chosen_agents = ["vscode"]
+
+    install_argv: list[str] = []
+    for ag in chosen_agents:
+        install_argv.extend(["--agent", ag])
+    install_argv.extend(["--pack", pack, "--scope", args.scope, "--project-dir", str(project_dir)])
+    if "vscode" in chosen_agents:
+        install_argv.append("--write-vscode-settings")
+    if "aider" in chosen_agents:
+        install_argv.append("--write-aider-conf")
+    if args.dry_run:
+        install_argv.append("--dry-run")
+
+    if args.as_json:
+        buf_res = subprocess.run(
+            [sys.executable, str(SCRIPTS / "install_skills.py"), *install_argv],
+            cwd=project_dir,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        print(json.dumps({
+            "version": VERSION,
+            "project_dir": project_dir.as_posix(),
+            "stack_signals": stack_signals,
+            "pack": pack,
+            "agents": chosen_agents,
+            "scope": args.scope,
+            "dry_run": args.dry_run,
+            "ok": buf_res.returncode == 0,
+            "output": buf_res.stdout.strip(),
+            "error": buf_res.stderr.strip(),
+        }, indent=2))
+        return buf_res.returncode
+
+    print(f"Cortex v{VERSION} — Project Initialization ({project_dir})")
+    print(f"  Stack signals : {', '.join(stack_signals) or 'generic'}")
+    print(f"  Selected pack : {pack}")
+    print(f"  Target agents : {', '.join(chosen_agents)}")
+    return delegate("install_skills", install_argv)
+
+
+def cmd_info(args: argparse.Namespace) -> int:
+    slug = args.slug.strip().lower()
+    skill_dir: Path | None = None
+    tier = ""
+    folder_name = ""
+    for folder, t in (("skills", "core"), ("premium-skills", "extended")):
+        candidate = ROOT / folder / slug
+        if (candidate / "SKILL.md").is_file():
+            skill_dir = candidate
+            tier = t
+            folder_name = folder
+            break
+
+    if skill_dir is None:
+        print(f"ERROR: Unknown skill {args.slug!r}. Run `cortex search` to list all skills.", file=sys.stderr)
+        return 2
+
+    meta = parse_skill_frontmatter(skill_dir / "SKILL.md")
+    scripts = sorted(
+        p.relative_to(skill_dir).as_posix()
+        for p in (skill_dir / "scripts").glob("*.py")
+    ) if (skill_dir / "scripts").is_dir() else []
+
+    checksums = json.loads((ROOT / "checksums.json").read_text(encoding="utf-8")) if (ROOT / "checksums.json").is_file() else {}
+    c_entry = checksums.get("skills", {}).get(slug, {})
+    packs_data = json.loads((ROOT / "packs.json").read_text(encoding="utf-8")) if (ROOT / "packs.json").is_file() else {}
+    member_packs = [pid for pid, pinfo in packs_data.get("packs", {}).items() if slug in pinfo.get("skills", [])]
+
+    info = {
+        "slug": slug,
+        "tier": tier,
+        "dir": folder_name,
+        "version": meta.get("version", VERSION),
+        "description": meta.get("description", ""),
+        "tags": meta.get("tags", []),
+        "scripts": scripts,
+        "packs": member_packs,
+        "skill_sha256": c_entry.get("files", {}).get("SKILL.md", ""),
+        "zip_sha256": c_entry.get("zip_sha256", ""),
+        "install_cmd": f"npx @jovianops/cortex install --agent vscode --skill {slug} --scope project",
+    }
+
+    if args.as_json:
+        print(json.dumps(info, indent=2))
+        return 0
+
+    print(f"{info['slug']}  (v{info['version']} · {info['tier']})")
+    print(f"  Description : {info['description']}")
+    print(f"  Path        : {info['dir']}/{info['slug']}/SKILL.md")
+    print(f"  Script      : {', '.join(info['scripts']) or 'none'}")
+    print(f"  Role packs  : {', '.join(info['packs']) or 'none'}")
+    if info["skill_sha256"]:
+        print(f"  SKILL SHA256: {info['skill_sha256']}")
+    if info["zip_sha256"]:
+        print(f"  ZIP SHA256  : {info['zip_sha256']}")
+    print(f"  Install     : {info['install_cmd']}")
+    return 0
+
+
+def cmd_verify(args: argparse.Namespace) -> int:
+    project_dir = args.project_dir.resolve()
+    checks: list[dict] = []
+
+    def run_check(name: str, script_name: str, extra: list[str]) -> bool:
+        res = subprocess.run(
+            [sys.executable, str(SCRIPTS / f"{script_name}.py"), *extra],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        checks.append({
+            "name": name,
+            "ok": res.returncode == 0,
+            "detail": (res.stdout.strip() or res.stderr.strip()).splitlines()[-1] if (res.stdout.strip() or res.stderr.strip()) else "",
+        })
+        return res.returncode == 0
+
+    all_ok = True
+    if (ROOT / "zips").is_dir() and (ROOT / "premium-zips").is_dir():
+        all_ok &= run_check("package_checksums", "package_skills", ["--check"])
+    elif (ROOT / "checksums.json").is_file():
+        manifest = json.loads((ROOT / "checksums.json").read_text(encoding="utf-8"))
+        bad: list[str] = []
+        for slug, meta in manifest.get("skills", {}).items():
+            base_dir = ROOT / meta["dir"] / slug
+            for rel, expected in meta.get("files", {}).items():
+                fp = base_dir / rel
+                if not fp.is_file() or hashlib.sha256(fp.read_bytes().replace(b"\r\n", b"\n")).hexdigest() != expected:
+                    bad.append(f"{slug}/{rel}")
+        ok = not bad
+        all_ok &= ok
+        checks.append({
+            "name": "bundled_checksums",
+            "ok": ok,
+            "detail": f"Verified {len(manifest.get('skills', {}))} bundled skills." if ok else f"Mismatch: {', '.join(bad)}",
+        })
+
+    all_ok &= run_check("manifests", "validate_manifests", [])
+    all_ok &= run_check("evals_and_audit", "eval_skills", [])
+
+    # Check installed lockfiles under project_dir
+    installer = load_script("install_skills")
+    lock_issues = 0
+    locks_checked = 0
+    seen_dests: set[Path] = set()
+    for target in installer.AGENT_TARGETS.values():
+        dest = installer.destination_dir(target, "project", project_dir)
+        if dest in seen_dests:
+            continue
+        seen_dests.add(dest)
+        if (dest / installer.LOCKFILE_NAME).is_file():
+            locks_checked += 1
+            if installer.cmd_status([target], "project", project_dir) != 0:
+                lock_issues += 1
+    if locks_checked:
+        ok = lock_issues == 0
+        all_ok &= ok
+        checks.append({
+            "name": "project_lockfiles",
+            "ok": ok,
+            "detail": f"Checked {locks_checked} project lockfile(s), {lock_issues} issue(s).",
+        })
+
+    if args.as_json:
+        print(json.dumps({"version": VERSION, "ok": all_ok, "checks": checks}, indent=2))
+    else:
+        for c in checks:
+            tag = "OK" if c["ok"] else "FAIL"
+            print(f"[{tag:<4}] {c['name']}: {c['detail']}")
+    return 0 if all_ok else 1
+
+
 def delegate(script_name: str, extra_args: list[str], *, use_root_cwd: bool = False) -> int:
     run_cwd = ROOT if use_root_cwd else Path.cwd()
-    res = subprocess.run([sys.executable, str(SCRIPTS / f"{script_name}.py"), *extra_args], cwd=run_cwd)
+    res = subprocess.run([sys.executable, str(SCRIPTS / f"{script_name}.py"), *extra_args], check=False, cwd=run_cwd)
     return res.returncode
 
 
 def main(argv: list[str] | None = None) -> int:
     raw = argv if argv is not None else sys.argv[1:]
+    if raw and raw[0] in {"-V", "--version"}:
+        print(f"cortex {VERSION}")
+        return 0
     if not raw or raw[0] in {"-h", "--help"}:
         print(
             f"Cortex CLI v{VERSION} — Multi-Agent Skill Platform\n\n"
             "Commands:\n"
+            "  init         Auto-detect stack & agents, install recommended pack with SHA-256 checks\n"
             "  detect       Auto-detect installed AI agents & locked Cortex skills\n"
             "  doctor       Run environment, lockfile SHA-256, checksum & manifest diagnostics\n"
+            "  info <slug>  Inspect a skill's metadata, bundled script, packs, and SHA-256 hashes\n"
             "  search       Search all 24 skills by keyword, tier, or bundled script\n"
             "  packs        List all 6 curated role-based skill packs (packs.json)\n"
-            "  new <slug>   Scaffold a 100/100 audit-ready v0.4.0 skill (+ optional script)\n"
+            f"  new <slug>   Scaffold a 100/100 audit-ready v{VERSION} skill (+ optional script)\n"
             "  install      Install skills/packs locally or --remote (SHA-256 verified)\n"
             "  status       Verify installed skills against .cortex-lock.json\n"
             "  upgrade      Upgrade installed skills to latest catalog\n"
@@ -427,11 +647,27 @@ def main(argv: list[str] | None = None) -> int:
             "  audit        Run 100-point structural quality audit on all skills\n"
             "  eval         Validate or --run live A/B benchmarks\n"
             "  package      Rebuild or --check reproducible ZIPs and checksums.json\n"
-            "  verify       Run full manifest + checksum + audit verification\n"
+            "  verify       Run full checksum, manifest, eval & lockfile verification (--json)\n"
         )
         return 0
 
     cmd, rest = raw[0], raw[1:]
+
+    if cmd == "init":
+        p = argparse.ArgumentParser(prog="cortex init")
+        p.add_argument("--project-dir", type=Path, default=Path.cwd())
+        p.add_argument("--agent", "-a", action="append", default=[])
+        p.add_argument("--pack", "-p", default=None)
+        p.add_argument("--scope", choices=("project", "global"), default="project")
+        p.add_argument("--dry-run", action="store_true")
+        p.add_argument("--json", action="store_true", dest="as_json")
+        return cmd_init(p.parse_args(rest))
+
+    if cmd == "info":
+        p = argparse.ArgumentParser(prog="cortex info")
+        p.add_argument("slug", help="Skill slug (e.g., security-auditor).")
+        p.add_argument("--json", action="store_true", dest="as_json")
+        return cmd_info(p.parse_args(rest))
 
     if cmd == "detect":
         p = argparse.ArgumentParser(prog="cortex detect")
@@ -482,12 +718,10 @@ def main(argv: list[str] | None = None) -> int:
     if cmd == "package":
         return delegate("package_skills", rest, use_root_cwd=True)
     if cmd == "verify":
-        rc = 0
-        if (ROOT / "zips").is_dir() and (ROOT / "premium-zips").is_dir():
-            rc |= delegate("package_skills", ["--check"], use_root_cwd=True)
-        rc |= delegate("validate_manifests", [], use_root_cwd=True)
-        rc |= delegate("eval_skills", [], use_root_cwd=True)
-        return 1 if rc else 0
+        p = argparse.ArgumentParser(prog="cortex verify")
+        p.add_argument("--project-dir", type=Path, default=Path.cwd())
+        p.add_argument("--json", action="store_true", dest="as_json")
+        return cmd_verify(p.parse_args(rest))
 
     print(f"ERROR: Unknown cortex subcommand {cmd!r}. Run `cortex --help`.", file=sys.stderr)
     return 2

@@ -1,7 +1,7 @@
 ---
 name: performance-profiler
 description: Profile CPU, memory, and I/O with measured benchmarks.
-version: 0.4.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -26,6 +26,8 @@ Diagnose and fix CPU, memory, and I/O bottlenecks using mandatory baseline profi
 - Pure SQL query plan & index tuning (use `db-optimizer`)
 
 ## How to Run
+
+> **Bundled Helper Script (`v1.0.0`):** Run `python premium-skills/performance-profiler/scripts/bench_compare.py base.json cand.json` to compare p50/p95/p99 latency samples and enforce a regression threshold.
 
 ```bash
 hermes skills tap add JovianOps/cortex

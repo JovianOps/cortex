@@ -1,7 +1,7 @@
 ---
 name: unit-test-generator
 description: Generate branch-covering unit tests from source code.
-version: 0.4.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Generate high-signal, branch-covering unit tests from real source code across Py
 - Setting up full repository CI pipelines and multi-stage coverage infrastructure (use `testing-automation` / `devops-pipeline`)
 
 ## How to Run
+
+> **Bundled Helper Script (`v1.0.0`):** Run `python premium-skills/unit-test-generator/scripts/test_skeleton.py module.py` to generate an AST-derived branch and edge-case test checklist for every public function.
 
 ```bash
 hermes skills tap add JovianOps/cortex

@@ -1,7 +1,7 @@
 ---
 name: code-migration
 description: Migrate languages and frameworks with parity tests.
-version: 0.4.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Migrate code between languages, frameworks, or major runtime/library versions wi
 - Internal cleanup within the same language and framework version (use `refactoring-assistant`)
 
 ## How to Run
+
+> **Bundled Helper Script (`v1.0.0`):** Run `python premium-skills/code-migration/scripts/migration_inventory.py . --json` to generate a deterministic file, line-count, and manifest inventory before planning a migration.
 
 ```bash
 hermes skills tap add JovianOps/cortex

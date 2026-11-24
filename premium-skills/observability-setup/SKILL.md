@@ -1,7 +1,7 @@
 ---
 name: observability-setup
 description: Add structured logs, OTel traces, SLOs, and clean alerts.
-version: 0.4.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -28,6 +28,8 @@ Instrument services with high-signal, low-cardinality observability: structured 
 - Active outage triage where stabilization takes priority (use `incident-response` instead)
 
 ## How to Run
+
+> **Bundled Helper Script (`v1.0.0`):** Run `python premium-skills/observability-setup/scripts/check_slo.py --slo 99.9 --scan src/` to compute exact SLO error budgets, multi-window burn-rate thresholds, and flag high-cardinality metric labels.
 
 ```bash
 # Universal CLI (Claude Code, Codex, Gemini CLI, Cursor, Copilot, OpenCode, OpenClaw, Goose, Cline)

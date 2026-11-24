@@ -1,7 +1,7 @@
 ---
 name: academic-assistant
 description: Orchestrate grading, coding, and 3D academic workflows.
-version: 0.4.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Orchestrate high-accuracy academic tasks across grading/report cards, Python cod
 - Purely creative essays or open-ended brainstorming with no source data or verification criteria
 
 ## How to Run
+
+> **Bundled Helper Script (`v1.0.0`):** Run `python skills/academic-assistant/scripts/citation_check.py draft.md` to verify every inline numeric citation `[1]` matches an entry in `## References`.
 
 ```bash
 hermes skills tap add JovianOps/cortex

@@ -1,7 +1,7 @@
 ---
 name: code-review-assistant
 description: Run evidence-backed code reviews with severity rubrics.
-version: 0.4.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Perform rigorous, evidence-backed code and PR reviews that prioritize real corre
 - Large architectural rewrites (use `refactoring-assistant`)
 
 ## How to Run
+
+> **Bundled Helper Script (`v1.0.0`):** Run `git diff | python skills/code-review-assistant/scripts/diff_review.py -` to flag leftover debug calls, TODOs, and source edits lacking companion tests.
 
 ```bash
 hermes skills tap add JovianOps/cortex

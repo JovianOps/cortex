@@ -1,7 +1,7 @@
 ---
 name: web-scraper
 description: Scrape web data politely with strict schema validation.
-version: 0.4.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -26,6 +26,8 @@ Build polite, resilient, and anti-hallucination web scraping pipelines that resp
 - Bypassing authentication walls, CAPTCHAs, paywalls, or sites whose `robots.txt` / Terms of Service disallow automated access
 
 ## How to Run
+
+> **Bundled Helper Script (`v1.0.0`):** Run `python skills/web-scraper/scripts/check_robots.py robots.txt /path` to verify `robots.txt` allow/disallow rules and crawl-delay compliance offline.
 
 ```bash
 hermes skills tap add JovianOps/cortex

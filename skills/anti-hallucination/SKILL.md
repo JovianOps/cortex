@@ -1,7 +1,7 @@
 ---
 name: anti-hallucination
 description: Verify AI claims and code with deterministic audit gates.
-version: 0.4.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,6 +27,8 @@ Systematically audit AI-generated code, technical answers, data summaries, and c
 - Purely subjective creative writing or fiction where factual grounding is not expected
 
 ## How to Run
+
+> **Bundled Helper Script (`v1.0.0`):** Run `python skills/anti-hallucination/scripts/verify_claims.py report.md --repo .` to verify every backticked relative file path actually exists in the repository.
 
 ```bash
 hermes skills tap add JovianOps/cortex

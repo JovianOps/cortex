@@ -1,7 +1,7 @@
 ---
 name: accessibility-auditor
 description: Audit HTML/UI for WCAG 2.2 AA flaws with exact code fixes.
-version: 0.4.0
+version: 1.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

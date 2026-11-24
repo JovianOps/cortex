@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cortex — deterministic agent skills (v0.4.0)</title>
-  <meta name="description" content="24 versioned SKILL.md playbooks, 10 zero-dependency Python helper scripts, 6 role packs, and SHA-256 verification for Claude, Codex, Gemini CLI, Cursor, Copilot, and more." />
+  <title>cortex — deterministic agent skills (v1.0.0)</title>
+  <meta name="description" content="24 versioned SKILL.md playbooks, 24 zero-dependency Python helper scripts, 6 role packs, and SHA-256 verification for Visual Studio Code, Claude, Codex, Gemini CLI, Cursor, Copilot, and more." />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230e0e0d'/%3E%3Crect x='22' y='6' width='4' height='4' fill='%23d92b1c'/%3E%3Cpath d='M7 11l6 5-6 5M15 21h10' stroke='%23f6f5f0' stroke-width='2.5' stroke-linecap='square' fill='none'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -983,7 +983,7 @@
       <a href="#top" class="brand">
         <span class="brand-mark" aria-hidden="true"></span>
         <span>cortex</span>
-        <span class="ver">v0.4.0</span>
+        <span class="ver">v1.0.0</span>
       </a>
       <nav aria-label="Primary">
         <a href="#skills">Index</a>
@@ -1021,7 +1021,7 @@
           </p>
           <h1>Deterministic skills for AI coding agents.</h1>
           <p class="lead">
-            24 versioned <code>SKILL.md</code> playbooks with stop gates, 10 zero-dependency Python helper scripts, 6 role packs, and lockfile SHA-256 verification. Built for Claude Code, Codex, Gemini CLI, Cursor, Copilot, OpenCode, Goose, Cline, Aider, and Hermes.
+            24 versioned <code>SKILL.md</code> playbooks with stop gates, 24 zero-dependency Python helper scripts, 6 role packs, and lockfile SHA-256 verification. Built for Visual Studio Code, Claude Code, Codex, Gemini CLI, Cursor, Copilot, OpenCode, Goose, Cline, Aider, and Hermes.
           </p>
 
           <div class="quick-box">
@@ -1065,8 +1065,8 @@
           <div class="spec-label">SKILL.md playbooks (10 core / 14 extended)</div>
         </div>
         <div class="spec">
-          <div class="spec-val">10</div>
-          <div class="spec-label">Bundled Python stdlib scripts</div>
+          <div class="spec-val">24</div>
+          <div class="spec-label">Bundled Python stdlib scripts (100%)</div>
         </div>
         <div class="spec">
           <div class="spec-val">6</div>
@@ -1097,7 +1097,7 @@
             <button type="button" data-filter="all" aria-pressed="true">all (24)</button>
             <button type="button" data-filter="core" aria-pressed="false">core (10)</button>
             <button type="button" data-filter="extended" aria-pressed="false">extended (14)</button>
-            <button type="button" data-filter="scripts" aria-pressed="false">with scripts (10)</button>
+            <button type="button" data-filter="scripts" aria-pressed="false">with scripts (24)</button>
           </div>
           <div class="search-wrap">
             <input id="searchInput" class="ctrl" type="search" placeholder="filter by slug, tag, script..." aria-label="Search skills" />
@@ -1220,7 +1220,7 @@
 
   <footer>
     <div class="wrap foot">
-      <div>JovianOps / cortex &middot; v0.4.0 &middot; MIT License</div>
+      <div>JovianOps / cortex &middot; v1.0.0 &middot; MIT License</div>
       <div class="foot-links">
         <a href="https://github.com/JovianOps/cortex" target="_blank" rel="noreferrer">repository</a>
         <a href="https://www.npmjs.com/package/@jovianops/cortex" target="_blank" rel="noreferrer">npm</a>
@@ -1259,9 +1259,9 @@
       "anti-hallucination",
       "memory"
     ],
-    "script": null,
-    "sha256": "ec3c6571b60a6390cb393ebe1f88e6e23fdce998111844784be46a22387bddcd",
-    "zipSha256": "07c0f4860a3d03911d10b63867403f21a5182e4ea16424d8f9cdde9be24a5ae9"
+    "script": "scripts/citation_check.py",
+    "sha256": "ee3e4f97aa05195c4ec11730d2c00ce0e7534365928a58609046f5e93949ea38",
+    "zipSha256": "09979c34ff239873a1f1a5fc9b1fe8446055f9250e28e1011cbbf106d235af2a"
   },
   {
     "slug": "anti-hallucination",
@@ -1275,9 +1275,9 @@
       "verification",
       "fact-checking"
     ],
-    "script": null,
-    "sha256": "80e37a26a6c136da7fa31f27f78adfa58f96784cea447896bc8d386527fb095a",
-    "zipSha256": "8ba30c14d772d71ee97025a8c6ac61bdb6be69bb3f7140f08d4699e44f1c91dd"
+    "script": "scripts/verify_claims.py",
+    "sha256": "6696b93c8b931c315f718adfa8e87d1aaa166b4f690071d54bca675cba227b8c",
+    "zipSha256": "64dbe62ebf4278f224a2e6e781b3fa36e54bc524083c60374f9457a179e889ac"
   },
   {
     "slug": "blender-3d-modeling",
@@ -1292,8 +1292,8 @@
       "validation"
     ],
     "script": "scripts/bmesh_check.py",
-    "sha256": "885bdd08d8a89a96d0895dcd183e9791bc8d57694907a0580077956cda05051e",
-    "zipSha256": "9749531b5c6da5511887918c4ffbb89011afd3adab0750e4e8c8555f4a6c4d00"
+    "sha256": "98beb57c4db7f792de5452c8be879a51bd5ed7c3d2b83fb731b9756ff8203fa7",
+    "zipSha256": "77099f677bec51af1acb16fdd9e1cbf5c94e7b74719b9c36ecd03e531f8da9c6"
   },
   {
     "slug": "code-review-assistant",
@@ -1307,9 +1307,9 @@
       "anti-hallucination",
       "quality"
     ],
-    "script": null,
-    "sha256": "c45a4523d46d88f21360f27ff9ca94c4d4b120174434c84c3126d41147d560f1",
-    "zipSha256": "873cda68daa652a2683fb8bf6dfb574ec216e6fca6b68e9d66872a49f6343bd2"
+    "script": "scripts/diff_review.py",
+    "sha256": "1736751a8df4a49735ad976b6a2b9a93e92d5c34b6c5583eaeedf960e464e4e0",
+    "zipSha256": "90a4cacdcd903f6c9bf1f65255ced349b23809c933b06312753e5243686eb34c"
   },
   {
     "slug": "college-report-card",
@@ -1325,8 +1325,8 @@
       "memory"
     ],
     "script": "scripts/grade_calc.py",
-    "sha256": "0880c290436d9eadc10d88e92c22719def2be40e7b96a36df42ad92ae3982fff",
-    "zipSha256": "dcd8e9b5e0c44b64e728c8d3ce96d3e8098cf88404d20dd78b08051db3f68e69"
+    "sha256": "9097c657ffe55957d6502d4a9281ba511b7903205725ba518f813b8fa24f7ae6",
+    "zipSha256": "4f89633b14f3824c2e09e0969577d61ab44756014f0025a007f23e5c42ec66e3"
   },
   {
     "slug": "documentation-generator",
@@ -1342,8 +1342,8 @@
       "validation"
     ],
     "script": "scripts/check_docs.py",
-    "sha256": "9de0ee05e1039aabeb370196e49e256f9461b2d2625c59e364baf239e859e38c",
-    "zipSha256": "4aa3d4f3006363132d45163eb4c7ec2202bf1b854cf1977716267ade058688f3"
+    "sha256": "c3f7f84f6bdeaf3a3cef996b67fab921af91595cf53ea95cc3ba9ea25d645f4c",
+    "zipSha256": "d861b36fd8e224553d3ad46048e5f9c3dd0005a262085845a10ea41bb3c3d34f"
   },
   {
     "slug": "memory-manager",
@@ -1358,8 +1358,8 @@
       "anti-forgetting"
     ],
     "script": "scripts/memory_store.py",
-    "sha256": "52c0c2120719eebc45494561ca6a11ac03fa99977a41fd8c14a8c4bab6cf4059",
-    "zipSha256": "6e61cb2d08823aa741ccf5294541f73ef39b075ff5378d31d11cbc5b7a75e4a7"
+    "sha256": "fdcfcd7802d0f286c3dcc57c0b8aa9d73d5a780d2edb43c99fe95d6e2217b935",
+    "zipSha256": "e06bc07bf4b5552fb1e72ff5bd8d8faca5ab375a943e0ced35b9233daca87469"
   },
   {
     "slug": "python-coding-assistant",
@@ -1373,9 +1373,9 @@
       "validation",
       "anti-hallucination"
     ],
-    "script": null,
-    "sha256": "22447380b0ff3163ce5590762f0632486404cfc111fda1578c36ddd23a244949",
-    "zipSha256": "ed60a2fcb123e6833e847483060b37f5e0f28658fdc34bc81e92bad9457d4253"
+    "script": "scripts/check_python_ast.py",
+    "sha256": "fb71ffea057c2816bd9ccad9e2ef4df7e5b5bb417bcb537ec1d82719041f0ca7",
+    "zipSha256": "4edd43ebd27c62c70111b91d248eb68f8fb13b391d64dc44ab9f5ea0a9fd0b74"
   },
   {
     "slug": "testing-automation",
@@ -1390,9 +1390,9 @@
       "ci-cd",
       "coverage"
     ],
-    "script": null,
-    "sha256": "de53c6fcd78c8d791e6aa0643cad75da33bd4834f4a10237879c6fec483ffae0",
-    "zipSha256": "e6e7384ade75012456ea20c1ee6d1dceb9f9b372d9017849f68ae92a7962ee11"
+    "script": "scripts/check_test_coverage_map.py",
+    "sha256": "3ae4cfd2ed24ecd63036bb02ed3c4831d9334850dad0a2141f88f19e6edaa7a7",
+    "zipSha256": "cce36d63529f573588f76ebfaa7fdc2e12751d8657adc921db70b206648f1896"
   },
   {
     "slug": "web-scraper",
@@ -1406,9 +1406,9 @@
       "data-extraction",
       "validation"
     ],
-    "script": null,
-    "sha256": "5bfc5786eacac82bb338e0a4ab4e818da3dfb866e3e4c42009238d164c1b7210",
-    "zipSha256": "ac41b2dc255ca81a5998dad3395185bad522533d144314f38915e7c7239eb3ab"
+    "script": "scripts/check_robots.py",
+    "sha256": "d31f7f16ca102a30637adda4fe7514abb0b75ea83c1de3cfe17ea96820311dca",
+    "zipSha256": "fb7ac19479387a6658ab0d53a34130a870eb36b1eeb704efa2debb19f623a96c"
   },
   {
     "slug": "accessibility-auditor",
@@ -1424,8 +1424,8 @@
       "frontend"
     ],
     "script": "scripts/a11y_scan.py",
-    "sha256": "1580ed2ebf3727f73f63a62a4fc1b9713bc36c77edf170d3eff29dda4ab0e32d",
-    "zipSha256": "714796dc269f4749448b9891961e177415ea4f4cee3c315cc82b4a2a815a4c0c"
+    "sha256": "da9355a66a506d33c5663a405ee4b1f134bb46244325eb173a732d6d908d9353",
+    "zipSha256": "863867f93f09b5f999b7bd57f7a07af308fc8c78abc4574c69f5bf175110d1db"
   },
   {
     "slug": "api-designer",
@@ -1441,8 +1441,8 @@
       "contract-testing"
     ],
     "script": "scripts/lint_openapi.py",
-    "sha256": "50ef780d8a9679c44f429e2e568d1961a7960eca095546dd2fcb4152119f1510",
-    "zipSha256": "4e239302fea9299948e0bb3d5bdf8e22dc13fdc1258bbea2ed29add7164377bc"
+    "sha256": "fc803efc9c0a6f4e200263cb29da27e80c546548e440794153ea4002456507a9",
+    "zipSha256": "e36792cb00147a56b56776eb507183b73a54500c0e4f13953a31a0c228d3a8a4"
   },
   {
     "slug": "code-migration",
@@ -1456,9 +1456,9 @@
       "upgrade",
       "parity-testing"
     ],
-    "script": null,
-    "sha256": "8454d195388c6590b7ad35906fd44abf7d114f4b99e19e48b4b376a7136e6ce4",
-    "zipSha256": "72f8c5a8c8b43df765b92961ee2d04bdfa8b9ad67a2630b165127576b3f4bd5f"
+    "script": "scripts/migration_inventory.py",
+    "sha256": "eb715b8d7e7b9729eb9d64bea157e7e3852d383894ff909b7dc4a14938d747fd",
+    "zipSha256": "c87cb75723617172194a3d1195cb9b2d30b45330728dc989bc4b96b588a0faa2"
   },
   {
     "slug": "db-optimizer",
@@ -1473,9 +1473,9 @@
       "indexing",
       "query-optimization"
     ],
-    "script": null,
-    "sha256": "0aab34da34b57a239f34963b11c19b9e433de662122484c245167193bcfd245a",
-    "zipSha256": "5aaac232f9370ae3469d90f55f00173b9962768e396bb6dc920a85eddd62bf89"
+    "script": "scripts/lint_sql.py",
+    "sha256": "945983607280c0ca82af668933750cc9f0264aacd996b4c0c35fc934d85818d7",
+    "zipSha256": "f896decc9f91295b6d93f8bef77cbd07c3983f2908fefac1e3e22305f143613f"
   },
   {
     "slug": "devops-pipeline",
@@ -1491,8 +1491,8 @@
       "security"
     ],
     "script": "scripts/lint_actions.py",
-    "sha256": "14d425021e6af9c75953c38644eecede8cb8957895f5d7cf0d9c8ebb6a8e583f",
-    "zipSha256": "095839d3184995ada7d6f1ac254ee88adc87def10444e396a1cfd5a60c3a9929"
+    "sha256": "2fa333cff3c7b5e347f4c85d25d5621cacd5b5907b068fff52c49f74aaacf7ac",
+    "zipSha256": "d0ee0af1a5cf114814582c717ee2b3d2638f24178f0b7f3b1fded3c1c92c1262"
   },
   {
     "slug": "docker-generator",
@@ -1508,8 +1508,8 @@
       "security"
     ],
     "script": "scripts/lint_dockerfile.py",
-    "sha256": "286ae956fba9307fb838c9edce556f4422ad5f1d4e9506d3cce299c681897e97",
-    "zipSha256": "174492e6203129c14924e94e7a4b6e68e27e05457affe514d3caa1fc2af86740"
+    "sha256": "84a6ec863ae02e23c3e5266c6c7aced3a8b5970914b19ed93850bfd0f744f885",
+    "zipSha256": "eb7718e7b9bf2508cdbe52a3fc7570ecfe8b73ef339e62ac1335563de5289de2"
   },
   {
     "slug": "incident-response",
@@ -1524,9 +1524,9 @@
       "postmortem",
       "triage"
     ],
-    "script": null,
-    "sha256": "bebd8cd59ddb905c9868280e7fb28aaf139445fd1c4f1df55488af96645c39e1",
-    "zipSha256": "67c6b406f81d8f49b5c1486db97435bb66945b1ef6a826d9ea572adf3355464e"
+    "script": "scripts/incident_timeline.py",
+    "sha256": "85b539b2aa44f1d1f6652857ad17e49d9762ed3ac365b3742d143af1d280a7fb",
+    "zipSha256": "bb2482b7ae0d595732e01abdba7067ab23c9b84baac8c775505e73e730eae0a9"
   },
   {
     "slug": "observability-setup",
@@ -1541,9 +1541,9 @@
       "metrics",
       "slo"
     ],
-    "script": null,
-    "sha256": "49fefd83b2748bc2e16433d0ea7286ceb5252303163126e89e6a7dc1523d013d",
-    "zipSha256": "ff7fb54df3e0ccc31037b7f0e438db5e50a415299b3ef751c74dcb2f778ce78a"
+    "script": "scripts/check_slo.py",
+    "sha256": "5f9449111dacccc327860d62b1aeddfd971f66bd03b52411ac3d8744002fa7bb",
+    "zipSha256": "92166ed5a4881915566e2ffd826d0c9f2f45149b71b9b2aaa9f441d336b5d2a4"
   },
   {
     "slug": "performance-profiler",
@@ -1558,9 +1558,9 @@
       "optimization",
       "memory"
     ],
-    "script": null,
-    "sha256": "b455b943a5a319c6bd855157a68a11f240f69f9ead7ede30f6e3bf6b14584f51",
-    "zipSha256": "64163f9816b64f75dd6de172e2ea9bf8cad34f589bfd0cb06d4e616302350b56"
+    "script": "scripts/bench_compare.py",
+    "sha256": "752ec7dbe8e06081e65fd2c57fcf9600eccd06533505d041b7deb0b626722e08",
+    "zipSha256": "8eab762bddc37ed448077062da9025778bef86eaee4df0af822c8764ebde69fb"
   },
   {
     "slug": "refactoring-assistant",
@@ -1575,9 +1575,9 @@
       "complexity",
       "maintainability"
     ],
-    "script": null,
-    "sha256": "ce7a547846de0579c19c20dc1b6d39adf8dd00bd277cf8cb07e9b03fb876487b",
-    "zipSha256": "91e135cd38037fa1b39d688d5485433a06933b93af61376d3af7a42dd3262c2a"
+    "script": "scripts/complexity_scan.py",
+    "sha256": "120901371ffcb15b9b756d577f1e5c9733893c69d5e7d5a9ff452eb74ec2f848",
+    "zipSha256": "29ed77f6f71bd948f55ae04e4f7fa0876a24d79668c43b8fe791cde470eb3d98"
   },
   {
     "slug": "release-engineering",
@@ -1593,8 +1593,8 @@
       "devops"
     ],
     "script": "scripts/semver_bump.py",
-    "sha256": "a09dea4754082bf58f64a2f9d92d1e698a0b2cfbb69b263894fb37ec561ce6f6",
-    "zipSha256": "a7a4c910953a971df076086c8f122de2f019f236468e3d421959a5b31a67cc83"
+    "sha256": "79769548c8f70f434dc24231872814588de34a960f09b3dff29b48d090c67620",
+    "zipSha256": "471d008ab656994c2a963b798d1bbfb170ee0ade31b1e4d881e341857bd5584e"
   },
   {
     "slug": "security-auditor",
@@ -1610,8 +1610,8 @@
       "vulnerability-scanning"
     ],
     "script": "scripts/secret_scan.py",
-    "sha256": "0456300f39d8ad654bda5fb936342e1f33d41802e08f183ea320b012a84aca3e",
-    "zipSha256": "9b07d995c08fb26909eb42db12e858c072faf8c279cf845646250f7fe83a494b"
+    "sha256": "619950c361a710115cf848d2676f980051d739ae02d658892908da66cd3d33b2",
+    "zipSha256": "721c5b017f7ad3c7b66912e656c9c7cc14e68423c213cb20d4aacf041b35f563"
   },
   {
     "slug": "terraform-generator",
@@ -1627,9 +1627,9 @@
       "aws",
       "security"
     ],
-    "script": null,
-    "sha256": "a9c4fbc73a12af1af4987d4018975175b19f3d50a526faac6b7edf9049ab3ebc",
-    "zipSha256": "af8d5eccc229c781c55c243bbfaf389b5bc26a34b8ae88c2a1aeb2ddcf31f006"
+    "script": "scripts/lint_terraform.py",
+    "sha256": "7f5b13a5b1a9e4bf576818f0efa7eb13ddcc8d359d5e403ce12f129156914524",
+    "zipSha256": "4c7d09c811cd7f515b174f0c91b59e9f8200ac916063a4b66f757841519cc03d"
   },
   {
     "slug": "unit-test-generator",
@@ -1644,9 +1644,9 @@
       "edge-cases",
       "tdd"
     ],
-    "script": null,
-    "sha256": "380b788d4ae7a59ec77ff762ab7f08761275fed82861e065d36ab4ebb79ba892",
-    "zipSha256": "1d9373e6e4a7915b14309e770fb4c420c6698863f3ed923e0280014c48320393"
+    "script": "scripts/test_skeleton.py",
+    "sha256": "7dfaa933b64d1bdc6758a438240057dc58a36e214aebd1dd1b14a7cb402c1d1b",
+    "zipSha256": "b73f94fdb205b68dca61a0d324ae9a8ede2f1b4207c4d9f07f214c66f3353159"
   }
 ];
     const PACKS = [
@@ -1752,22 +1752,22 @@
 
     const TERM_VIEWS = {
       doctor: `<span class="t-dim">$ npx @jovianops/cortex doctor</span>
-<span class="t-hi">Cortex v0.4.0 — Environment &amp; Integrity Doctor</span>
+<span class="t-hi">Cortex v1.0.0 — Environment &amp; Integrity Doctor</span>
 
 <span class="t-ok">[OK]</span>   Python 3.12.4 (/usr/bin/python3)
 <span class="t-ok">[OK]</span>   git found at /usr/bin/git
 <span class="t-ok">[OK]</span>   node found at /usr/local/bin/node
-<span class="t-ok">[OK]</span>   Verified SHA-256 checksums for 24 bundled skills (34 files).
-<span class="t-ok">[OK]</span>   Validated 9 multi-agent manifests (all 24 skills verified at v0.4.0).
+<span class="t-ok">[OK]</span>   Verified SHA-256 checksums for 24 bundled skills (48 files).
+<span class="t-ok">[OK]</span>   Validated 9 multi-agent manifests (all 24 skills verified at v1.0.0).
 
 <span class="t-dim">==> Claude Code (project: ./.claude/skills)</span>
-  security-auditor          v0.4.0    <span class="t-ok">[OK]</span>
-  accessibility-auditor     v0.4.0    <span class="t-ok">[OK]</span>
+  security-auditor          v1.0.0    <span class="t-ok">[OK]</span>
+  accessibility-auditor     v1.0.0    <span class="t-ok">[OK]</span>
 
 Doctor finished with <span class="t-ok">0 issue(s)</span>.`,
 
       detect: `<span class="t-dim">$ npx @jovianops/cortex detect</span>
-<span class="t-hi">Cortex v0.4.0 — Agent Environment Detection</span>
+<span class="t-hi">Cortex v1.0.0 — Agent Environment Detection</span>
 
 Agent          Platform                  Status      Locked  Signals
 -----------------------------------------------------------------------------
@@ -1782,20 +1782,22 @@ Suggested install command:
   <span class="t-accent">npx @jovianops/cortex install --agent claude-code --pack fullstack</span>`,
 
       search: `<span class="t-dim">$ npx @jovianops/cortex search --has-script</span>
-Found <span class="t-hi">10</span> Cortex skill(s) with bundled Python helper scripts:
+Found <span class="t-hi">24</span> Cortex skill(s) with bundled Python helper scripts (100% coverage):
 
 Skill                      Tier       Script
 ---------------------------------------------------------------
+academic-assistant         core       <span class="t-accent">citation_check.py</span>
+anti-hallucination         core       <span class="t-accent">verify_claims.py</span>
 blender-3d-modeling        core       <span class="t-accent">bmesh_check.py</span>
+code-review-assistant      core       <span class="t-accent">diff_review.py</span>
 college-report-card        core       <span class="t-accent">grade_calc.py</span>
-documentation-generator    core       <span class="t-accent">check_docs.py</span>
-memory-manager             core       <span class="t-accent">memory_store.py</span>
 accessibility-auditor      extended   <span class="t-accent">a11y_scan.py</span>
 api-designer               extended   <span class="t-accent">lint_openapi.py</span>
+db-optimizer               extended   <span class="t-accent">lint_sql.py</span>
 devops-pipeline            extended   <span class="t-accent">lint_actions.py</span>
-docker-generator           extended   <span class="t-accent">lint_dockerfile.py</span>
-release-engineering        extended   <span class="t-accent">semver_bump.py</span>
-security-auditor           extended   <span class="t-accent">secret_scan.py</span>`,
+security-auditor           extended   <span class="t-accent">secret_scan.py</span>
+terraform-generator        extended   <span class="t-accent">lint_terraform.py</span>
+<span class="t-dim">... +13 more bundled zero-dependency Python 3 scripts</span>`,
 
       new: `<span class="t-dim">$ npx @jovianops/cortex new graph-debugger --with-script</span>
 Created premium-skills/graph-debugger/SKILL.md
@@ -2069,7 +2071,7 @@ Next steps:
         <p style="margin:0;color:var(--muted);">${s.desc}</p>
         <div class="kv-list">
           <div class="kv"><span class="kv-k">path</span><span class="kv-v">${s.dir}/${s.slug}/SKILL.md</span></div>
-          <div class="kv"><span class="kv-k">version</span><span class="kv-v">0.4.0</span></div>
+          <div class="kv"><span class="kv-k">version</span><span class="kv-v">1.0.0</span></div>
           ${scriptRow}
           <div class="kv"><span class="kv-k">tags</span><span class="kv-v">${s.tags.join(', ')}</span></div>
           <div class="kv"><span class="kv-k">SKILL.md SHA</span><span class="kv-v">${s.sha256}</span></div>

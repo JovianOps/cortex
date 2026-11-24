@@ -1,4 +1,4 @@
-"""Comprehensive test suite for Cortex v0.4.0 tooling, manifests, installer, and bundled helper scripts."""
+"""Comprehensive test suite for Cortex v1.0.0 tooling, manifests, installer, and all 24 bundled helper scripts."""
 from __future__ import annotations
 
 import importlib.util
@@ -42,7 +42,7 @@ class TestPackagingAndManifests(unittest.TestCase):
             text=True,
         )
         self.assertEqual(res.returncode, 0, msg=res.stderr + res.stdout)
-        self.assertIn("24 skills verified at v0.4.0", res.stdout)
+        self.assertIn("24 skills verified at v1.0.0", res.stdout)
 
     def test_eval_suite_and_audit_pass(self) -> None:
         res = subprocess.run(
@@ -131,12 +131,15 @@ class TestMultiAgentInstaller(unittest.TestCase):
     def test_remote_install_verifies_sha256_and_rejects_tampering(self) -> None:
         checksums_bytes = (ROOT / "checksums.json").read_bytes()
         skill_bytes = (ROOT / "skills/anti-hallucination/SKILL.md").read_bytes()
+        script_bytes = (ROOT / "skills/anti-hallucination/scripts/verify_claims.py").read_bytes()
 
         def fake_fetch_ok(url: str, timeout: int = 20) -> bytes:
             if url.endswith("/checksums.json"):
                 return checksums_bytes
             if url.endswith("/skills/anti-hallucination/SKILL.md"):
                 return skill_bytes
+            if url.endswith("/skills/anti-hallucination/scripts/verify_claims.py"):
+                return script_bytes
             raise AssertionError(f"Unexpected URL: {url}")
 
         def fake_fetch_tampered(url: str, timeout: int = 20) -> bytes:
@@ -344,7 +347,7 @@ class TestUnifiedCortexCLI(unittest.TestCase):
 
         srch = subprocess.run([sys.executable, str(cli), "search", "--has-script", "--json"], cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(srch.returncode, 0, msg=srch.stderr)
-        self.assertEqual(json.loads(srch.stdout)["count"], 10)
+        self.assertEqual(json.loads(srch.stdout)["count"], 24)
 
         pks = subprocess.run([sys.executable, str(cli), "packs", "--json"], cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(pks.returncode, 0, msg=pks.stderr)
@@ -430,6 +433,133 @@ class TestUnifiedCortexCLI(unittest.TestCase):
                 text=True,
             )
             self.assertEqual(st.returncode, 0, msg=st.stdout + st.stderr)
+
+    def test_cortex_v1_init_info_verify_and_version(self) -> None:
+        cli = SCRIPTS / "cortex.py"
+        ver = subprocess.run([sys.executable, str(cli), "--version"], cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(ver.returncode, 0)
+        self.assertEqual(ver.stdout.strip(), "cortex 1.0.0")
+
+        info = subprocess.run([sys.executable, str(cli), "info", "terraform-generator", "--json"], cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(info.returncode, 0, msg=info.stderr)
+        info_data = json.loads(info.stdout)
+        self.assertEqual(info_data["version"], "1.0.0")
+        self.assertEqual(info_data["scripts"], ["scripts/lint_terraform.py"])
+        self.assertEqual(len(info_data["skill_sha256"]), 64)
+
+        vfy = subprocess.run([sys.executable, str(cli), "verify", "--json"], cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(vfy.returncode, 0, msg=vfy.stdout + vfy.stderr)
+        self.assertTrue(json.loads(vfy.stdout)["ok"])
+
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = Path(tmp)
+            (proj / "main.tf").write_text('terraform { required_version = ">= 1.5" }\n', encoding="utf-8")
+            init_res = subprocess.run(
+                [sys.executable, str(cli), "init", "--agent", "vscode", "--scope", "project", "--json"],
+                cwd=proj,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(init_res.returncode, 0, msg=init_res.stdout + init_res.stderr)
+            payload = json.loads(init_res.stdout)
+            self.assertTrue(payload["ok"])
+            self.assertEqual(payload["pack"], "devops-sre")
+            self.assertTrue((proj / ".github/skills/terraform-generator/scripts/lint_terraform.py").is_file())
+            self.assertTrue((proj / ".vscode/settings.json").is_file())
+
+    def test_v1_new_bundled_helper_scripts(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            t = Path(tmp)
+
+            # 1. lint_terraform.py
+            tf_bad = t / "bad.tf"
+            tf_bad.write_text('resource "aws_db_instance" "x" {\n  storage_encrypted = false\n  publicly_accessible = true\n}\n', encoding="utf-8")
+            r = subprocess.run([sys.executable, str(ROOT / "premium-skills/terraform-generator/scripts/lint_terraform.py"), str(tf_bad), "--json"], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 1)
+            self.assertGreaterEqual(json.loads(r.stdout)["count"], 2)
+
+            # 2. lint_sql.py
+            sql_bad = t / "bad.sql"
+            sql_bad.write_text("SELECT * FROM users WHERE name LIKE '%bob';\nDELETE FROM sessions;\n", encoding="utf-8")
+            r = subprocess.run([sys.executable, str(ROOT / "premium-skills/db-optimizer/scripts/lint_sql.py"), str(sql_bad), "--json"], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 1)
+            rules = {f["rule"] for f in json.loads(r.stdout)["findings"]}
+            self.assertIn("dml-without-where", rules)
+
+            # 3. check_slo.py
+            r = subprocess.run([sys.executable, str(ROOT / "premium-skills/observability-setup/scripts/check_slo.py"), "--slo", "99.9", "--window-days", "30", "--json"], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0)
+            self.assertEqual(json.loads(r.stdout)["slo"]["error_budget_minutes"], "43.20")
+
+            # 4. incident_timeline.py
+            inc = t / "inc.json"
+            inc.write_text(json.dumps({
+                "timeline": [
+                    {"timestamp": "2026-11-24T00:00:00Z", "phase": "impact_start", "event": "Deploy"},
+                    {"timestamp": "2026-11-24T00:05:00Z", "phase": "detected", "event": "Alert"},
+                    {"timestamp": "2026-11-24T00:20:00Z", "phase": "resolved", "event": "Rollback"},
+                ],
+                "action_items": [{"owner": "alice", "due_date": "2026-12-01", "task": "Add canary"}],
+            }), encoding="utf-8")
+            r = subprocess.run([sys.executable, str(ROOT / "premium-skills/incident-response/scripts/incident_timeline.py"), str(inc), "--json"], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0)
+            self.assertEqual(json.loads(r.stdout)["metrics"]["mttr_minutes"], 20.0)
+
+            # 5. diff_review.py
+            diff_f = t / "p.diff"
+            diff_f.write_text("+++ b/src/app.py\n+breakpoint()\n", encoding="utf-8")
+            r = subprocess.run([sys.executable, str(ROOT / "skills/code-review-assistant/scripts/diff_review.py"), str(diff_f), "--json"], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 1)
+
+            # 6. verify_claims.py
+            claim_doc = t / "claims.md"
+            claim_doc.write_text("Checked `scripts/cortex.py` and `scripts/does_not_exist.py`.\n", encoding="utf-8")
+            r = subprocess.run([sys.executable, str(ROOT / "skills/anti-hallucination/scripts/verify_claims.py"), str(claim_doc), "--repo", str(ROOT), "--json"], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 1)
+            self.assertEqual(json.loads(r.stdout)["missing"], ["scripts/does_not_exist.py"])
+
+            # 7. check_python_ast.py
+            py_bad = t / "bad.py"
+            py_bad.write_text("def f(x=[]):\n    try:\n        return x\n    except:\n        return []\n", encoding="utf-8")
+            r = subprocess.run([sys.executable, str(ROOT / "skills/python-coding-assistant/scripts/check_python_ast.py"), str(py_bad), "--json"], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 1)
+
+            # 8. check_test_coverage_map.py
+            r = subprocess.run([sys.executable, str(ROOT / "skills/testing-automation/scripts/check_test_coverage_map.py"), str(ROOT / "tests"), "--json"], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0, msg=r.stdout)
+
+            # 9. test_skeleton.py
+            r = subprocess.run([sys.executable, str(ROOT / "premium-skills/unit-test-generator/scripts/test_skeleton.py"), str(ROOT / "scripts/validate_yaml.py"), "--json"], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0)
+            self.assertGreaterEqual(len(json.loads(r.stdout)["functions"]), 1)
+
+            # 10. citation_check.py
+            draft = t / "paper.md"
+            draft.write_text("See prior work [1].\n\n## References\n\n[1] Smith, 2026.\n", encoding="utf-8")
+            r = subprocess.run([sys.executable, str(ROOT / "skills/academic-assistant/scripts/citation_check.py"), str(draft), "--json"], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0)
+
+            # 11. check_robots.py
+            rob = t / "robots.txt"
+            rob.write_text("User-agent: *\nDisallow: /admin/\nAllow: /\n", encoding="utf-8")
+            r = subprocess.run([sys.executable, str(ROOT / "skills/web-scraper/scripts/check_robots.py"), str(rob), "https://example.com/public", "--json"], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0)
+
+            # 12. migration_inventory.py
+            r = subprocess.run([sys.executable, str(ROOT / "premium-skills/code-migration/scripts/migration_inventory.py"), str(ROOT / "scripts"), "--json"], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0)
+            self.assertGreaterEqual(json.loads(r.stdout)["total_files"], 5)
+
+            # 13. bench_compare.py
+            b1, b2 = t / "b1.json", t / "b2.json"
+            b1.write_text("[10.0, 11.0, 12.0, 10.5, 11.5]", encoding="utf-8")
+            b2.write_text("[9.5, 10.0, 11.0, 10.0, 10.5]", encoding="utf-8")
+            r = subprocess.run([sys.executable, str(ROOT / "premium-skills/performance-profiler/scripts/bench_compare.py"), str(b1), str(b2), "--json"], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0)
+
+            # 14. complexity_scan.py
+            r = subprocess.run([sys.executable, str(ROOT / "premium-skills/refactoring-assistant/scripts/complexity_scan.py"), str(ROOT / "scripts/validate_yaml.py"), "--json"], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0)
 
 
 if __name__ == "__main__":

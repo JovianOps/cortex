@@ -1,33 +1,35 @@
 {
   "schema_version": "1.0.0",
-  "release_version": "0.4.0",
+  "release_version": "1.0.0",
   "skill_count": 24,
   "skills": {
     "academic-assistant": {
       "collection": "core",
       "dir": "skills",
       "zip": "zips/academic-assistant.zip",
-      "zip_sha256": "07c0f4860a3d03911d10b63867403f21a5182e4ea16424d8f9cdde9be24a5ae9",
+      "zip_sha256": "09979c34ff239873a1f1a5fc9b1fe8446055f9250e28e1011cbbf106d235af2a",
       "files": {
-        "SKILL.md": "ec3c6571b60a6390cb393ebe1f88e6e23fdce998111844784be46a22387bddcd"
+        "SKILL.md": "ee3e4f97aa05195c4ec11730d2c00ce0e7534365928a58609046f5e93949ea38",
+        "scripts/citation_check.py": "13b7b848ae2b6e0875a29a519ef2dc28d03d2caaeadf9787b33a68f7ed1bc2e1"
       }
     },
     "anti-hallucination": {
       "collection": "core",
       "dir": "skills",
       "zip": "zips/anti-hallucination.zip",
-      "zip_sha256": "8ba30c14d772d71ee97025a8c6ac61bdb6be69bb3f7140f08d4699e44f1c91dd",
+      "zip_sha256": "64dbe62ebf4278f224a2e6e781b3fa36e54bc524083c60374f9457a179e889ac",
       "files": {
-        "SKILL.md": "80e37a26a6c136da7fa31f27f78adfa58f96784cea447896bc8d386527fb095a"
+        "SKILL.md": "6696b93c8b931c315f718adfa8e87d1aaa166b4f690071d54bca675cba227b8c",
+        "scripts/verify_claims.py": "56bc5bcbf6f305870531cc52e68df4690fc25fc032c1e2096acdc8b07b47751b"
       }
     },
     "blender-3d-modeling": {
       "collection": "core",
       "dir": "skills",
       "zip": "zips/blender-3d-modeling.zip",
-      "zip_sha256": "9749531b5c6da5511887918c4ffbb89011afd3adab0750e4e8c8555f4a6c4d00",
+      "zip_sha256": "77099f677bec51af1acb16fdd9e1cbf5c94e7b74719b9c36ecd03e531f8da9c6",
       "files": {
-        "SKILL.md": "885bdd08d8a89a96d0895dcd183e9791bc8d57694907a0580077956cda05051e",
+        "SKILL.md": "98beb57c4db7f792de5452c8be879a51bd5ed7c3d2b83fb731b9756ff8203fa7",
         "scripts/bmesh_check.py": "f5f0127c02b5692b79a72d365b6ae39f059b3935c3d4b3c54eae38feffd71e78"
       }
     },
@@ -35,18 +37,19 @@
       "collection": "core",
       "dir": "skills",
       "zip": "zips/code-review-assistant.zip",
-      "zip_sha256": "873cda68daa652a2683fb8bf6dfb574ec216e6fca6b68e9d66872a49f6343bd2",
+      "zip_sha256": "90a4cacdcd903f6c9bf1f65255ced349b23809c933b06312753e5243686eb34c",
       "files": {
-        "SKILL.md": "c45a4523d46d88f21360f27ff9ca94c4d4b120174434c84c3126d41147d560f1"
+        "SKILL.md": "1736751a8df4a49735ad976b6a2b9a93e92d5c34b6c5583eaeedf960e464e4e0",
+        "scripts/diff_review.py": "9806ce17bb251930e554f2d51391d69d69ff05837c86de13741ba841a4e99c1a"
       }
     },
     "college-report-card": {
       "collection": "core",
       "dir": "skills",
       "zip": "zips/college-report-card.zip",
-      "zip_sha256": "dcd8e9b5e0c44b64e728c8d3ce96d3e8098cf88404d20dd78b08051db3f68e69",
+      "zip_sha256": "4f89633b14f3824c2e09e0969577d61ab44756014f0025a007f23e5c42ec66e3",
       "files": {
-        "SKILL.md": "0880c290436d9eadc10d88e92c22719def2be40e7b96a36df42ad92ae3982fff",
+        "SKILL.md": "9097c657ffe55957d6502d4a9281ba511b7903205725ba518f813b8fa24f7ae6",
         "scripts/grade_calc.py": "94a8cd70eb8b502e75b839690d9d2789281f2aa3487b2c840ea56272c3c3eff4"
       }
     },
@@ -54,9 +57,9 @@
       "collection": "core",
       "dir": "skills",
       "zip": "zips/documentation-generator.zip",
-      "zip_sha256": "4aa3d4f3006363132d45163eb4c7ec2202bf1b854cf1977716267ade058688f3",
+      "zip_sha256": "d861b36fd8e224553d3ad46048e5f9c3dd0005a262085845a10ea41bb3c3d34f",
       "files": {
-        "SKILL.md": "9de0ee05e1039aabeb370196e49e256f9461b2d2625c59e364baf239e859e38c",
+        "SKILL.md": "c3f7f84f6bdeaf3a3cef996b67fab921af91595cf53ea95cc3ba9ea25d645f4c",
         "scripts/check_docs.py": "ca29ca9f647475935563db1d0d7b9daaa729f992cdb68a6819fbaa9d1296a870"
       }
     },
@@ -64,9 +67,9 @@
       "collection": "core",
       "dir": "skills",
       "zip": "zips/memory-manager.zip",
-      "zip_sha256": "6e61cb2d08823aa741ccf5294541f73ef39b075ff5378d31d11cbc5b7a75e4a7",
+      "zip_sha256": "e06bc07bf4b5552fb1e72ff5bd8d8faca5ab375a943e0ced35b9233daca87469",
       "files": {
-        "SKILL.md": "52c0c2120719eebc45494561ca6a11ac03fa99977a41fd8c14a8c4bab6cf4059",
+        "SKILL.md": "fdcfcd7802d0f286c3dcc57c0b8aa9d73d5a780d2edb43c99fe95d6e2217b935",
         "scripts/memory_store.py": "1ad410509bcd8852c0515224f6eb583794136943fa2336426e5d9a36d5f2122a"
       }
     },
@@ -74,36 +77,39 @@
       "collection": "core",
       "dir": "skills",
       "zip": "zips/python-coding-assistant.zip",
-      "zip_sha256": "ed60a2fcb123e6833e847483060b37f5e0f28658fdc34bc81e92bad9457d4253",
+      "zip_sha256": "4edd43ebd27c62c70111b91d248eb68f8fb13b391d64dc44ab9f5ea0a9fd0b74",
       "files": {
-        "SKILL.md": "22447380b0ff3163ce5590762f0632486404cfc111fda1578c36ddd23a244949"
+        "SKILL.md": "fb71ffea057c2816bd9ccad9e2ef4df7e5b5bb417bcb537ec1d82719041f0ca7",
+        "scripts/check_python_ast.py": "b7cafc5fc0576ba71745ff5849c67e1b7a0662323fc156e1960be149e2b19106"
       }
     },
     "testing-automation": {
       "collection": "core",
       "dir": "skills",
       "zip": "zips/testing-automation.zip",
-      "zip_sha256": "e6e7384ade75012456ea20c1ee6d1dceb9f9b372d9017849f68ae92a7962ee11",
+      "zip_sha256": "cce36d63529f573588f76ebfaa7fdc2e12751d8657adc921db70b206648f1896",
       "files": {
-        "SKILL.md": "de53c6fcd78c8d791e6aa0643cad75da33bd4834f4a10237879c6fec483ffae0"
+        "SKILL.md": "3ae4cfd2ed24ecd63036bb02ed3c4831d9334850dad0a2141f88f19e6edaa7a7",
+        "scripts/check_test_coverage_map.py": "80d7e3453caa0ac85e537309195c28c1b39cea1cb143f38a5ad9312a3ba51afe"
       }
     },
     "web-scraper": {
       "collection": "core",
       "dir": "skills",
       "zip": "zips/web-scraper.zip",
-      "zip_sha256": "ac41b2dc255ca81a5998dad3395185bad522533d144314f38915e7c7239eb3ab",
+      "zip_sha256": "fb7ac19479387a6658ab0d53a34130a870eb36b1eeb704efa2debb19f623a96c",
       "files": {
-        "SKILL.md": "5bfc5786eacac82bb338e0a4ab4e818da3dfb866e3e4c42009238d164c1b7210"
+        "SKILL.md": "d31f7f16ca102a30637adda4fe7514abb0b75ea83c1de3cfe17ea96820311dca",
+        "scripts/check_robots.py": "1f26414013531097cddf1e853df980bfa8ef6644746019ddef00c3ebbb9c50e9"
       }
     },
     "accessibility-auditor": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/accessibility-auditor.zip",
-      "zip_sha256": "714796dc269f4749448b9891961e177415ea4f4cee3c315cc82b4a2a815a4c0c",
+      "zip_sha256": "863867f93f09b5f999b7bd57f7a07af308fc8c78abc4574c69f5bf175110d1db",
       "files": {
-        "SKILL.md": "1580ed2ebf3727f73f63a62a4fc1b9713bc36c77edf170d3eff29dda4ab0e32d",
+        "SKILL.md": "da9355a66a506d33c5663a405ee4b1f134bb46244325eb173a732d6d908d9353",
         "scripts/a11y_scan.py": "98961b648fbcd4775b0af6df99d0816b1779695cf3fcf7ba3cebd73ad6827a22"
       }
     },
@@ -111,9 +117,9 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/api-designer.zip",
-      "zip_sha256": "4e239302fea9299948e0bb3d5bdf8e22dc13fdc1258bbea2ed29add7164377bc",
+      "zip_sha256": "e36792cb00147a56b56776eb507183b73a54500c0e4f13953a31a0c228d3a8a4",
       "files": {
-        "SKILL.md": "50ef780d8a9679c44f429e2e568d1961a7960eca095546dd2fcb4152119f1510",
+        "SKILL.md": "fc803efc9c0a6f4e200263cb29da27e80c546548e440794153ea4002456507a9",
         "scripts/lint_openapi.py": "ffc72306791d7a75ba9aeeff9f5474c3876f0a8ea141f7782467da5456dd441d"
       }
     },
@@ -121,27 +127,29 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/code-migration.zip",
-      "zip_sha256": "72f8c5a8c8b43df765b92961ee2d04bdfa8b9ad67a2630b165127576b3f4bd5f",
+      "zip_sha256": "c87cb75723617172194a3d1195cb9b2d30b45330728dc989bc4b96b588a0faa2",
       "files": {
-        "SKILL.md": "8454d195388c6590b7ad35906fd44abf7d114f4b99e19e48b4b376a7136e6ce4"
+        "SKILL.md": "eb715b8d7e7b9729eb9d64bea157e7e3852d383894ff909b7dc4a14938d747fd",
+        "scripts/migration_inventory.py": "e6dd06c69518a413fafd1ad8cba0b9f1c1d20387e0aa77c47aa5c5663c0c2b08"
       }
     },
     "db-optimizer": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/db-optimizer.zip",
-      "zip_sha256": "5aaac232f9370ae3469d90f55f00173b9962768e396bb6dc920a85eddd62bf89",
+      "zip_sha256": "f896decc9f91295b6d93f8bef77cbd07c3983f2908fefac1e3e22305f143613f",
       "files": {
-        "SKILL.md": "0aab34da34b57a239f34963b11c19b9e433de662122484c245167193bcfd245a"
+        "SKILL.md": "945983607280c0ca82af668933750cc9f0264aacd996b4c0c35fc934d85818d7",
+        "scripts/lint_sql.py": "3054631f75069c5de71df4234fb8ed77db1f9f670ad9b51434f74245c626ec54"
       }
     },
     "devops-pipeline": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/devops-pipeline.zip",
-      "zip_sha256": "095839d3184995ada7d6f1ac254ee88adc87def10444e396a1cfd5a60c3a9929",
+      "zip_sha256": "d0ee0af1a5cf114814582c717ee2b3d2638f24178f0b7f3b1fded3c1c92c1262",
       "files": {
-        "SKILL.md": "14d425021e6af9c75953c38644eecede8cb8957895f5d7cf0d9c8ebb6a8e583f",
+        "SKILL.md": "2fa333cff3c7b5e347f4c85d25d5621cacd5b5907b068fff52c49f74aaacf7ac",
         "scripts/lint_actions.py": "2172ce7468f315f16a63d2cb29f8cdabe88a6d0725f1fecc8a320bc503837d5e"
       }
     },
@@ -149,9 +157,9 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/docker-generator.zip",
-      "zip_sha256": "174492e6203129c14924e94e7a4b6e68e27e05457affe514d3caa1fc2af86740",
+      "zip_sha256": "eb7718e7b9bf2508cdbe52a3fc7570ecfe8b73ef339e62ac1335563de5289de2",
       "files": {
-        "SKILL.md": "286ae956fba9307fb838c9edce556f4422ad5f1d4e9506d3cce299c681897e97",
+        "SKILL.md": "84a6ec863ae02e23c3e5266c6c7aced3a8b5970914b19ed93850bfd0f744f885",
         "scripts/lint_dockerfile.py": "7a92f2a4fb2b0a9a4f3fdf42789c1a8e5018aa048517dfe067286a2b328c29bb"
       }
     },
@@ -159,45 +167,49 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/incident-response.zip",
-      "zip_sha256": "67c6b406f81d8f49b5c1486db97435bb66945b1ef6a826d9ea572adf3355464e",
+      "zip_sha256": "bb2482b7ae0d595732e01abdba7067ab23c9b84baac8c775505e73e730eae0a9",
       "files": {
-        "SKILL.md": "bebd8cd59ddb905c9868280e7fb28aaf139445fd1c4f1df55488af96645c39e1"
+        "SKILL.md": "85b539b2aa44f1d1f6652857ad17e49d9762ed3ac365b3742d143af1d280a7fb",
+        "scripts/incident_timeline.py": "c84146a640c9b567ab6380fce39c43eb2101c5d3863f27ba20f9d8632b41594e"
       }
     },
     "observability-setup": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/observability-setup.zip",
-      "zip_sha256": "ff7fb54df3e0ccc31037b7f0e438db5e50a415299b3ef751c74dcb2f778ce78a",
+      "zip_sha256": "92166ed5a4881915566e2ffd826d0c9f2f45149b71b9b2aaa9f441d336b5d2a4",
       "files": {
-        "SKILL.md": "49fefd83b2748bc2e16433d0ea7286ceb5252303163126e89e6a7dc1523d013d"
+        "SKILL.md": "5f9449111dacccc327860d62b1aeddfd971f66bd03b52411ac3d8744002fa7bb",
+        "scripts/check_slo.py": "c5200ffe7c5be9eef065b805165d0a7e1eb8a6302b7c387910abd68192aca3c3"
       }
     },
     "performance-profiler": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/performance-profiler.zip",
-      "zip_sha256": "64163f9816b64f75dd6de172e2ea9bf8cad34f589bfd0cb06d4e616302350b56",
+      "zip_sha256": "8eab762bddc37ed448077062da9025778bef86eaee4df0af822c8764ebde69fb",
       "files": {
-        "SKILL.md": "b455b943a5a319c6bd855157a68a11f240f69f9ead7ede30f6e3bf6b14584f51"
+        "SKILL.md": "752ec7dbe8e06081e65fd2c57fcf9600eccd06533505d041b7deb0b626722e08",
+        "scripts/bench_compare.py": "d58eff939fddd4edc9c131344dbeb7ef61f66ee2c252cec8d81efdb4e92961c0"
       }
     },
     "refactoring-assistant": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/refactoring-assistant.zip",
-      "zip_sha256": "91e135cd38037fa1b39d688d5485433a06933b93af61376d3af7a42dd3262c2a",
+      "zip_sha256": "29ed77f6f71bd948f55ae04e4f7fa0876a24d79668c43b8fe791cde470eb3d98",
       "files": {
-        "SKILL.md": "ce7a547846de0579c19c20dc1b6d39adf8dd00bd277cf8cb07e9b03fb876487b"
+        "SKILL.md": "120901371ffcb15b9b756d577f1e5c9733893c69d5e7d5a9ff452eb74ec2f848",
+        "scripts/complexity_scan.py": "411c94b641fa78ce266a908bf17f77b540dfedf7033ee759e6b6210998f39336"
       }
     },
     "release-engineering": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/release-engineering.zip",
-      "zip_sha256": "a7a4c910953a971df076086c8f122de2f019f236468e3d421959a5b31a67cc83",
+      "zip_sha256": "471d008ab656994c2a963b798d1bbfb170ee0ade31b1e4d881e341857bd5584e",
       "files": {
-        "SKILL.md": "a09dea4754082bf58f64a2f9d92d1e698a0b2cfbb69b263894fb37ec561ce6f6",
+        "SKILL.md": "79769548c8f70f434dc24231872814588de34a960f09b3dff29b48d090c67620",
         "scripts/semver_bump.py": "565c275376b83084839b21bc703c7ef2ad244f19bcc87ff8d90e49389bde6ff5"
       }
     },
@@ -205,9 +217,9 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/security-auditor.zip",
-      "zip_sha256": "9b07d995c08fb26909eb42db12e858c072faf8c279cf845646250f7fe83a494b",
+      "zip_sha256": "721c5b017f7ad3c7b66912e656c9c7cc14e68423c213cb20d4aacf041b35f563",
       "files": {
-        "SKILL.md": "0456300f39d8ad654bda5fb936342e1f33d41802e08f183ea320b012a84aca3e",
+        "SKILL.md": "619950c361a710115cf848d2676f980051d739ae02d658892908da66cd3d33b2",
         "scripts/secret_scan.py": "3459f9d66eff61e367c21375a2c89b647b91ae71d8179c2b8a4b8325b4c8fd56"
       }
     },
@@ -215,18 +227,20 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/terraform-generator.zip",
-      "zip_sha256": "af8d5eccc229c781c55c243bbfaf389b5bc26a34b8ae88c2a1aeb2ddcf31f006",
+      "zip_sha256": "4c7d09c811cd7f515b174f0c91b59e9f8200ac916063a4b66f757841519cc03d",
       "files": {
-        "SKILL.md": "a9c4fbc73a12af1af4987d4018975175b19f3d50a526faac6b7edf9049ab3ebc"
+        "SKILL.md": "7f5b13a5b1a9e4bf576818f0efa7eb13ddcc8d359d5e403ce12f129156914524",
+        "scripts/lint_terraform.py": "758aa5149421f0654a66ab7bed5ee68256e68541a7f75582ca970b71d075e92a"
       }
     },
     "unit-test-generator": {
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/unit-test-generator.zip",
-      "zip_sha256": "1d9373e6e4a7915b14309e770fb4c420c6698863f3ed923e0280014c48320393",
+      "zip_sha256": "b73f94fdb205b68dca61a0d324ae9a8ede2f1b4207c4d9f07f214c66f3353159",
       "files": {
-        "SKILL.md": "380b788d4ae7a59ec77ff762ab7f08761275fed82861e065d36ab4ebb79ba892"
+        "SKILL.md": "7dfaa933b64d1bdc6758a438240057dc58a36e214aebd1dd1b14a7cb402c1d1b",
+        "scripts/test_skeleton.py": "2beab56a29c4925bda9d465194d0c92d55efa0a26ffff047cd1f72687d93c0f7"
       }
     }
   }
