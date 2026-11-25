@@ -202,6 +202,7 @@ STUDIO_HTML = """<!DOCTYPE html>
             <option value="cursor">Cursor (.cursor/mcp.json)</option>
             <option value="codex">OpenAI Codex CLI</option>
             <option value="windsurf">Windsurf</option>
+            <option value="opencode">OpenCode (opencode.json)</option>
           </select>
           <button type="button" class="primary" id="btnLoadMcp">Generate Config</button>
         </div>

@@ -359,13 +359,25 @@ def client_mcp_config(client: str, project_dir: Path) -> dict:
     }
     if client == "vscode":
         return {"servers": {"cortex": {"type": "stdio", **base_entry}}}
+    if client == "opencode":
+        return {
+            "$schema": "https://opencode.ai/config.json",
+            "mcp": {
+                "servers": {
+                    "cortex": {
+                        "type": "local",
+                        "command": [base_entry["command"], *base_entry["args"]],
+                    }
+                }
+            },
+        }
     return {"mcpServers": {"cortex": base_entry}}
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run Cortex zero-dependency MCP (Model Context Protocol) JSON-RPC stdio server.")
     parser.add_argument("--project-dir", type=Path, default=Path.cwd(), help="Workspace root directory for tool confinement.")
-    parser.add_argument("--print-config", choices=("vscode", "claude-code", "cursor", "codex", "windsurf"), default=None, help="Print copy-paste MCP client JSON configuration and exit.")
+    parser.add_argument("--print-config", choices=("vscode", "claude-code", "cursor", "codex", "windsurf", "opencode"), default=None, help="Print copy-paste MCP client JSON configuration and exit.")
     args = parser.parse_args(argv)
 
     if args.print_config:
