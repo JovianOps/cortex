@@ -12,6 +12,7 @@ Different AI coding IDEs and harnesses expect different instruction file formats
 | `cline` | `.clinerules/cortex-<slug>.md` | Cline / Roo Code modular rule files |
 | `claude` | `CLAUDE.md` | Idempotent `<!-- BEGIN CORTEX MANAGED -->` table preserving user content |
 | `agents` | `AGENTS.md` | Idempotent `<!-- BEGIN CORTEX MANAGED -->` table preserving user content |
+| `opencode` | `AGENTS.md` | OpenCode alias targeting `AGENTS.md` managed rules block |
 | `gemini` | `GEMINI.md` | Idempotent `<!-- BEGIN CORTEX MANAGED -->` table preserving user content |
 
 ## Common Commands

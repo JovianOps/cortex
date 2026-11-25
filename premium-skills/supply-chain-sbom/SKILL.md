@@ -1,7 +1,7 @@
 ---
 name: supply-chain-sbom
 description: Audit dependencies, lockfiles, SLSA provenance, and SBOMs.
-version: 2.0.0
+version: 2.0.1
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

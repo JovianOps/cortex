@@ -1,7 +1,7 @@
 ---
 name: docker-generator
 description: Generate hardened multi-stage Docker and Compose setups.
-version: 2.0.0
+version: 2.0.1
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

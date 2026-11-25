@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cortex Studio — Zero-dependency Light/Dark Swiss local web workbench for Cortex v2.0.0."""
+"""Cortex Studio — Zero-dependency Light/Dark Swiss local web workbench for Cortex v2.0.1."""
 from __future__ import annotations
 
 import argparse
@@ -15,7 +15,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 
 
 def load_local(name: str):
@@ -32,7 +32,7 @@ STUDIO_HTML = """<!DOCTYPE html>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cortex Studio v2.0.0 — Local Workbench</title>
+  <title>Cortex Studio v2.0.1 — Local Workbench</title>
   <style>
     :root, [data-theme="light"] {
       --bg: #ffffff; --surface: #f7f7f5; --surface-2: #efefec;
@@ -93,7 +93,7 @@ STUDIO_HTML = """<!DOCTYPE html>
   <header>
     <div class="brand">
       <h1>Cortex Studio</h1>
-      <span class="badge accent">v2.0.0</span>
+      <span class="badge accent">v2.0.1</span>
       <span class="badge" id="wsBadge">workspace</span>
     </div>
     <nav id="tabs">
@@ -168,6 +168,7 @@ STUDIO_HTML = """<!DOCTYPE html>
           <label><input type="checkbox" value="cline" /> Cline (.clinerules/*.md)</label>
           <label><input type="checkbox" value="claude" /> CLAUDE.md</label>
           <label><input type="checkbox" value="agents" /> AGENTS.md</label>
+          <label><input type="checkbox" value="opencode" /> OpenCode (AGENTS.md)</label>
           <label><input type="checkbox" value="gemini" /> GEMINI.md</label>
         </div>
         <pre id="compileOut">Choose a pack and target formats to preview or generate native agent rule files.</pre>
@@ -410,8 +411,21 @@ def make_handler(workspace_dir: Path):
             self.end_headers()
             self.wfile.write(raw)
 
+        MAX_BODY_BYTES = 1024 * 1024
+
+        def _is_allowed_origin(self) -> bool:
+            origin = self.headers.get("Origin")
+            if not origin:
+                return True
+            parsed = urllib.parse.urlparse(origin)
+            host_header = (self.headers.get("Host") or "").split(":", 1)[0].lower()
+            origin_host = (parsed.hostname or "").lower()
+            return origin_host in {"127.0.0.1", "localhost", "::1", host_header} or origin_host.endswith(".e2b.app")
+
         def _read_json_body(self) -> dict:
             length = int(self.headers.get("Content-Length", "0") or "0")
+            if length < 0 or length > self.MAX_BODY_BYTES:
+                raise ValueError(f"Request body exceeds maximum allowed size ({self.MAX_BODY_BYTES} bytes).")
             raw = self.rfile.read(length) if length > 0 else b"{}"
             return json.loads(raw.decode("utf-8")) if raw else {}
 
@@ -484,6 +498,9 @@ def make_handler(workspace_dir: Path):
             self._send_json({"error": f"Not found: {path}"}, HTTPStatus.NOT_FOUND)
 
         def do_POST(self) -> None:
+            if not self._is_allowed_origin():
+                self._send_json({"error": "Cross-origin POST rejected."}, HTTPStatus.FORBIDDEN)
+                return
             parsed = urllib.parse.urlparse(self.path)
             path = parsed.path
             try:

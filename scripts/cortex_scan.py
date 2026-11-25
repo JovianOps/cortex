@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 
 SEVERITY_RANK = {"INFO": 0, "LOW": 1, "MEDIUM": 2, "HIGH": 3, "CRITICAL": 4}
 FAIL_THRESHOLD = {"none": 99, "low": 1, "medium": 2, "high": 3, "critical": 4}
@@ -207,6 +207,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--policy", type=Path, default=None, help="Path to .cortex-policy.json.")
     parser.add_argument("--fail-on", choices=("none", "low", "medium", "high", "critical"), default=None)
     parser.add_argument("--format", "-f", choices=("table", "json", "sarif", "junit"), default="table")
+    parser.add_argument("--json", action="store_true", dest="as_json", help="Emit JSON output (alias for --format json).")
+    parser.add_argument("--init-policy", action="store_true", help="Write a starter .cortex-policy.json in the target directory.")
     parser.add_argument("--output", "-o", type=Path, default=None, help="Optional file path to write report.")
     args = parser.parse_args(argv)
 
@@ -215,14 +217,31 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: Target not found: {target}", file=sys.stderr)
         return 2
 
+    if args.init_policy:
+        policy_dest = (target / ".cortex-policy.json") if target.is_dir() else (target.parent / ".cortex-policy.json")
+        if not policy_dest.exists():
+            starter = {
+                "schema_version": VERSION,
+                "fail_on": "high",
+                "disabled_scanners": [],
+                "ignore_rules": [],
+                "ignore_paths": ["node_modules/**", ".venv/**", "dist/**", "build/**"],
+            }
+            policy_dest.write_text(json.dumps(starter, indent=2) + "\n", encoding="utf-8")
+            print(f"Created starter policy at {policy_dest}")
+        else:
+            print(f"Policy already exists at {policy_dest}")
+        return 0
+
     pol = load_policy(args.policy, target)
     report = run_scan(target, only=args.only or None, policy=pol, fail_on_override=args.fail_on)
+    fmt = "json" if args.as_json else args.format
 
-    if args.format == "json":
+    if fmt == "json":
         rendered = json.dumps(report, indent=2) + "\n"
-    elif args.format == "sarif":
+    elif fmt == "sarif":
         rendered = json.dumps(to_sarif(report), indent=2) + "\n"
-    elif args.format == "junit":
+    elif fmt == "junit":
         rendered = to_junit_xml(report)
     else:
         lines = [

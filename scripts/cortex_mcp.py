@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Zero-dependency Model Context Protocol (MCP 2025-03-26) JSON-RPC 2.0 server for Cortex v2.0.0."""
+"""Zero-dependency Model Context Protocol (MCP 2025-03-26) JSON-RPC 2.0 server for Cortex v2.0.1."""
 from __future__ import annotations
 
 import argparse
@@ -12,7 +12,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 PROTOCOL_VERSION = "2025-03-26"
 
 
@@ -134,7 +134,7 @@ class CortexMCPServer:
             },
             {
                 "name": "cortex_compile_rules",
-                "description": "Compile Cortex skills/packs into native Cursor (.mdc), VS Code (.instructions.md), Windsurf, Cline, CLAUDE.md, AGENTS.md, or GEMINI.md rules.",
+                "description": "Compile Cortex skills/packs into native Cursor (.mdc), VS Code (.instructions.md), Windsurf, Cline, CLAUDE.md, AGENTS.md (Codex/OpenCode), or GEMINI.md rules.",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
@@ -203,12 +203,17 @@ class CortexMCPServer:
                 raise ValueError(f"Skill {slug!r} has no bundled helper script.")
             script_path = ROOT / self.skills[slug]["dir"] / slug / scripts[0]
             cmd = [sys.executable, str(script_path)]
-            if args.get("target"):
-                safe_t = self._safe_workspace_path(str(args["target"]))
-                cmd.append(str(safe_t))
-            extra = args.get("extra_args") or []
-            if isinstance(extra, list):
-                cmd.extend(str(a) for a in extra)
+            extra = [str(a) for a in (args.get("extra_args") or [])] if isinstance(args.get("extra_args"), list) else []
+            if slug == "memory-manager":
+                if args.get("target"):
+                    safe_t = self._safe_workspace_path(str(args["target"]))
+                    cmd.extend(["--file", str(safe_t)])
+                cmd.extend(extra or ["summary"])
+            else:
+                if args.get("target"):
+                    safe_t = self._safe_workspace_path(str(args["target"]))
+                    cmd.append(str(safe_t))
+                cmd.extend(extra)
             if "--json" not in cmd:
                 cmd.append("--json")
             res = subprocess.run(cmd, cwd=self.workspace_dir, check=False, capture_output=True, text=True, timeout=60)

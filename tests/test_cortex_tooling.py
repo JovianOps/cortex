@@ -12,6 +12,7 @@ from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
+PKG_VERSION = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
 
 
 def load_module(name: str, path: Path):
@@ -42,7 +43,7 @@ class TestPackagingAndManifests(unittest.TestCase):
             text=True,
         )
         self.assertEqual(res.returncode, 0, msg=res.stderr + res.stdout)
-        self.assertIn("36 skills verified at v2.0.0", res.stdout)
+        self.assertIn(f"36 skills verified at v{PKG_VERSION}", res.stdout)
 
     def test_eval_suite_and_audit_pass(self) -> None:
         res = subprocess.run(
@@ -438,12 +439,12 @@ class TestUnifiedCortexCLI(unittest.TestCase):
         cli = SCRIPTS / "cortex.py"
         ver = subprocess.run([sys.executable, str(cli), "--version"], cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(ver.returncode, 0)
-        self.assertEqual(ver.stdout.strip(), "cortex 2.0.0")
+        self.assertEqual(ver.stdout.strip(), f"cortex {PKG_VERSION}")
 
         info = subprocess.run([sys.executable, str(cli), "info", "terraform-generator", "--json"], cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(info.returncode, 0, msg=info.stderr)
         info_data = json.loads(info.stdout)
-        self.assertEqual(info_data["version"], "2.0.0")
+        self.assertEqual(info_data["version"], PKG_VERSION)
         self.assertEqual(info_data["scripts"], ["scripts/lint_terraform.py"])
         self.assertEqual(len(info_data["skill_sha256"]), 64)
 
@@ -560,6 +561,40 @@ class TestUnifiedCortexCLI(unittest.TestCase):
             # 14. complexity_scan.py
             r = subprocess.run([sys.executable, str(ROOT / "premium-skills/refactoring-assistant/scripts/complexity_scan.py"), str(ROOT / "scripts/validate_yaml.py"), "--json"], capture_output=True, text=True)
             self.assertEqual(r.returncode, 0)
+
+    def test_security_and_json_cli_hardening(self) -> None:
+        installer = load_module("cortex_installer_sec", SCRIPTS / "install_skills.py")
+        with self.assertRaises(ValueError):
+            installer.fetch_bytes("http://example.com/unencrypted.json")
+        with self.assertRaises(ValueError):
+            installer.raw_url("bad repo!", "main", "SKILL.md")
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp) / "skills"
+            base.mkdir()
+            with self.assertRaises(RuntimeError):
+                installer._safe_child_path(base, "../escape.txt")
+
+        cli = SCRIPTS / "cortex.py"
+        doc = subprocess.run([sys.executable, str(cli), "doctor", "--json"], cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(doc.returncode, 0, msg=doc.stdout + doc.stderr)
+        self.assertTrue(json.loads(doc.stdout)["ok"])
+
+        aud = subprocess.run([sys.executable, str(cli), "audit", "--json"], cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(aud.returncode, 0, msg=aud.stdout + aud.stderr)
+        self.assertTrue(json.loads(aud.stdout)["ok"])
+
+        with tempfile.TemporaryDirectory() as tmp:
+            out_root = Path(tmp)
+            nw = subprocess.run(
+                [sys.executable, str(cli), "new", "sample-checker", "--with-script", "--out-dir", str(out_root), "--json"],
+                cwd=ROOT, capture_output=True, text=True,
+            )
+            self.assertEqual(nw.returncode, 0, msg=nw.stdout + nw.stderr)
+            self.assertEqual(json.loads(nw.stdout)["slug"], "sample-checker")
+
+        eval_mod = load_module("cortex_eval_sec", SCRIPTS / "eval_skills.py")
+        with self.assertRaises(RuntimeError):
+            eval_mod._validate_provider_url("http://api.example.com/v1/chat")
 
 
 if __name__ == "__main__":

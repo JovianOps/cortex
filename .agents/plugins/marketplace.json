@@ -4,13 +4,13 @@
     "name": "Athalla Jovian Maharsa",
     "url": "https://github.com/JovianOps"
   },
-  "description": "Cortex \u2014 24 deterministic v2.0.0 Agent Skills for Codex CLI, ChatGPT, and Agent Plugins 1.0 hosts.",
+  "description": "Cortex \u2014 24 deterministic v2.0.1 Agent Skills for Codex CLI, ChatGPT, and Agent Plugins 1.0 hosts.",
   "plugins": [
     {
       "name": "cortex",
       "source": "./",
-      "description": "All 36 Cortex v2.0.0 Agent Skills (10 core + 26 extended with 36 bundled zero-dependency Python helper scripts).",
-      "version": "2.0.0",
+      "description": "All 36 Cortex v2.0.1 Agent Skills (10 core + 26 extended with 36 bundled zero-dependency Python helper scripts).",
+      "version": "2.0.1",
       "skills": [
         "./skills/academic-assistant",
         "./skills/anti-hallucination",
@@ -53,8 +53,8 @@
     {
       "name": "cortex-core",
       "source": "./",
-      "description": "10 core Cortex v2.0.0 skills with 10 bundled helper scripts.",
-      "version": "2.0.0",
+      "description": "10 core Cortex v2.0.1 skills with 10 bundled helper scripts.",
+      "version": "2.0.1",
       "skills": [
         "./skills/academic-assistant",
         "./skills/anti-hallucination",
@@ -71,8 +71,8 @@
     {
       "name": "cortex-extended",
       "source": "./",
-      "description": "26 extended Cortex v2.0.0 engineering skills (K8s, TypeScript, Rust, Go, GraphQL, LLM Security, SBOM, PII, FinOps, Chaos, ADRs, Git, plus full DevOps/API/DB/Security suite).",
-      "version": "2.0.0",
+      "description": "26 extended Cortex v2.0.1 engineering skills (K8s, TypeScript, Rust, Go, GraphQL, LLM Security, SBOM, PII, FinOps, Chaos, ADRs, Git, plus full DevOps/API/DB/Security suite).",
+      "version": "2.0.1",
       "skills": [
         "./premium-skills/accessibility-auditor",
         "./premium-skills/api-designer",

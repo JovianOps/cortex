@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0.1",
+  "fail_on": "high",
+  "disabled_scanners": [],
+  "ignore_rules": [],
+  "ignore_paths": [
+    "tests/*",
+    "evals/skill_evals.json",
+    "node_modules/*",
+    ".venv/*",
+    "dist/*",
+    "build/*"
+  ]
+}

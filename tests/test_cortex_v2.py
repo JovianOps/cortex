@@ -8,12 +8,14 @@ import sys
 import tempfile
 import threading
 import unittest
+import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
+PKG_VERSION = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
 
 
 def load_mod(name: str, path: Path):
@@ -36,7 +38,7 @@ class TestCortexMCPServer(unittest.TestCase):
             init_resp = server.handle_request({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}})
             assert init_resp is not None
             self.assertEqual(init_resp["result"]["serverInfo"]["name"], "cortex-mcp")
-            self.assertEqual(init_resp["result"]["serverInfo"]["version"], "2.0.0")
+            self.assertEqual(init_resp["result"]["serverInfo"]["version"], PKG_VERSION)
 
             tools_resp = server.handle_request({"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}})
             assert tools_resp is not None
@@ -177,6 +179,17 @@ class TestCortexStudioWorkbench(unittest.TestCase):
                     scan_res = json.loads(resp.read().decode("utf-8"))
                     self.assertEqual(scan_res["sarif"]["version"], "2.1.0")
                     self.assertEqual(scan_res["report"]["total_findings"], 1)
+
+                # Cross-origin POST MUST be blocked (CSRF guard)
+                evil_req = urllib.request.Request(
+                    f"{base}/api/scan",
+                    data=b"{}",
+                    headers={"Content-Type": "application/json", "Origin": "https://evil.example.com"},
+                    method="POST",
+                )
+                with self.assertRaises(urllib.error.HTTPError) as ctx:
+                    urllib.request.urlopen(evil_req, timeout=5)
+                self.assertEqual(ctx.exception.code, 403)
             finally:
                 server.shutdown()
                 server.server_close()
@@ -267,7 +280,8 @@ class TestUnifiedPolicyAndSarifScanner(unittest.TestCase):
             self.assertEqual(json.loads(pol_r.stdout)["total_findings"], 0)
 
             # Unified secrets sub-scanner runs cleanly with --json via cortex scan
-            (proj / "leak.py").write_text("AWS = 'AKIA1234567890ABCDEF'\n", encoding="utf-8")
+            fake_aws = "AKIA" + "1234567890ABCDEF"
+            (proj / "leak.py").write_text(f"AWS = '{fake_aws}'\n", encoding="utf-8")
             sec_r = subprocess.run(
                 [sys.executable, str(SCRIPTS / "cortex.py"), "scan", str(proj), "--only", "secrets", "--format", "json", "--fail-on", "none"],
                 cwd=ROOT, capture_output=True, text=True,
@@ -343,7 +357,8 @@ class TestV2TwelveNewBundledScripts(unittest.TestCase):
 
             # 8. scan_pii.py
             pii_bad = t / "logs.py"
-            pii_bad.write_text('logger.info(f"user ssn={ssn}")\nraw = "123-45-6789"\n', encoding="utf-8")
+            fake_ssn = "123" + "-45-" + "6789"
+            pii_bad.write_text(f'logger.info(f"user ssn={{ssn}}")\nraw = "{fake_ssn}"\n', encoding="utf-8")
             r = subprocess.run([sys.executable, str(ROOT / "premium-skills/privacy-compliance-auditor/scripts/scan_pii.py"), str(pii_bad), "--json"], capture_output=True, text=True)
             self.assertEqual(r.returncode, 1)
             self.assertGreaterEqual(json.loads(r.stdout)["count"], 2)
@@ -376,6 +391,80 @@ class TestV2TwelveNewBundledScripts(unittest.TestCase):
             r = subprocess.run([sys.executable, str(ROOT / "premium-skills/git-history-surgeon/scripts/audit_git_hygiene.py"), str(git_dir), "--json"], capture_output=True, text=True)
             self.assertEqual(r.returncode, 1)
             self.assertGreaterEqual(json.loads(r.stdout)["count"], 1)
+
+    def test_v201_parity_opencode_json_and_ignore_dirs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = Path(tmp)
+            # 1. cortex compile --target opencode generates AGENTS.md cleanly
+            comp = subprocess.run(
+                [sys.executable, str(SCRIPTS / "cortex.py"), "compile", "--skill", "security-auditor", "--target", "opencode", "--project-dir", str(proj), "--json"],
+                cwd=ROOT, capture_output=True, text=True,
+            )
+            self.assertEqual(comp.returncode, 0, msg=comp.stdout + comp.stderr)
+            self.assertTrue((proj / "AGENTS.md").is_file())
+
+            # 2. cortex scan --init-policy + --json alias
+            init_pol = subprocess.run(
+                [sys.executable, str(SCRIPTS / "cortex.py"), "scan", str(proj), "--init-policy"],
+                cwd=ROOT, capture_output=True, text=True,
+            )
+            self.assertEqual(init_pol.returncode, 0, msg=init_pol.stdout + init_pol.stderr)
+            self.assertTrue((proj / ".cortex-policy.json").is_file())
+
+            sc_json = subprocess.run(
+                [sys.executable, str(SCRIPTS / "cortex.py"), "scan", str(proj), "--only", "secrets", "--json"],
+                cwd=ROOT, capture_output=True, text=True,
+            )
+            self.assertEqual(sc_json.returncode, 0, msg=sc_json.stdout + sc_json.stderr)
+            self.assertTrue(json.loads(sc_json.stdout)["passed"])
+
+            # 3. lint_terraform skips installed .github/skills & .opencode directories
+            (proj / ".github" / "skills").mkdir(parents=True)
+            (proj / ".github" / "skills" / "ignored.tf").write_text('resource "aws_db_instance" "x" {\n  storage_encrypted = false\n}\n', encoding="utf-8")
+            tf_r = subprocess.run(
+                [sys.executable, str(ROOT / "premium-skills/terraform-generator/scripts/lint_terraform.py"), str(proj), "--json"],
+                capture_output=True, text=True,
+            )
+            self.assertEqual(tf_r.returncode, 0, msg=tf_r.stdout + tf_r.stderr)
+            self.assertEqual(json.loads(tf_r.stdout)["count"], 0)
+
+            # 4. grade_calc --json & memory_store --json & bmesh_check --json
+            mem_file = proj / "mem.json"
+            mem_missing = subprocess.run(
+                [sys.executable, str(ROOT / "skills/memory-manager/scripts/memory_store.py"), "--file", str(mem_file), "summary", "--json"],
+                capture_output=True, text=True,
+            )
+            self.assertEqual(mem_missing.returncode, 2)
+            self.assertFalse(json.loads(mem_missing.stdout)["ok"])
+
+            subprocess.run(
+                [sys.executable, str(ROOT / "skills/memory-manager/scripts/memory_store.py"), "--file", str(mem_file), "init", "--project", "demo", "--json"],
+                capture_output=True, text=True, check=True,
+            )
+            mem_r = subprocess.run(
+                [sys.executable, str(ROOT / "skills/memory-manager/scripts/memory_store.py"), "--file", str(mem_file), "summary", "--json"],
+                capture_output=True, text=True,
+            )
+            self.assertEqual(mem_r.returncode, 0, msg=mem_r.stdout + mem_r.stderr)
+            self.assertEqual(json.loads(mem_r.stdout)["project"], "demo")
+
+            grades_csv = proj / "grades.csv"
+            grades_csv.write_text("student_id,name,labs,final\nS001,Alice,95,90\n", encoding="utf-8")
+            syl_json = proj / "syllabus.json"
+            syl_json.write_text(json.dumps({"weights": {"labs": 0.4, "final": 0.6}}), encoding="utf-8")
+            gr_r = subprocess.run(
+                [sys.executable, str(ROOT / "skills/college-report-card/scripts/grade_calc.py"), str(grades_csv), str(syl_json), "--json"],
+                capture_output=True, text=True,
+            )
+            self.assertEqual(gr_r.returncode, 0, msg=gr_r.stdout + gr_r.stderr)
+            self.assertEqual(json.loads(gr_r.stdout)["graded_count"], 1)
+
+            bmesh_r = subprocess.run(
+                [sys.executable, str(ROOT / "skills/blender-3d-modeling/scripts/bmesh_check.py"), "--json"],
+                capture_output=True, text=True,
+            )
+            self.assertEqual(bmesh_r.returncode, 2)
+            self.assertIn("error", json.loads(bmesh_r.stdout))
 
 
 if __name__ == "__main__":

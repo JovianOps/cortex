@@ -10,6 +10,15 @@ from pathlib import Path
 
 REQUIRED_TAGS = ("environment", "owner", "cost_center")
 OVERSIZED_RE = re.compile(r"\b(?:m5|m6i|c5|c6i|r5|r6i|p4d|g5)\.(?:8xlarge|12xlarge|16xlarge|24xlarge|32xlarge|metal)\b")
+IGNORE_DIRS = {
+    ".git", "node_modules", ".venv", "__pycache__", ".terraform", "dist", "build",
+    ".opencode", ".claude", ".cursor", ".windsurf", ".cline", ".agents",
+}
+
+
+def should_skip(fp: Path, root: Path) -> bool:
+    rel = fp.relative_to(root).parts if fp != root else fp.parts
+    return any(p in IGNORE_DIRS for p in rel) or (len(rel) >= 2 and rel[0] == ".github" and rel[1] == "skills")
 
 
 def audit_tf_finops(path: Path) -> list[dict]:
@@ -78,7 +87,8 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     files = [args.target] if args.target.is_file() else sorted(
-        p for p in args.target.rglob("*") if p.is_file() and p.suffix.lower() in {".tf", ".yaml", ".yml"}
+        p for p in args.target.rglob("*")
+        if p.is_file() and p.suffix.lower() in {".tf", ".yaml", ".yml"} and not should_skip(p, args.target)
     )
     findings: list[dict] = []
     for fp in files:

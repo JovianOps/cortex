@@ -1,7 +1,7 @@
 ---
 name: rust-systems-engineer
 description: Write safe, idiomatic Rust with verified unsafe invariants.
-version: 2.0.0
+version: 2.0.1
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

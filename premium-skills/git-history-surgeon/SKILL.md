@@ -1,7 +1,7 @@
 ---
 name: git-history-surgeon
 description: Execute safe Git rebases, bisects, and repo hygiene audits.
-version: 2.0.0
+version: 2.0.1
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

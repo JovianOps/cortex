@@ -17,6 +17,7 @@ JSON_FILES = (
     "packs.json",
     "plugin.json",
     "gemini-extension.json",
+    ".cortex-policy.json",
     ".claude-plugin/plugin.json",
     ".claude-plugin/marketplace.json",
     ".github/plugin.json",
@@ -83,6 +84,8 @@ def bump_all(new_version: str) -> None:
     html = html_path.read_text(encoding="utf-8")
     for pattern in (
         f"v{old_version}",
+        f"@{old_version}",
+        f"version: '{old_version}'",
         f'<span class="kv-v">{old_version}</span>',
     ):
         html = html.replace(pattern, pattern.replace(old_version, new_version))

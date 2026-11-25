@@ -1,7 +1,7 @@
 ---
 name: graphql-architect
 description: Design schema-first GraphQL APIs with Relay pagination.
-version: 2.0.0
+version: 2.0.1
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

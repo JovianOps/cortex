@@ -1,7 +1,7 @@
 ---
 name: db-optimizer
 description: Optimize SQL queries and indexes using EXPLAIN plans.
-version: 2.0.0
+version: 2.0.1
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -56,7 +56,7 @@ Systematically inspect the query and plan for these high-impact bottlenecks:
 
 1. **Row-Estimate Skew**: Compare `estimated rows` vs `actual rows` (10x+ mismatch indicates stale stats → `ANALYZE table`, correlated columns → `CREATE STATISTICS`, or skewed distribution).
 2. **Non-Sargable Predicates** (prevent index usage):
-   - Functions on indexed columns: `WHERE LOWER(email) = 'a@b.com'` → expression index or `citext`; `WHERE DATE(created_at) = '2026-01-01'` → half-open range `created_at >= '2026-01-01' AND created_at < '2026-01-02'`.
+   - Functions on indexed columns: `WHERE LOWER(email) = 'user@example.com'` → expression index or `citext`; `WHERE DATE(created_at) = '2026-01-01'` → half-open range `created_at >= '2026-01-01' AND created_at < '2026-01-02'`.
    - Leading wildcard `LIKE '%foo'` → trigram (`pg_trgm` GIN) or full-text (`tsvector`) index.
    - Implicit type mismatch (`VARCHAR` column compared to integer literal).
 3. **ESR Composite Index Ordering Rule**:

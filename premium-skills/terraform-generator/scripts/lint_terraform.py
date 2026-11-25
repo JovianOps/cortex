@@ -9,6 +9,15 @@ import sys
 from pathlib import Path
 
 SENSITIVE_PORTS = {"22", "3389", "5432", "3306", "6379", "27017"}
+IGNORE_DIRS = {
+    ".git", "node_modules", ".venv", "__pycache__", ".terraform", "dist", "build",
+    ".opencode", ".claude", ".cursor", ".windsurf", ".cline", ".agents",
+}
+
+
+def should_skip(fp: Path, root: Path) -> bool:
+    rel = fp.relative_to(root).parts if fp != root else fp.parts
+    return any(p in IGNORE_DIRS for p in rel) or (len(rel) >= 2 and rel[0] == ".github" and rel[1] == "skills")
 
 
 def lint_tf_text(text: str, filename: str) -> list[dict]:
@@ -80,7 +89,7 @@ def lint_tf_text(text: str, filename: str) -> list[dict]:
 
 
 def scan_target(target: Path) -> tuple[int, list[dict]]:
-    files = [target] if target.is_file() else sorted(target.rglob("*.tf"))
+    files = [target] if target.is_file() else sorted(p for p in target.rglob("*.tf") if not should_skip(p, target))
     findings: list[dict] = []
     for fp in files:
         findings.extend(lint_tf_text(fp.read_text(encoding="utf-8", errors="ignore"), fp.as_posix()))
