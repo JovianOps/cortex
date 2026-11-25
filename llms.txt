@@ -1,0 +1,49 @@
+# Cortex
+
+> 36 deterministic, versioned Agent Skills (`SKILL.md`) with a bundled zero-dependency Python verifier for every skill, a native MCP 2025-03-26 stdio server, a universal rule compiler, a 14-scanner policy/SARIF engine, and SHA-256 integrity verification. MIT licensed. Works with Claude Code, OpenAI Codex, Gemini CLI, Cursor, VS Code / GitHub Copilot, Windsurf, OpenCode, OpenClaw, Goose, Aider, Cline and Hermes Agent.
+
+Every playbook is audited to 100/100 by a nine-check structural gate, ships a runnable verifier script, and is covered by a paired 100-point without-skill vs. with-skill evaluation rubric.
+
+## Start here
+
+- [README](https://github.com/JovianOps/cortex#readme): install paths, supported agents, core and extended skill tables
+- [Interactive catalog](https://jovianops.github.io/cortex/): filter all 36 skills and 10 role packs, then build a Bash or PowerShell install command
+- [Quick start](https://github.com/JovianOps/cortex#quick-start): `npx @jovianops/cortex detect`, `install`, `compile`, `scan`, `studio`, `mcp`
+- [Contributing](https://github.com/JovianOps/cortex/blob/main/CONTRIBUTING.md): skill authoring and the required verification gate
+
+## Documentation
+
+- [Architecture](https://github.com/JovianOps/cortex/blob/main/docs/architecture.md)
+- [MCP server guide](https://github.com/JovianOps/cortex/blob/main/docs/mcp-guide.md)
+- [Studio web workbench](https://github.com/JovianOps/cortex/blob/main/docs/studio-guide.md)
+- [Rule compiler](https://github.com/JovianOps/cortex/blob/main/docs/compiler-guide.md)
+- [Policy and SARIF scanning](https://github.com/JovianOps/cortex/blob/main/docs/policy-and-sarif.md)
+- [Skill authoring](https://github.com/JovianOps/cortex/blob/main/docs/skill-authoring.md)
+- [Security policy](https://github.com/JovianOps/cortex/blob/main/SECURITY.md)
+
+## Skills
+
+Ten core skills live under `skills/`, twenty-six extended engineering skills under `premium-skills/`. Each directory contains `SKILL.md` plus a `scripts/` verifier.
+
+- [Full skill index](https://github.com/JovianOps/cortex/blob/main/AGENTS.md): every slug, one-line purpose and bundled script
+- Core: academic-assistant, anti-hallucination, blender-3d-modeling, code-review-assistant, college-report-card, documentation-generator, memory-manager, python-coding-assistant, testing-automation, web-scraper
+- Extended: accessibility-auditor, api-designer, architecture-decision-records, chaos-resilience-engineer, code-migration, db-optimizer, devops-pipeline, docker-generator, finops-cost-optimizer, git-history-surgeon, go-backend-engineer, graphql-architect, incident-response, kubernetes-architect, llm-security-auditor, observability-setup, performance-profiler, privacy-compliance-auditor, refactoring-assistant, release-engineering, rust-systems-engineer, security-auditor, supply-chain-sbom, terraform-generator, typescript-architect, unit-test-generator
+
+## Machine-readable
+
+- [checksums.json](https://github.com/JovianOps/cortex/blob/main/checksums.json): SHA-256 for all 72 skill files and 36 ZIP archives
+- [packs.json](https://github.com/JovianOps/cortex/blob/main/packs.json): the 10 curated role-based packs
+- [schemas/](https://github.com/JovianOps/cortex/tree/main/schemas): JSON Schemas for checksums, cortex-lock, packs and policy
+- [skill_evals.json](https://github.com/JovianOps/cortex/blob/main/evals/skill_evals.json): 36 paired A/B rubrics
+- [CHANGELOG.md](https://github.com/JovianOps/cortex/blob/main/CHANGELOG.md): release history
+
+## Commands
+
+```bash
+npx @jovianops/cortex doctor
+npx @jovianops/cortex install --agent claude-code --pack fullstack --scope project
+npx @jovianops/cortex compile --target agents --pack cloud-native
+npx @jovianops/cortex scan . --fail-on high
+npx @jovianops/cortex mcp
+npx @jovianops/cortex studio
+```

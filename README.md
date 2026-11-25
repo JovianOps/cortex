@@ -67,6 +67,16 @@
 
 Built on the open **`SKILL.md`** and **MCP** standards, Cortex works natively across **Visual Studio Code**, **GitHub Copilot**, **Claude** (Claude Code & Claude apps), **OpenAI** (Codex CLI & ChatGPT), **Gemini CLI**, **Cursor**, **Windsurf**, **OpenCode**, **OpenClaw**, **Goose**, **Aider**, **Cline**, and **Hermes Agent**.
 
+## Why Cortex
+
+| The usual problem | What Cortex does instead |
+| :--- | :--- |
+| Prompt advice you cannot verify | Every skill ships a deterministic Python verifier (**36/36**); a nine-check structural audit scores all 36 playbooks **100/100** in CI |
+| Skills written for one vendor | One `SKILL.md` source compiles to **7 native formats** — Cursor, VS Code, Windsurf, Cline, `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` |
+| Silent supply-chain drift | `checksums.json` pins **72 files and 36 ZIPs** with SHA-256; `cortex verify` fails on any mismatch |
+| Security review done by hand | `cortex scan` runs **14 bundled scanners** and emits SARIF 2.1.0 or JUnit XML for CI gates |
+| Agent context you cannot inspect | `cortex studio` serves a local Light/Dark workbench and a 10-endpoint REST API over the same skill files |
+
 ## What's New in `v2.0.0`
 
 - **Native Model Context Protocol Server (`cortex mcp`)**: Zero-dependency MCP 2025-03-26 JSON-RPC 2.0 stdio server exposing **8 tools**, **38 resources** (`cortex://skills/<slug>`, `cortex://packs`, `cortex://checksums`), and **36 invocable prompts** (`cortex/<slug>`), plus `--print-config <vscode|claude-code|cursor|codex|windsurf|opencode>`. See [docs/mcp-guide.md](docs/mcp-guide.md).
