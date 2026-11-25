@@ -81,3 +81,6 @@ build/
 
 # Private local planning & internal notes (never commit or push)
 .private/
+
+# Local release bundle
+/cortex-20-skills.zip

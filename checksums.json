@@ -107,9 +107,9 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/accessibility-auditor.zip",
-      "zip_sha256": "fe07b1d68cd32e2261e0e9dcc76e14a740ccfbd5255a116b829dee3de6309bae",
+      "zip_sha256": "f4803878fec1f9ab10fddf655ceb943fe2c282722c1780ad8167667a795cdfa3",
       "files": {
-        "SKILL.md": "930943a7e7854b1ead8f1a5cce0303c6536d35cac7873a326e132af32d8aff81",
+        "SKILL.md": "2be7127c19dbf2bf4882eaa11669fe561d35cf92c185728bab2f45a367f8f0db",
         "scripts/a11y_scan.py": "98961b648fbcd4775b0af6df99d0816b1779695cf3fcf7ba3cebd73ad6827a22"
       }
     },

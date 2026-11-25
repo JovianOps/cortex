@@ -57,6 +57,99 @@ class TestPackagingAndManifests(unittest.TestCase):
         self.assertIn("36 tasks covering all 36 skills", res.stdout)
 
 
+class TestSkillAuditGates(unittest.TestCase):
+    """The structural audit must reject stubs that cannot actually be executed.
+
+    Assertions compare against a fully compliant control skill instead of a hard-coded
+    score, so rebalancing audit weights does not produce false failures as long as the
+    check still fires.
+    """
+
+    def _write_stub(
+        self,
+        root: Path,
+        *,
+        name: str,
+        reference_verifier: bool,
+        non_trigger_bullet: bool,
+    ) -> Path:
+        """Create a skill that satisfies every format check except the one under test."""
+        skill_dir = root / "skills" / name
+        (skill_dir / "scripts").mkdir(parents=True)
+        (skill_dir / "scripts" / "check.py").write_text("print('ok')\n", encoding="utf-8")
+        command = f"python skills/{name}/scripts/check.py ." if reference_verifier else "python --version"
+        non_trigger = "- Unrelated tasks outside this domain\n" if non_trigger_bullet else ""
+        (skill_dir / "SKILL.md").write_text(
+            "---\n"
+            f"name: {name}\n"
+            "description: Stub skill used by the audit tests.\n"
+            "version: 2.0.0\n"
+            "author: test\n"
+            "license: MIT\n"
+            "platforms: [linux]\n"
+            "metadata:\n"
+            "  hermes:\n"
+            "    tags: [stub, testing]\n"
+            "    related_skills: [anti-hallucination]\n"
+            "---\n\n"
+            "# Stub Skill\n\n"
+            "## When to Use\n\n- Exercising the quality gate\n\n"
+            "### When Not to Use\n\n"
+            f"{non_trigger}\n"
+            "## How to Run\n\n"
+            f"```bash\n{command}\n```\n\n"
+            "## Mandatory Protocol\n\n"
+            "### Step 1 — Inspect\n\n### Step 2 — Check\n\n### Step 3 — Report\n\n"
+            "```bash\necho done\n```\n\n"
+            "## Output Contract\n\n- Report the result\n",
+            encoding="utf-8",
+        )
+        return skill_dir / "SKILL.md"
+
+    def _audit_against_control(
+        self, *, reference_verifier: bool, non_trigger_bullet: bool
+    ) -> tuple[int, int, list[str]]:
+        eval_mod = load_module("cortex_eval_audit_gate", SCRIPTS / "eval_skills.py")
+        names = {"ok-skill", "stub-skill", "anti-hallucination"}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            control_md = self._write_stub(
+                root, name="ok-skill", reference_verifier=True, non_trigger_bullet=True
+            )
+            stub_md = self._write_stub(
+                root,
+                name="stub-skill",
+                reference_verifier=reference_verifier,
+                non_trigger_bullet=non_trigger_bullet,
+            )
+            control_score, control_issues = eval_mod.audit_skill("ok-skill", control_md, names)
+            score, issues = eval_mod.audit_skill("stub-skill", stub_md, names)
+        self.assertEqual(control_issues, [], msg=f"control skill must be clean: {control_issues}")
+        return control_score, score, issues
+
+    def test_audit_rejects_stub_without_verifier_reference(self) -> None:
+        control, score, issues = self._audit_against_control(
+            reference_verifier=False, non_trigger_bullet=True
+        )
+        self.assertEqual(control, 100, msg="a fully compliant skill must still score 100")
+        self.assertLess(score, control, msg=f"unreferenced verifier was not penalised; issues: {issues}")
+        self.assertTrue(
+            any("bundled script not referenced" in issue for issue in issues),
+            msg=f"missing verifier-reference issue: {issues}",
+        )
+
+    def test_audit_rejects_hollow_when_not_to_use_section(self) -> None:
+        control, score, issues = self._audit_against_control(
+            reference_verifier=True, non_trigger_bullet=False
+        )
+        self.assertEqual(control, 100, msg="a fully compliant skill must still score 100")
+        self.assertLess(score, control, msg=f"hollow boundary was not penalised; issues: {issues}")
+        self.assertTrue(
+            any("When Not to Use" in issue for issue in issues),
+            msg=f"missing non-trigger issue: {issues}",
+        )
+
+
 class TestMultiAgentInstaller(unittest.TestCase):
     def setUp(self) -> None:
         self.installer = load_module("cortex_installer_test", SCRIPTS / "install_skills.py")

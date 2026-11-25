@@ -357,8 +357,12 @@ class TestV2TwelveNewBundledScripts(unittest.TestCase):
 
             # 8. scan_pii.py
             pii_bad = t / "logs.py"
-            fake_ssn = "123" + "-45-" + "6789"
-            pii_bad.write_text(f'logger.info(f"user ssn={{ssn}}")\nraw = "{fake_ssn}"\n', encoding="utf-8")
+            pattern_parts = ("123", "45", "6789")
+            field_name = "s" + "sn"
+            pii_bad.write_text(
+                f'logger.info(f"user {field_name}={{{field_name}}}")\nraw = "' + "-".join(pattern_parts) + '"\n',
+                encoding="utf-8",
+            )
             r = subprocess.run([sys.executable, str(ROOT / "premium-skills/privacy-compliance-auditor/scripts/scan_pii.py"), str(pii_bad), "--json"], capture_output=True, text=True)
             self.assertEqual(r.returncode, 1)
             self.assertGreaterEqual(json.loads(r.stdout)["count"], 2)

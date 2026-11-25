@@ -87,17 +87,17 @@ def audit_skill(name: str, path: Path, all_skill_names: set[str]) -> tuple[int, 
     else:
         issues.append("missing '## When to Use' or 'When Not to Use' boundary")
 
-    # 4. Step-by-step Mandatory Protocol (20 pts)
+    # 4. Step-by-step Mandatory Protocol (15 pts)
     steps = re.findall(r"^###\s+(?:Step|Layer)\s+\d+", body, flags=re.MULTILINE)
     if len(steps) >= 3:
-        score += 20
+        score += 15
     else:
         issues.append(f"expected >=3 structured '### Step N' / '### Layer N' workflow stages (found {len(steps)})")
 
-    # 5. Concrete verification/code snippets (>=2 fenced blocks) (15 pts)
+    # 5. Concrete verification/code snippets (>=2 fenced blocks) (10 pts)
     fenced_blocks = re.findall(r"```[a-zA-Z0-9_-]+", body)
     if len(fenced_blocks) >= 2:
-        score += 15
+        score += 10
     else:
         issues.append("expected >=2 concrete fenced command/code/contract blocks")
 
@@ -113,6 +113,28 @@ def audit_skill(name: str, path: Path, all_skill_names: set[str]) -> tuple[int, 
         score += 10
     else:
         issues.append("duplicate H2 headings or missing '## How to Run'")
+
+    # 8. Bundled verifier is actually referenced by name (5 pts)
+    # A skill that ships scripts/ must tell the agent what to run; otherwise the
+    # helper is dead weight and the playbook silently falls back to guessing.
+    script_dir = path.parent / "scripts"
+    bundled = sorted(p.name for p in script_dir.glob("*.py")) if script_dir.is_dir() else []
+    unreferenced = [name for name in bundled if name not in body]
+    if not bundled:
+        score += 5
+    elif not unreferenced:
+        score += 5
+    else:
+        issues.append(f"bundled script not referenced in playbook: {unreferenced}")
+
+    # 9. Concrete non-trigger boundary, not just a heading (5 pts)
+    non_trigger = re.search(
+        r"###\s+When Not to Use\s*\n(.*?)(?=\n##\s|\n###\s|\Z)", body, flags=re.DOTALL
+    )
+    if non_trigger and re.search(r"^\s*-\s+\S", non_trigger.group(1), flags=re.MULTILINE):
+        score += 5
+    else:
+        issues.append("'When Not to Use' needs at least one concrete bullet (route to a sibling skill)")
 
     return score, issues
 
