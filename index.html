@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cortex — deterministic agent skills (v2.0.0)</title>
-  <meta name="description" content="36 versioned SKILL.md playbooks, 36 zero-dependency Python helper scripts, native MCP server, Local Studio UI, Universal Rule Compiler, 10 role packs, and SHA-256 verification." />
+  <title>cortex — deterministic agent skills &amp; runtime (v2.0.0)</title>
+  <meta name="description" content="36 versioned SKILL.md playbooks, 36 zero-dependency Python helper scripts, native MCP 2025-03-26 server, Local Studio UI, Universal Rule Compiler, SARIF 2.1.0 scanner, 10 role packs, and SHA-256 verification." />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230e0e0d'/%3E%3Crect x='22' y='6' width='4' height='4' fill='%23d92b1c'/%3E%3Cpath d='M7 11l6 5-6 5M15 21h10' stroke='%23f6f5f0' stroke-width='2.5' stroke-linecap='square' fill='none'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -34,14 +34,17 @@
       --border: #d8d5cb;
       --border-strong: #9e9b90;
       --rule: #0e0e0d;
+      --grid-dot: rgba(14, 14, 13, 0.11);
       --accent: #d92b1c;
       --accent-soft: rgba(217, 43, 28, 0.08);
       --ok: #126b36;
       --ok-soft: rgba(18, 107, 54, 0.09);
+      --warn: #a15206;
+      --warn-soft: rgba(161, 82, 6, 0.10);
       --sans: 'IBM Plex Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       --radius: 0px;
-      --max: 1160px;
+      --max: 1180px;
     }
 
     [data-theme="dark"] {
@@ -54,14 +57,17 @@
       --code-bar: #181816;
       --ink: #f3f2ed;
       --muted: #a19f96;
-      --faint: #6f6d65;
+      --faint: #737168;
       --border: #2a2a26;
       --border-strong: #46463f;
       --rule: #f3f2ed;
+      --grid-dot: rgba(243, 242, 237, 0.09);
       --accent: #ff4d3d;
       --accent-soft: rgba(255, 77, 61, 0.13);
       --ok: #4ade80;
       --ok-soft: rgba(74, 222, 128, 0.10);
+      --warn: #fbbf24;
+      --warn-soft: rgba(251, 191, 36, 0.11);
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -84,8 +90,13 @@
     }
 
     a { color: inherit; text-decoration: none; }
-    button, input, select { font: inherit; color: inherit; }
+    button, input, select, textarea { font: inherit; color: inherit; }
     code, pre, .mono { font-family: var(--mono); }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
 
     .wrap {
       max-width: var(--max);
@@ -98,9 +109,20 @@
       position: sticky;
       top: 0;
       z-index: 30;
-      background: color-mix(in srgb, var(--bg) 95%, transparent);
-      backdrop-filter: blur(6px);
+      background: color-mix(in srgb, var(--bg) 93%, transparent);
+      backdrop-filter: blur(8px);
       border-bottom: 2px solid var(--rule);
+    }
+
+    .scroll-progress {
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      height: 2px;
+      width: 0%;
+      background: var(--accent);
+      pointer-events: none;
+      transition: width 0.08s linear;
     }
 
     .bar {
@@ -108,7 +130,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 14px;
     }
 
     .brand {
@@ -120,6 +142,7 @@
       font-size: 14px;
       letter-spacing: 0.02em;
       text-transform: uppercase;
+      white-space: nowrap;
     }
 
     .brand-mark {
@@ -136,25 +159,86 @@
       text-transform: none;
     }
 
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--ok);
+      border: 1px solid color-mix(in srgb, var(--ok) 35%, transparent);
+      background: var(--ok-soft);
+      padding: 2px 7px;
+      text-transform: none;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--ok);
+      animation: pulse-dot 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.82); }
+    }
+
     nav {
       display: flex;
       align-items: center;
-      gap: 22px;
+      gap: 18px;
       font-family: var(--mono);
-      font-size: 12px;
+      font-size: 11.5px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       color: var(--muted);
     }
 
-    nav a:hover { color: var(--ink); }
+    nav a {
+      padding: 4px 0;
+      border-bottom: 2px solid transparent;
+      transition: color 0.12s, border-color 0.12s;
+    }
+
+    nav a:hover, nav a.active {
+      color: var(--ink);
+      border-bottom-color: var(--accent);
+    }
 
     .bar-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       font-family: var(--mono);
       font-size: 12px;
+    }
+
+    .cmdk-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      padding: 4px 9px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .cmdk-trigger:hover {
+      border-color: var(--rule);
+      color: var(--ink);
+    }
+
+    .kbd-pill {
+      font-size: 10.5px;
+      padding: 0 5px;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--ink);
     }
 
     .theme-switch {
@@ -181,9 +265,7 @@
       border-left: 1.5px solid var(--rule);
     }
 
-    .theme-switch button:hover {
-      color: var(--ink);
-    }
+    .theme-switch button:hover { color: var(--ink); }
 
     .theme-switch button[aria-pressed="true"] {
       background: var(--ink);
@@ -219,14 +301,34 @@
 
     /* Hero */
     .hero {
-      padding: 52px 0 44px;
+      position: relative;
+      padding: 52px 0 46px;
       border-bottom: 2px solid var(--rule);
+      background-image: radial-gradient(var(--grid-dot) 1.15px, transparent 1.15px);
+      background-size: 22px 22px;
     }
+
+    .hero-frame {
+      position: relative;
+    }
+
+    .reg-mark {
+      position: absolute;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--faint);
+      user-select: none;
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    .reg-tl { top: -28px; left: 0; }
+    .reg-tr { top: -28px; right: 0; }
 
     .hero-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
-      gap: 44px;
+      grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr);
+      gap: 40px;
       align-items: start;
     }
 
@@ -236,7 +338,7 @@
       letter-spacing: 0.04em;
       text-transform: uppercase;
       color: var(--muted);
-      margin: 0 0 16px;
+      margin: 0 0 14px;
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
@@ -253,18 +355,30 @@
 
     h1 {
       margin: 0;
-      font-size: clamp(34px, 4.6vw, 52px);
+      font-size: clamp(34px, 4.4vw, 52px);
       line-height: 1.03;
       letter-spacing: -0.04em;
       font-weight: 700;
     }
 
+    .h1-accent {
+      color: var(--accent);
+    }
+
     .lead {
-      margin: 20px 0 28px;
+      margin: 18px 0 26px;
       color: var(--muted);
       font-size: 15.5px;
-      line-height: 1.6;
-      max-width: 54ch;
+      line-height: 1.62;
+      max-width: 56ch;
+    }
+
+    .lead code {
+      font-size: 13px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1px 5px;
+      color: var(--ink);
     }
 
     /* Quick install widget */
@@ -272,6 +386,7 @@
       border: 1.5px solid var(--rule);
       background: var(--surface);
       overflow: hidden;
+      box-shadow: 5px 5px 0 0 color-mix(in srgb, var(--rule) 12%, transparent);
     }
 
     .quick-top {
@@ -292,7 +407,7 @@
       flex-wrap: wrap;
     }
 
-    select.ctrl {
+    select.ctrl, input.ctrl, textarea.ctrl {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -300,11 +415,13 @@
       font-family: var(--mono);
       font-size: 12px;
       color: var(--ink);
-      cursor: pointer;
     }
 
-    select.ctrl:focus, input.ctrl:focus {
-      outline: 1px solid var(--accent);
+    select.ctrl { cursor: pointer; }
+
+    select.ctrl:focus, input.ctrl:focus, textarea.ctrl:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 0;
       border-color: var(--accent);
     }
 
@@ -388,6 +505,7 @@
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
+      background: var(--surface);
     }
 
     /* Terminal Specimen Plate */
@@ -396,13 +514,21 @@
       background: var(--code-bg);
       color: var(--code-fg);
       overflow: hidden;
+      box-shadow: 5px 5px 0 0 color-mix(in srgb, var(--rule) 12%, transparent);
+    }
+
+    .term-head {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: var(--code-bar);
     }
 
     .term-tabs {
       display: flex;
-      border-bottom: 1px solid var(--border);
-      background: var(--code-bar);
       overflow-x: auto;
+      flex: 1;
     }
 
     .term-tabs button {
@@ -410,7 +536,7 @@
       border-right: 1px solid var(--border);
       background: transparent;
       color: var(--muted);
-      padding: 9px 13px;
+      padding: 9px 12px;
       font-family: var(--mono);
       font-size: 11.5px;
       cursor: pointer;
@@ -434,20 +560,39 @@
       background: var(--accent);
     }
 
+    .term-replay {
+      border: 0;
+      border-left: 1px solid var(--border);
+      background: transparent;
+      color: var(--accent);
+      padding: 0 12px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .term-replay:hover {
+      background: var(--accent-soft);
+    }
+
     .term-body {
       padding: 16px 18px;
       margin: 0;
       font-family: var(--mono);
       font-size: 12px;
-      line-height: 1.65;
-      min-height: 274px;
-      overflow-x: auto;
+      line-height: 1.62;
+      min-height: 294px;
+      max-height: 330px;
+      overflow: auto;
       white-space: pre;
     }
 
     .t-dim { color: var(--code-muted); }
     .t-ok { color: var(--ok); font-weight: 600; }
     .t-accent { color: var(--accent); font-weight: 500; }
+    .t-warn { color: var(--warn); font-weight: 600; }
     .t-hi { color: var(--ink); font-weight: 600; }
 
     /* Spec strip */
@@ -519,7 +664,338 @@
       margin: 4px 0 0;
       font-size: 14px;
       color: var(--muted);
-      max-width: 64ch;
+      max-width: 68ch;
+    }
+
+    .sec-desc code {
+      font-size: 12.5px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1px 4px;
+    }
+
+    /* Runtime Playground */
+    .runtime-shell {
+      border: 1.5px solid var(--rule);
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .runtime-nav {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border-bottom: 1.5px solid var(--rule);
+      background: var(--surface-alt);
+    }
+
+    .runtime-nav button {
+      border: 0;
+      border-right: 1px solid var(--border);
+      background: transparent;
+      padding: 12px 14px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      position: relative;
+    }
+
+    .runtime-nav button:last-child { border-right: 0; }
+    .runtime-nav button:hover { background: color-mix(in srgb, var(--surface) 60%, transparent); }
+
+    .runtime-nav button[aria-selected="true"] {
+      background: var(--surface);
+    }
+
+    .runtime-nav button[aria-selected="true"]::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 2.5px;
+      background: var(--accent);
+    }
+
+    .rt-cmd {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .rt-sub {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .runtime-panel {
+      display: none;
+      padding: 20px;
+    }
+
+    .runtime-panel.active { display: block; }
+
+    .rt-split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .rt-pane {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .rt-pane-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-alt);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      flex-wrap: wrap;
+    }
+
+    .code-lines {
+      padding: 12px 0;
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.65;
+      overflow: auto;
+      max-height: 310px;
+      flex: 1;
+      background: var(--code-bg);
+    }
+
+    .code-line {
+      display: flex;
+      gap: 12px;
+      padding: 0 12px;
+      white-space: pre;
+    }
+
+    .code-line.flagged {
+      background: var(--accent-soft);
+      border-left: 3px solid var(--accent);
+      padding-left: 9px;
+    }
+
+    .code-line.clean-hl {
+      background: var(--ok-soft);
+      border-left: 3px solid var(--ok);
+      padding-left: 9px;
+    }
+
+    .ln {
+      color: var(--faint);
+      user-select: none;
+      min-width: 20px;
+      text-align: right;
+    }
+
+    .scan-summary-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      flex-wrap: wrap;
+    }
+
+    .sev-pill {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border: 1px solid;
+      text-transform: uppercase;
+    }
+
+    .sev-pill.critical, .sev-pill.high {
+      color: var(--accent);
+      border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+      background: var(--accent-soft);
+    }
+
+    .sev-pill.medium {
+      color: var(--warn);
+      border-color: color-mix(in srgb, var(--warn) 45%, transparent);
+      background: var(--warn-soft);
+    }
+
+    .sev-pill.ok {
+      color: var(--ok);
+      border-color: color-mix(in srgb, var(--ok) 45%, transparent);
+      background: var(--ok-soft);
+    }
+
+    .finding-list {
+      overflow: auto;
+      max-height: 266px;
+      flex: 1;
+      background: var(--surface);
+    }
+
+    .finding-item {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12.5px;
+    }
+
+    .finding-item:last-child { border-bottom: 0; }
+
+    .finding-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+
+    .finding-msg {
+      color: var(--muted);
+      font-size: 12.5px;
+      margin: 0;
+    }
+
+    .raw-out {
+      margin: 0;
+      padding: 12px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      line-height: 1.55;
+      overflow: auto;
+      max-height: 310px;
+      flex: 1;
+      background: var(--code-bg);
+      color: var(--code-fg);
+      white-space: pre;
+    }
+
+    .mcp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .mcp-item {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 10px 12px;
+    }
+
+    .mcp-item-title {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .mcp-item-desc {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .topo-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    /* Platform Matrix */
+    .platforms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      border-top: 1.5px solid var(--rule);
+      border-left: 1.5px solid var(--rule);
+      background: var(--surface);
+    }
+
+    .plat-card {
+      border: 0;
+      border-right: 1.5px solid var(--rule);
+      border-bottom: 1.5px solid var(--rule);
+      background: var(--surface);
+      padding: 14px 16px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      transition: background 0.1s ease;
+    }
+
+    .plat-card:hover {
+      background: var(--surface-alt);
+    }
+
+    .plat-card[aria-pressed="true"] {
+      background: var(--accent-soft);
+    }
+
+    .plat-card[aria-pressed="true"]::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+
+    .plat-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .plat-name {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .plat-badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 1px 5px;
+      border: 1px solid var(--border-strong);
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .plat-card[aria-pressed="true"] .plat-badge {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--surface);
+    }
+
+    .plat-path {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--faint);
+      word-break: break-all;
     }
 
     /* Filter toolbar */
@@ -529,6 +1005,23 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .tag-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
       margin-bottom: 14px;
     }
 
@@ -560,8 +1053,8 @@
     .search-wrap {
       position: relative;
       flex: 1;
-      max-width: 320px;
-      min-width: 200px;
+      max-width: 300px;
+      min-width: 190px;
     }
 
     .search-wrap input {
@@ -584,7 +1077,6 @@
       color: var(--faint);
       border: 1px solid var(--border);
       padding: 0 5px;
-      border-radius: 3px;
       pointer-events: none;
     }
 
@@ -628,12 +1120,52 @@
       transition: background 0.1s ease;
     }
 
-    table.idx tbody tr:hover {
-      background: var(--surface-alt);
+    table.idx tbody tr:hover { background: var(--surface-alt); }
+    table.idx tbody tr.selected { background: var(--accent-soft); }
+
+    /* Blueprint Cards View */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-top: 1.5px solid var(--rule);
+      border-left: 1.5px solid var(--rule);
+      background: var(--surface);
     }
 
-    table.idx tbody tr.selected {
-      background: var(--accent-soft);
+    .skill-card {
+      padding: 16px 18px;
+      border-right: 1.5px solid var(--rule);
+      border-bottom: 1.5px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.1s ease;
+    }
+
+    .skill-card:hover { background: var(--surface-alt); }
+    .skill-card.selected { background: var(--accent-soft); }
+
+    .skill-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .skill-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .mini-tag {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      padding: 1px 6px;
+      border: 1px solid var(--border);
+      color: var(--faint);
+      background: var(--bg);
     }
 
     .col-chk { width: 38px; text-align: center; }
@@ -659,7 +1191,6 @@
       color: var(--muted);
       padding: 2px 6px;
       border: 1px solid var(--border);
-      border-radius: 3px;
       white-space: nowrap;
     }
 
@@ -682,9 +1213,7 @@
       color: var(--faint);
     }
 
-    .desc-cell {
-      color: var(--muted);
-    }
+    .desc-cell { color: var(--muted); }
 
     .empty-row {
       text-align: center;
@@ -697,15 +1226,16 @@
     /* Packs Grid */
     .packs-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      border: 1.5px solid var(--rule);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      border-top: 1.5px solid var(--rule);
+      border-left: 1.5px solid var(--rule);
       background: var(--surface);
     }
 
     .pack-card {
       padding: 18px 20px;
-      border-right: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
+      border-right: 1.5px solid var(--rule);
+      border-bottom: 1.5px solid var(--rule);
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -720,7 +1250,7 @@
 
     .pack-id {
       font-family: var(--mono);
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 600;
     }
 
@@ -737,11 +1267,25 @@
       flex: 1;
     }
 
-    .pack-skills {
+    .pack-skill-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .pack-skill-btn {
       font-family: var(--mono);
       font-size: 11px;
-      color: var(--faint);
-      line-height: 1.6;
+      padding: 2px 7px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .pack-skill-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
     .pack-actions {
@@ -835,7 +1379,7 @@
 
     .ledger-row {
       display: grid;
-      grid-template-columns: 220px minmax(0, 1fr) auto;
+      grid-template-columns: 230px minmax(0, 1fr) auto;
       gap: 14px;
       align-items: center;
       padding: 13px 16px;
@@ -873,7 +1417,7 @@
     .backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.45);
+      background: rgba(0, 0, 0, 0.48);
       z-index: 40;
       opacity: 0;
       pointer-events: none;
@@ -887,9 +1431,9 @@
       top: 0;
       right: 0;
       bottom: 0;
-      width: min(520px, 100vw);
+      width: min(560px, 100vw);
       background: var(--surface);
-      border-left: 1px solid var(--border);
+      border-left: 2px solid var(--rule);
       z-index: 50;
       transform: translateX(100%);
       transition: transform 0.18s ease;
@@ -904,7 +1448,8 @@
       align-items: center;
       justify-content: space-between;
       padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1.5px solid var(--rule);
+      background: var(--surface-alt);
     }
 
     .drawer-body {
@@ -918,7 +1463,6 @@
 
     .kv-list {
       border: 1px solid var(--border);
-      border-radius: var(--radius);
       overflow: hidden;
     }
 
@@ -939,6 +1483,180 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
+    }
+
+    .drawer-box {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      padding: 12px;
+    }
+
+    .drawer-box h3 {
+      margin: 0 0 8px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+
+    .hash-status {
+      margin-top: 8px;
+      padding: 7px 10px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      word-break: break-all;
+    }
+
+    .hash-status.match {
+      border-color: var(--ok);
+      background: var(--ok-soft);
+      color: var(--ok);
+    }
+
+    .hash-status.mismatch {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    /* Command Palette Modal */
+    .palette-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 10vh 16px 16px;
+      background: rgba(0, 0, 0, 0.52);
+    }
+
+    .palette-modal.open { display: flex; }
+
+    .palette-box {
+      width: min(640px, 100%);
+      border: 2px solid var(--rule);
+      background: var(--surface);
+      box-shadow: 10px 10px 0 0 color-mix(in srgb, var(--rule) 20%, transparent);
+      overflow: hidden;
+    }
+
+    .palette-input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1.5px solid var(--rule);
+      background: var(--surface-alt);
+    }
+
+    .palette-input-row input {
+      flex: 1;
+      border: 0;
+      background: transparent;
+      font-family: var(--mono);
+      font-size: 13.5px;
+      padding: 2px 0;
+    }
+
+    .palette-input-row input:focus { outline: none; }
+
+    .palette-list {
+      max-height: 360px;
+      overflow-y: auto;
+    }
+
+    .palette-item {
+      width: 100%;
+      border: 0;
+      border-bottom: 1px solid var(--border);
+      background: transparent;
+      padding: 10px 14px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .palette-item:last-child { border-bottom: 0; }
+    .palette-item:hover, .palette-item.active {
+      background: var(--accent-soft);
+    }
+
+    .palette-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .palette-kind {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      padding: 1px 5px;
+      border: 1px solid var(--border-strong);
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .palette-title {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .palette-sub {
+      font-size: 12px;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .palette-foot {
+      padding: 7px 14px;
+      border-top: 1px solid var(--border);
+      background: var(--surface-alt);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--faint);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    /* Toast */
+    .toast-region {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 70;
+      pointer-events: none;
+    }
+
+    .toast {
+      border: 1.5px solid var(--rule);
+      background: var(--ink);
+      color: var(--bg);
+      padding: 9px 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      box-shadow: 4px 4px 0 0 var(--accent);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.16s ease, transform 0.16s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     /* Footer */
@@ -965,15 +1683,30 @@
 
     .foot-links a:hover { color: var(--ink); }
 
-    @media (max-width: 880px) {
-      .hero-grid { grid-template-columns: 1fr; gap: 28px; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .live-dot { animation: none; }
+      * { transition-duration: 0.01ms !important; }
+    }
+
+    @media (max-width: 960px) {
+      .hero-grid, .rt-split { grid-template-columns: 1fr; gap: 24px; }
+      .runtime-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .runtime-nav button:nth-child(2) { border-right: 0; }
+      .runtime-nav button:nth-child(1), .runtime-nav button:nth-child(2) { border-bottom: 1px solid var(--border); }
+      .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .specs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .spec:nth-child(2) { border-right: 0; }
       .spec:nth-child(1), .spec:nth-child(2) { border-bottom: 1px solid var(--border); }
       .spec { padding: 14px 12px !important; }
       .packs-grid { grid-template-columns: 1fr; }
       .ledger-row { grid-template-columns: 1fr; gap: 6px; }
-      nav { display: none; }
+      nav, .live-badge { display: none; }
+    }
+
+    @media (max-width: 620px) {
+      .cards-grid { grid-template-columns: 1fr; }
+      .cmdk-trigger .kbd-pill { display: none; }
     }
   </style>
 </head>
@@ -984,14 +1717,24 @@
         <span class="brand-mark" aria-hidden="true"></span>
         <span>cortex</span>
         <span class="ver">v2.0.0</span>
+        <span class="live-badge" title="All 36 skill verifiers audited at 100/100">
+          <span class="live-dot" aria-hidden="true"></span>
+          <span>36/36 verified</span>
+        </span>
       </a>
       <nav aria-label="Primary">
+        <a href="#runtime">Runtime</a>
+        <a href="#platforms">Platforms</a>
         <a href="#skills">Index</a>
         <a href="#packs">Packs</a>
         <a href="#builder">Builder</a>
         <a href="#verify">Verify</a>
       </nav>
       <div class="bar-actions">
+        <button type="button" id="cmdkBtn" class="cmdk-trigger" aria-label="Open command palette">
+          <span>Search</span>
+          <span class="kbd-pill">Ctrl K</span>
+        </button>
         <a class="text-link" href="https://www.npmjs.com/package/@jovianops/cortex" target="_blank" rel="noreferrer">npm</a>
         <a class="text-link" href="https://github.com/JovianOps/cortex" target="_blank" rel="noreferrer">github</a>
         <div class="theme-switch" role="group" aria-label="Color theme">
@@ -1006,54 +1749,66 @@
         </div>
       </div>
     </div>
+    <div id="scrollProgress" class="scroll-progress" aria-hidden="true"></div>
   </header>
 
   <main id="top">
     <div class="hero">
-      <div class="wrap hero-grid">
-        <div>
-          <p class="kicker">
-            <span>MIT</span>
-            <span>&middot;</span>
-            <a href="https://www.npmjs.com/package/@jovianops/cortex" target="_blank" rel="noreferrer">@jovianops/cortex</a>
-            <span>&middot;</span>
-            <a href="#verify">SLSA v1 + SHA-256</a>
-          </p>
-          <h1>Deterministic skills for AI coding agents.</h1>
-          <p class="lead">
-            36 versioned <code>SKILL.md</code> playbooks, 36 zero-dependency Python verifiers, native MCP 2025-03-26 server (<code>cortex mcp</code>), Local Studio Web Workbench (<code>cortex studio</code>), Universal Agent Rule Compiler (<code>cortex compile</code>), SARIF 2.1.0 scanner (<code>cortex scan</code>), 10 role packs, and SHA-256 verification.
-          </p>
+      <div class="wrap hero-frame">
+        <span class="reg-mark reg-tl" aria-hidden="true">+ SYS.CATALOG // 36x36</span>
+        <span class="reg-mark reg-tr" aria-hidden="true">SHA-256 // STDLIB ONLY +</span>
 
-          <div class="quick-box">
-            <div class="quick-top">
-              <div class="quick-controls">
-                <label for="heroAgent" class="mono" style="font-size:11.5px;color:var(--muted);">target</label>
-                <select id="heroAgent" class="ctrl" aria-label="Install target"></select>
+        <div class="hero-grid">
+          <div>
+            <p class="kicker">
+              <span>MIT</span>
+              <span>&middot;</span>
+              <a href="https://www.npmjs.com/package/@jovianops/cortex" target="_blank" rel="noreferrer">@jovianops/cortex</a>
+              <span>&middot;</span>
+              <a href="#verify">SLSA v1 + SHA-256</a>
+              <span>&middot;</span>
+              <span>Zero Runtime Deps</span>
+            </p>
+            <h1>Deterministic skills for <span class="h1-accent">AI coding agents.</span></h1>
+            <p class="lead">
+              36 versioned <code>SKILL.md</code> playbooks, 36 Python stdlib verifiers, native MCP 2025-03-26 server (<code>cortex mcp</code>), Local Studio Web Workbench (<code>cortex studio</code>), Universal Rule Compiler (<code>cortex compile</code>), SARIF 2.1.0 scanner (<code>cortex scan</code>), 10 role packs, and cryptographic SHA-256 verification.
+            </p>
+
+            <div class="quick-box">
+              <div class="quick-top">
+                <div class="quick-controls">
+                  <label for="heroAgent" class="mono" style="font-size:11.5px;color:var(--muted);">target</label>
+                  <select id="heroAgent" class="ctrl" aria-label="Install target"></select>
+                </div>
+                <div class="seg" role="group" aria-label="Shell">
+                  <button type="button" data-shell="bash" aria-pressed="true">bash</button>
+                  <button type="button" data-shell="powershell" aria-pressed="false">powershell</button>
+                </div>
               </div>
-              <div class="seg" role="group" aria-label="Shell">
-                <button type="button" data-shell="bash" aria-pressed="true">bash</button>
-                <button type="button" data-shell="powershell" aria-pressed="false">powershell</button>
+              <div class="cmd-row">
+                <pre><span class="prompt">$</span><span id="heroCmd"></span></pre>
+                <button type="button" id="heroCopy" class="copy-btn">copy</button>
               </div>
-            </div>
-            <div class="cmd-row">
-              <pre><span class="prompt">$</span><span id="heroCmd"></span></pre>
-              <button type="button" id="heroCopy" class="copy-btn">copy</button>
-            </div>
-            <div class="quick-hint">
-              <span id="heroHint"></span>
-              <a href="#builder" style="color:var(--accent);">customize &rarr;</a>
+              <div class="quick-hint">
+                <span id="heroHint"></span>
+                <a href="#builder" style="color:var(--accent);">customize &rarr;</a>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="term" aria-label="CLI output preview">
-          <div class="term-tabs" role="tablist">
-            <button type="button" role="tab" data-term="doctor" aria-selected="true">cortex doctor</button>
-            <button type="button" role="tab" data-term="detect" aria-selected="false">cortex detect</button>
-            <button type="button" role="tab" data-term="search" aria-selected="false">search --has-script</button>
-            <button type="button" role="tab" data-term="new" aria-selected="false">cortex new</button>
+          <div class="term" aria-label="CLI output preview">
+            <div class="term-head">
+              <div class="term-tabs" role="tablist" aria-label="CLI specimen commands">
+                <button type="button" role="tab" data-term="doctor" aria-selected="true">cortex doctor</button>
+                <button type="button" role="tab" data-term="scan" aria-selected="false">cortex scan</button>
+                <button type="button" role="tab" data-term="compile" aria-selected="false">cortex compile</button>
+                <button type="button" role="tab" data-term="mcp" aria-selected="false">cortex mcp</button>
+                <button type="button" role="tab" data-term="detect" aria-selected="false">cortex detect</button>
+              </div>
+              <button type="button" id="termReplay" class="term-replay" title="Replay terminal output">&#9654; replay</button>
+            </div>
+            <pre id="termBody" class="term-body"></pre>
           </div>
-          <pre id="termBody" class="term-body"></pre>
         </div>
       </div>
     </div>
@@ -1061,15 +1816,15 @@
     <div class="wrap">
       <div class="specs" aria-label="Release summary">
         <div class="spec">
-          <div class="spec-val">36</div>
+          <div class="spec-val" data-count-to="36">36</div>
           <div class="spec-label">SKILL.md playbooks (10 core / 26 extended)</div>
         </div>
         <div class="spec">
-          <div class="spec-val">36</div>
+          <div class="spec-val" data-count-to="36">36</div>
           <div class="spec-label">Bundled Python stdlib verifiers (100%)</div>
         </div>
         <div class="spec">
-          <div class="spec-val">10</div>
+          <div class="spec-val" data-count-to="10">10</div>
           <div class="spec-label">Curated role packs in <code>packs.json</code></div>
         </div>
         <div class="spec">
@@ -1079,13 +1834,210 @@
       </div>
     </div>
 
+    <section id="runtime">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <span class="sec-num">01 / RUNTIME ENGINE</span>
+            <h2>Live v2.0.0 Workbench</h2>
+            <p class="sec-desc">Test Cortex's four zero-dependency runtime pillars right here: simulate deterministic <code>cortex scan</code> findings &amp; fixes, transpile rules with <code>cortex compile</code>, inspect <code>cortex mcp</code>, or explore the <code>cortex studio</code> topology.</p>
+          </div>
+        </div>
+
+        <div class="runtime-shell">
+          <div class="runtime-nav" role="tablist" aria-label="Runtime engine tools">
+            <button type="button" role="tab" data-rt="scan" aria-selected="true">
+              <span class="rt-cmd">cortex scan</span>
+              <span class="rt-sub">Policy &amp; SARIF 2.1.0 simulator</span>
+            </button>
+            <button type="button" role="tab" data-rt="compile" aria-selected="false">
+              <span class="rt-cmd">cortex compile</span>
+              <span class="rt-sub">7-target rule transpiler</span>
+            </button>
+            <button type="button" role="tab" data-rt="mcp" aria-selected="false">
+              <span class="rt-cmd">cortex mcp</span>
+              <span class="rt-sub">MCP 2025-03-26 JSON-RPC server</span>
+            </button>
+            <button type="button" role="tab" data-rt="studio" aria-selected="false">
+              <span class="rt-cmd">cortex studio</span>
+              <span class="rt-sub">Local Swiss UI &amp; topology</span>
+            </button>
+          </div>
+
+          <!-- Panel 1: Live Policy & SARIF Scanner -->
+          <div id="rt-scan" class="runtime-panel active">
+            <div class="rt-split">
+              <div class="rt-pane">
+                <div class="rt-pane-bar">
+                  <div class="quick-controls">
+                    <label for="scanFixture" class="mono">fixture</label>
+                    <select id="scanFixture" class="ctrl" aria-label="Select scanner sample file">
+                      <option value="k8s">deploy.yaml (Kubernetes)</option>
+                      <option value="tf">main.tf (Terraform AWS)</option>
+                      <option value="graphql">schema.graphql (GraphQL)</option>
+                      <option value="py">app.py (Secrets &amp; Exec)</option>
+                    </select>
+                  </div>
+                  <button type="button" id="scanFixToggle" class="btn-sm primary">apply hardened fix</button>
+                </div>
+                <div id="scanSource" class="code-lines"></div>
+              </div>
+
+              <div class="rt-pane">
+                <div class="rt-pane-bar">
+                  <span id="scanMetaLabel">scanner output</span>
+                  <div class="seg" role="group" aria-label="Scanner output format">
+                    <button type="button" data-scan-fmt="table" aria-pressed="true">findings</button>
+                    <button type="button" data-scan-fmt="sarif" aria-pressed="false">SARIF 2.1.0</button>
+                    <button type="button" data-scan-fmt="junit" aria-pressed="false">JUnit XML</button>
+                  </div>
+                </div>
+                <div class="scan-summary-bar" id="scanSummaryBar"></div>
+                <div id="scanOutputWrap" style="flex:1;display:flex;flex-direction:column;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel 2: Universal Rule Compiler -->
+          <div id="rt-compile" class="runtime-panel">
+            <div class="rt-pane">
+              <div class="rt-pane-bar">
+                <div class="quick-controls">
+                  <label for="compileSkillSel" class="mono">skill</label>
+                  <select id="compileSkillSel" class="ctrl" aria-label="Select skill to compile"></select>
+                  <label for="compileTargetSel" class="mono">format</label>
+                  <select id="compileTargetSel" class="ctrl" aria-label="Select compiler output target">
+                    <option value="cursor">Cursor (.cursor/rules/*.mdc)</option>
+                    <option value="vscode">VS Code (.github/instructions/*.instructions.md)</option>
+                    <option value="windsurf">Windsurf (.windsurf/rules/*.md)</option>
+                    <option value="cline">Cline (.clinerules/*.md)</option>
+                    <option value="claude">Claude Code (CLAUDE.md managed block)</option>
+                    <option value="agents">Codex / OpenCode (AGENTS.md managed block)</option>
+                    <option value="gemini">Gemini CLI (GEMINI.md managed block)</option>
+                  </select>
+                </div>
+                <div class="quick-controls">
+                  <span id="compileOutPath" class="mono" style="color:var(--accent);"></span>
+                  <button type="button" id="compileCopyBtn" class="btn-sm">copy rule</button>
+                </div>
+              </div>
+              <pre id="compilePreview" class="raw-out"></pre>
+            </div>
+          </div>
+
+          <!-- Panel 3: Native MCP 2025-03-26 Server -->
+          <div id="rt-mcp" class="runtime-panel">
+            <div class="rt-pane" style="margin-bottom:16px;">
+              <div class="rt-pane-bar">
+                <div class="quick-controls">
+                  <label for="mcpClientSel" class="mono">client config</label>
+                  <select id="mcpClientSel" class="ctrl" aria-label="Select MCP client">
+                    <option value="vscode">VS Code (.vscode/mcp.json)</option>
+                    <option value="claude-code">Claude Code (.mcp.json)</option>
+                    <option value="cursor">Cursor (.cursor/mcp.json)</option>
+                    <option value="codex">OpenAI Codex CLI (~/.codex/config.toml)</option>
+                    <option value="windsurf">Windsurf (~/.codeium/windsurf/mcp_config.json)</option>
+                  </select>
+                </div>
+                <button type="button" id="mcpCopyBtn" class="btn-sm">copy config</button>
+              </div>
+              <pre id="mcpConfigPreview" class="raw-out" style="max-height:190px;"></pre>
+            </div>
+
+            <div class="toolbar" style="margin-bottom:8px;">
+              <div class="tabs" role="group" aria-label="MCP surface">
+                <button type="button" data-mcp-tab="tools" aria-pressed="true">8 tools</button>
+                <button type="button" data-mcp-tab="resources" aria-pressed="false">38 resources</button>
+                <button type="button" data-mcp-tab="prompts" aria-pressed="false">36 prompts</button>
+              </div>
+              <span class="mono" style="font-size:11.5px;color:var(--muted);">Protocol 2025-03-26 &middot; Workspace-confined stdio JSON-RPC 2.0</span>
+            </div>
+            <div id="mcpSurfaceGrid" class="mcp-grid"></div>
+          </div>
+
+          <!-- Panel 4: Studio & Architecture Topology -->
+          <div id="rt-studio" class="runtime-panel">
+            <div style="margin-bottom:14px;" class="cmd-row" >
+              <pre><span class="prompt">$</span>npx @jovianops/cortex studio --port 4173</pre>
+              <button type="button" class="copy-btn" data-copy="npx @jovianops/cortex studio --port 4173">copy</button>
+            </div>
+            <svg class="topo-svg" viewBox="0 0 920 290" role="img" aria-label="Cortex v2.0.0 System Topology Diagram">
+              <defs>
+                <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--border-strong)" />
+                </marker>
+              </defs>
+              <!-- Canonical Catalog Box -->
+              <rect x="210" y="18" width="500" height="78" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.8" />
+              <rect x="210" y="18" width="500" height="5" fill="var(--accent)" />
+              <text x="460" y="45" text-anchor="middle" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600">CORTEX CANONICAL CATALOG (v2.0.0)</text>
+              <text x="460" y="66" text-anchor="middle" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="11">36 SKILL.md + 36 Python Verifiers &middot; 10 Packs &middot; 72 SHA-256 Digests</text>
+              <text x="460" y="83" text-anchor="middle" fill="var(--ok)" font-family="IBM Plex Mono, monospace" font-size="10.5">4 JSON Schemas &middot; 36 Paired 100-pt Eval Rubrics &middot; Zero External Deps</text>
+
+              <!-- Routing lines -->
+              <path d="M 300 96 L 300 132 L 118 132 L 118 164" fill="none" stroke="var(--border-strong)" stroke-width="1.5" marker-end="url(#arr)" />
+              <path d="M 405 96 L 405 132 L 346 132 L 346 164" fill="none" stroke="var(--border-strong)" stroke-width="1.5" marker-end="url(#arr)" />
+              <path d="M 515 96 L 515 132 L 574 132 L 574 164" fill="none" stroke="var(--border-strong)" stroke-width="1.5" marker-end="url(#arr)" />
+              <path d="M 620 96 L 620 132 L 802 132 L 802 164" fill="none" stroke="var(--border-strong)" stroke-width="1.5" marker-end="url(#arr)" />
+
+              <!-- 4 Runtime Modules -->
+              <g>
+                <rect x="20" y="168" width="196" height="98" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.5" />
+                <text x="34" y="192" fill="var(--accent)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">cortex mcp</text>
+                <text x="34" y="212" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="11">JSON-RPC 2.0 stdio</text>
+                <text x="34" y="230" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">8 tools &middot; 38 resources</text>
+                <text x="34" y="247" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">36 invocable prompts</text>
+              </g>
+              <g>
+                <rect x="248" y="168" width="196" height="98" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.5" />
+                <text x="262" y="192" fill="var(--accent)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">cortex studio</text>
+                <text x="262" y="212" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="11">Local Swiss Workbench</text>
+                <text x="262" y="230" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">6 UI panels &middot; 10 REST APIs</text>
+                <text x="262" y="247" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">Live workspace runner</text>
+              </g>
+              <g>
+                <rect x="476" y="168" width="196" height="98" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.5" />
+                <text x="490" y="192" fill="var(--accent)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">cortex compile</text>
+                <text x="490" y="212" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="11">Universal Transpiler</text>
+                <text x="490" y="230" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">7 native IDE/agent formats</text>
+                <text x="490" y="247" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">--check CI drift gate</text>
+              </g>
+              <g>
+                <rect x="704" y="168" width="196" height="98" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.5" />
+                <text x="718" y="192" fill="var(--accent)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">cortex scan</text>
+                <text x="718" y="212" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="11">Policy &amp; SARIF 2.1.0</text>
+                <text x="718" y="230" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">14 repo verifiers in 1 pass</text>
+                <text x="718" y="247" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">Table, JSON, SARIF, JUnit</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="platforms">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <span class="sec-num">02 / COMPATIBILITY MATRIX</span>
+            <h2>14 Agents, One Standard</h2>
+            <p class="sec-desc">Click any platform below to switch the active install target across the Hero, Builder, and Skill Inspector.</p>
+          </div>
+          <div class="mono" style="font-size:12px;color:var(--muted);">
+            active: <strong id="activePlatformLabel" style="color:var(--accent);">npx @jovianops/cortex (CLI)</strong>
+          </div>
+        </div>
+        <div id="platformsGrid" class="platforms-grid"></div>
+      </div>
+    </section>
+
     <section id="skills">
       <div class="wrap">
         <div class="sec-head">
           <div>
-            <span class="sec-num">01 / SKILL INDEX</span>
+            <span class="sec-num">03 / SKILL INDEX</span>
             <h2>Catalog</h2>
-            <p class="sec-desc">Click any row to inspect its <code>SKILL.md</code> SHA-256, bundled helper script, and install command. Check rows to stage them in the builder.</p>
+            <p class="sec-desc">Click any skill to inspect its <code>SKILL.md</code> SHA-256, preview compiled rules, or verify local files in-browser. Check rows to stage them in the builder.</p>
           </div>
           <div class="mono" style="font-size:12px;color:var(--muted);">
             <span id="countLabel">36 shown</span>
@@ -1099,13 +2051,21 @@
             <button type="button" data-filter="extended" aria-pressed="false">extended (26)</button>
             <button type="button" data-filter="scripts" aria-pressed="false">with scripts (36)</button>
           </div>
-          <div class="search-wrap">
-            <input id="searchInput" class="ctrl" type="search" placeholder="filter by slug, tag, script..." aria-label="Search skills" />
-            <span class="search-kbd">/</span>
+          <div class="toolbar-right">
+            <div class="search-wrap">
+              <input id="searchInput" class="ctrl" type="search" placeholder="filter by slug, tag, script..." aria-label="Search skills" />
+              <span class="search-kbd">/</span>
+            </div>
+            <div class="tabs" role="group" aria-label="Catalog view mode">
+              <button type="button" data-view="table" aria-pressed="true">table</button>
+              <button type="button" data-view="cards" aria-pressed="false">cards</button>
+            </div>
           </div>
         </div>
 
-        <div class="table-wrap">
+        <div id="tagStrip" class="tag-strip" aria-label="Quick topic filters"></div>
+
+        <div id="tableViewWrap" class="table-wrap">
           <table class="idx">
             <thead>
               <tr>
@@ -1119,6 +2079,7 @@
             <tbody id="skillRows"></tbody>
           </table>
         </div>
+        <div id="cardsViewWrap" class="cards-grid" style="display:none;"></div>
       </div>
     </section>
 
@@ -1126,9 +2087,9 @@
       <div class="wrap">
         <div class="sec-head">
           <div>
-            <span class="sec-num">02 / ROLE PACKS</span>
+            <span class="sec-num">04 / ROLE PACKS</span>
             <h2>Curated Bundles</h2>
-            <p class="sec-desc">Defined in <code>packs.json</code> and validated in CI. Install any 6-skill bundle with <code>--pack &lt;id&gt;</code>.</p>
+            <p class="sec-desc">Defined in <code>packs.json</code> and validated in CI. Click any skill pill inside a bundle to inspect it, or load the full 6-skill pack into the builder.</p>
           </div>
         </div>
         <div id="packsGrid" class="packs-grid"></div>
@@ -1139,7 +2100,7 @@
       <div class="wrap">
         <div class="sec-head">
           <div>
-            <span class="sec-num">03 / COMMAND BUILDER</span>
+            <span class="sec-num">05 / COMMAND BUILDER</span>
             <h2>Install Command</h2>
             <p class="sec-desc">Generate an exact copy-paste command for your agent, shell, and selected skills or role pack.</p>
           </div>
@@ -1172,9 +2133,9 @@
       <div class="wrap">
         <div class="sec-head">
           <div>
-            <span class="sec-num">04 / SUPPLY CHAIN</span>
+            <span class="sec-num">06 / SUPPLY CHAIN</span>
             <h2>Verify Authenticity</h2>
-            <p class="sec-desc">Confirm the published npm tarball, SLSA v1 provenance attestation, and every installed <code>SKILL.md</code> against <code>checksums.json</code>.</p>
+            <p class="sec-desc">Confirm the published npm tarball, SLSA v1 provenance attestation, and every installed <code>SKILL.md</code> &amp; bundled script (72 files) against <code>checksums.json</code>.</p>
           </div>
         </div>
 
@@ -1197,7 +2158,7 @@
           <div class="ledger-row">
             <span class="ledger-key">Skill &amp; ZIP Manifest</span>
             <span class="ledger-val"><a href="https://github.com/JovianOps/cortex/blob/main/checksums.json" target="_blank" rel="noreferrer">github.com/JovianOps/cortex/blob/main/checksums.json</a></span>
-            <span class="tier">36 skills</span>
+            <span class="tier">36 skills &middot; 72 files</span>
           </div>
         </div>
 
@@ -1242,6 +2203,25 @@
     </div>
     <div class="drawer-body" id="drawerBody"></div>
   </aside>
+
+  <div id="cmdPalette" class="palette-modal" role="dialog" aria-modal="true" aria-label="Quick command palette" aria-hidden="true">
+    <div class="palette-box">
+      <div class="palette-input-row">
+        <span class="mono" style="color:var(--accent);font-weight:600;">&gt;_</span>
+        <input id="paletteInput" type="search" placeholder="Jump to skill, pack, platform, or action..." aria-label="Command palette search" autocomplete="off" />
+        <button type="button" id="paletteClose" class="btn-sm">esc</button>
+      </div>
+      <div id="paletteList" class="palette-list"></div>
+      <div class="palette-foot">
+        <span>&#8593;&#8595; navigate &middot; Enter select &middot; Esc close</span>
+        <span>36 skills &middot; 10 packs &middot; 14 platforms</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-region" aria-live="polite" aria-atomic="true">
+    <div id="toast" class="toast"></div>
+  </div>
 
   <script>
     const SKILLS = [
@@ -1668,7 +2648,7 @@
     ],
     "script": "scripts/audit_prompts.py",
     "sha256": "a49024fe23eb7a6d8107d303f6c5be6549b8f57c7c24623851888355e24b6463",
-    "zipSha256": "0c3656fcfdb8107ef3cc2fceed629cde62a06faba2686ef422f3b93c8581fa36"
+    "zipSha256": "fe9b853cc4d2d927d16a7f162270b0932bdec1fd8505bbb01025afa2adfa69c8"
   },
   {
     "slug": "observability-setup",
@@ -1996,108 +2976,339 @@
 ];
     const NPM_SHA256 = "cbb9ce6a26086fc9481052bead73d9ec9f496cc9628341f0c92d1f72fd5e6247";
 
+    const SKILL_GLOBS = {
+      "academic-assistant": "**/*.md,**/*.tex",
+      "accessibility-auditor": "**/*.html,**/*.tsx,**/*.jsx,**/*.css",
+      "anti-hallucination": "**/*",
+      "api-designer": "**/*openapi*.yml,**/*openapi*.yaml,**/*swagger*.json",
+      "architecture-decision-records": "docs/adr/**/*.md,adr/**/*.md",
+      "blender-3d-modeling": "**/*.py,**/*.blend",
+      "chaos-resilience-engineer": "**/*.py,**/*.ts,**/*.go,**/*.yaml,**/*.yml",
+      "code-migration": "**/*",
+      "code-review-assistant": "**/*",
+      "college-report-card": "**/*.csv,**/*.json,**/*.py",
+      "db-optimizer": "**/*.sql,**/migrations/**/*",
+      "devops-pipeline": ".github/workflows/**/*.yml,.github/workflows/**/*.yaml,.gitlab-ci.yml",
+      "docker-generator": "**/Dockerfile*,**/docker-compose*.yml,**/compose*.yaml",
+      "documentation-generator": "**/*.md,docs/**/*",
+      "finops-cost-optimizer": "**/*.tf,**/*.yaml,**/*.yml",
+      "git-history-surgeon": "**/*",
+      "go-backend-engineer": "**/*.go,**/go.mod",
+      "graphql-architect": "**/*.graphql,**/*.gql",
+      "incident-response": "**/*.md,**/*.json",
+      "kubernetes-architect": "**/k8s/**/*.yaml,**/k8s/**/*.yml,**/charts/**/*.yaml",
+      "llm-security-auditor": "**/*.md,**/*.prompt,**/*.py,**/*.ts",
+      "memory-manager": "**/*",
+      "observability-setup": "**/*.py,**/*.ts,**/*.go,**/*.yaml,**/*.yml",
+      "performance-profiler": "**/*.py,**/*.ts,**/*.go,**/*.rs",
+      "privacy-compliance-auditor": "**/*.py,**/*.ts,**/*.js,**/*.sql,**/*.json",
+      "python-coding-assistant": "**/*.py,**/pyproject.toml",
+      "refactoring-assistant": "**/*.py,**/*.ts,**/*.js,**/*.go,**/*.rs",
+      "release-engineering": "CHANGELOG.md,package.json,pyproject.toml",
+      "rust-systems-engineer": "**/*.rs,**/Cargo.toml",
+      "security-auditor": "**/*",
+      "supply-chain-sbom": "package.json,requirements*.txt,Cargo.toml,go.mod",
+      "terraform-generator": "**/*.tf,**/*.tfvars",
+      "testing-automation": "**/tests/**/*,**/*_test.*,**/*.test.*,**/*.spec.*",
+      "typescript-architect": "**/*.ts,**/*.tsx,**/tsconfig.json",
+      "unit-test-generator": "**/tests/**/*,**/*_test.*,**/*.test.*,**/*.spec.*",
+      "web-scraper": "**/*.py,**/*.ts,**/robots.txt"
+    };
+
     const TARGETS = [
-      { id: 'cortex-cli', label: 'npx @jovianops/cortex (CLI)', hint: 'Runs Cortex CLI directly from npm — verifies bundled SHA-256 checksums' },
-      { id: 'npx-skills', label: 'npx skills add (universal)', hint: 'Universal skills.sh CLI — Claude Code, Codex, Gemini CLI, Cursor, Copilot, OpenCode, Goose, Cline' },
-      { id: 'claude-code', label: 'Claude Code', hint: 'Installs into .claude/skills/ or ~/.claude/skills/ (-a claude-code)' },
-      { id: 'codex', label: 'OpenAI Codex CLI', hint: 'Installs into .agents/skills/ or ~/.codex/skills/ (-a codex)' },
-      { id: 'gemini-cli', label: 'Gemini CLI', hint: 'Installs into .gemini/skills/ or ~/.gemini/skills/ (-a gemini-cli)' },
-      { id: 'cursor', label: 'Cursor', hint: 'Installs into .cursor/skills/ or ~/.cursor/skills/ (-a cursor)' },
-      { id: 'vscode', label: 'Visual Studio Code', hint: 'Installs into .github/skills/ + enables chat.useAgentSkills in .vscode/settings.json (also supports .github/plugin/marketplace.json)' },
-      { id: 'copilot', label: 'GitHub Copilot', hint: 'Installs into .github/skills/ or ~/.copilot/skills/ (-a github-copilot)' },
-      { id: 'opencode', label: 'OpenCode', hint: 'Installs into .opencode/skills/ (-a opencode)' },
-      { id: 'openclaw', label: 'OpenClaw', hint: 'Installs into .openclaw/skills/ (-a openclaw)' },
-      { id: 'goose', label: 'Goose', hint: 'Installs into .goose/skills/ (-a goose)' },
-      { id: 'cline', label: 'Cline (VS Code)', hint: 'Installs into .cline/skills/ (-a cline)' },
-      { id: 'aider', label: 'Aider', hint: 'Installs SKILL.md files and updates .aider.conf.yml' },
-      { id: 'remote-py', label: 'Python --remote (no Node)', hint: 'Zero-clone Python 3 stdlib — verifies checksums.json SHA-256 before writing' },
-      { id: 'hermes', label: 'Hermes Agent', hint: 'Uses hermes skills tap add JovianOps/cortex' },
-      { id: 'zip-upload', label: 'Claude Apps / ChatGPT (ZIP)', hint: 'Download verified <slug>.zip from zips/ or premium-zips/ and upload in Settings' }
+      { id: 'cortex-cli', label: 'npx @jovianops/cortex (CLI)', badge: 'CLI', path: './.claude/skills/', hint: 'Runs Cortex CLI directly from npm — verifies bundled SHA-256 checksums' },
+      { id: 'npx-skills', label: 'npx skills add (universal)', badge: 'Universal', path: '40+ agents', hint: 'Universal skills.sh CLI — Claude Code, Codex, Gemini CLI, Cursor, Copilot, OpenCode, Goose, Cline' },
+      { id: 'claude-code', label: 'Claude Code', badge: 'Plugin', path: '.claude/skills/', hint: 'Installs into .claude/skills/ or ~/.claude/skills/ (-a claude-code)' },
+      { id: 'codex', label: 'OpenAI Codex CLI', badge: 'Plugin', path: '.agents/skills/', hint: 'Installs into .agents/skills/ or ~/.codex/skills/ (-a codex)' },
+      { id: 'gemini-cli', label: 'Gemini CLI', badge: 'Ext', path: '.gemini/skills/', hint: 'Installs into .gemini/skills/ or ~/.gemini/skills/ (-a gemini-cli)' },
+      { id: 'cursor', label: 'Cursor', badge: 'Rules', path: '.cursor/skills/', hint: 'Installs into .cursor/skills/ or ~/.cursor/skills/ (-a cursor)' },
+      { id: 'vscode', label: 'Visual Studio Code', badge: 'Native', path: '.github/skills/', hint: 'Installs into .github/skills/ + enables chat.useAgentSkills in .vscode/settings.json' },
+      { id: 'copilot', label: 'GitHub Copilot', badge: 'Plugin', path: '.github/skills/', hint: 'Installs into .github/skills/ or ~/.copilot/skills/ (-a github-copilot)' },
+      { id: 'opencode', label: 'OpenCode', badge: 'SKILL.md', path: '.opencode/skills/', hint: 'Installs into .opencode/skills/ (-a opencode)' },
+      { id: 'openclaw', label: 'OpenClaw', badge: 'SKILL.md', path: '.openclaw/skills/', hint: 'Installs into .openclaw/skills/ (-a openclaw)' },
+      { id: 'goose', label: 'Goose', badge: 'SKILL.md', path: '.goose/skills/', hint: 'Installs into .goose/skills/ (-a goose)' },
+      { id: 'cline', label: 'Cline (VS Code)', badge: 'Rules', path: '.cline/skills/', hint: 'Installs into .cline/skills/ (-a cline)' },
+      { id: 'aider', label: 'Aider', badge: 'Conf', path: '.aider.conf.yml', hint: 'Installs SKILL.md files and updates .aider.conf.yml' },
+      { id: 'remote-py', label: 'Python --remote (no Node)', badge: 'Stdlib', path: 'SHA-256 verified', hint: 'Zero-clone Python 3 stdlib — verifies checksums.json SHA-256 before writing' },
+      { id: 'hermes', label: 'Hermes Agent', badge: 'Tap', path: 'hermes tap', hint: 'Uses hermes skills tap add JovianOps/cortex' },
+      { id: 'zip-upload', label: 'Claude Apps / ChatGPT (ZIP)', badge: 'ZIP', path: 'zips/*.zip', hint: 'Download verified <slug>.zip from zips/ or premium-zips/ and upload in Settings' }
     ];
 
     const TERM_VIEWS = {
-      doctor: `<span class="t-dim">$ npx @jovianops/cortex doctor</span>
-<span class="t-hi">Cortex v2.0.0 — Environment &amp; Integrity Doctor</span>
-
-<span class="t-ok">[OK]</span>   Python 3.12.4 (/usr/bin/python3)
-<span class="t-ok">[OK]</span>   git found at /usr/bin/git
-<span class="t-ok">[OK]</span>   node found at /usr/local/bin/node
-<span class="t-ok">[OK]</span>   Verified SHA-256 checksums for 24 bundled skills (48 files).
-<span class="t-ok">[OK]</span>   Validated 9 multi-agent manifests (all 24 skills verified at v2.0.0).
-
-<span class="t-dim">==> Claude Code (project: ./.claude/skills)</span>
-  security-auditor          v2.0.0    <span class="t-ok">[OK]</span>
-  accessibility-auditor     v2.0.0    <span class="t-ok">[OK]</span>
-
-Doctor finished with <span class="t-ok">0 issue(s)</span>.`,
-
-      detect: `<span class="t-dim">$ npx @jovianops/cortex detect</span>
-<span class="t-hi">Cortex v2.0.0 — Agent Environment Detection</span>
-
-Agent          Platform                  Status      Locked  Signals
------------------------------------------------------------------------------
-claude-code    Claude Code               <span class="t-ok">DETECTED</span>         6  ~/.claude, cli:claude
-codex          OpenAI Codex CLI          <span class="t-ok">DETECTED</span>         0  ./.agents
-cursor         Cursor                    <span class="t-ok">DETECTED</span>         0  ~/.cursor
-vscode         Visual Studio Code        <span class="t-ok">DETECTED</span>         0  ./.vscode, cli:code
-copilot        GitHub Copilot            <span class="t-ok">DETECTED</span>         0  ./.github
-gemini-cli     Gemini CLI                <span class="t-dim">not found</span>        0  —
-
-Suggested install command:
-  <span class="t-accent">npx @jovianops/cortex install --agent claude-code --pack fullstack</span>`,
-
-      search: `<span class="t-dim">$ npx @jovianops/cortex search --has-script</span>
-Found <span class="t-hi">24</span> Cortex skill(s) with bundled Python helper scripts (100% coverage):
-
-Skill                      Tier       Script
----------------------------------------------------------------
-academic-assistant         core       <span class="t-accent">citation_check.py</span>
-anti-hallucination         core       <span class="t-accent">verify_claims.py</span>
-blender-3d-modeling        core       <span class="t-accent">bmesh_check.py</span>
-code-review-assistant      core       <span class="t-accent">diff_review.py</span>
-college-report-card        core       <span class="t-accent">grade_calc.py</span>
-accessibility-auditor      extended   <span class="t-accent">a11y_scan.py</span>
-api-designer               extended   <span class="t-accent">lint_openapi.py</span>
-db-optimizer               extended   <span class="t-accent">lint_sql.py</span>
-devops-pipeline            extended   <span class="t-accent">lint_actions.py</span>
-security-auditor           extended   <span class="t-accent">secret_scan.py</span>
-terraform-generator        extended   <span class="t-accent">lint_terraform.py</span>
-<span class="t-dim">... +13 more bundled zero-dependency Python 3 scripts</span>`,
-
-      new: `<span class="t-dim">$ npx @jovianops/cortex new graph-debugger --with-script</span>
-Created premium-skills/graph-debugger/SKILL.md
-Created premium-skills/graph-debugger/scripts/graph_debugger_check.py
-
-<span class="t-dim">$ npx @jovianops/cortex audit</span>
-graph-debugger             premium-skills    <span class="t-ok">100/100  OK</span>
-
-Next steps:
-  1. Add a 100-point rubric in evals/skill_evals.json
-  2. Rebuild ZIPs &amp; checksums.json: npx @jovianops/cortex package`
+      doctor: [
+        `<span class="t-dim">$ npx @jovianops/cortex doctor</span>`,
+        `<span class="t-hi">Cortex v2.0.0 — Environment &amp; Integrity Doctor</span>`,
+        ``,
+        `<span class="t-ok">[OK]</span>   Python 3.12.4 (/usr/bin/python3)`,
+        `<span class="t-ok">[OK]</span>   git found at /usr/bin/git`,
+        `<span class="t-ok">[OK]</span>   node found at /usr/local/bin/node`,
+        `<span class="t-ok">[OK]</span>   Verified SHA-256 checksums for 36 bundled skills (72 files).`,
+        `<span class="t-ok">[OK]</span>   Validated 11 multi-agent manifests (all 36 skills verified at v2.0.0).`,
+        `<span class="t-ok">[OK]</span>   Eval suite: 36/36 tasks &middot; average 100.0/100.`,
+        ``,
+        `<span class="t-dim">==&gt; Claude Code (project: ./.claude/skills)</span>`,
+        `  kubernetes-architect      v2.0.0    <span class="t-ok">[OK]</span>`,
+        `  security-auditor          v2.0.0    <span class="t-ok">[OK]</span>`,
+        ``,
+        `Doctor finished with <span class="t-ok">0 issue(s)</span>.`
+      ],
+      scan: [
+        `<span class="t-dim">$ npx @jovianops/cortex scan . --format sarif --fail-on high</span>`,
+        `<span class="t-hi">Cortex v2.0.0 — Unified Policy &amp; SARIF 2.1.0 Scanner (14 verifiers)</span>`,
+        ``,
+        `Severity  Scanner     Rule                        Target`,
+        `----------------------------------------------------------------------`,
+        `<span class="t-accent">CRITICAL</span>  kubernetes  k8s-privileged-container    deploy.yaml:9`,
+        `<span class="t-accent">HIGH</span>      terraform   tf-unencrypted-storage        main.tf:2`,
+        `<span class="t-warn">MEDIUM</span>    graphql     gql-unbounded-list-field      schema.graphql:2`,
+        ``,
+        `Summary: <span class="t-accent">1 critical, 1 high</span>, 1 medium across 14 scanners.`,
+        `Wrote SARIF 2.1.0 report &rarr; <span class="t-hi">cortex.sarif</span> (exit 1 on --fail-on high)`
+      ],
+      compile: [
+        `<span class="t-dim">$ npx @jovianops/cortex compile --pack cloud-native --target all</span>`,
+        `<span class="t-hi">Cortex v2.0.0 — Universal Agent Rule Compiler</span>`,
+        ``,
+        `<span class="t-ok">[WRITE]</span> .cursor/rules/cortex-kubernetes-architect.mdc        (6 rules)`,
+        `<span class="t-ok">[WRITE]</span> .github/instructions/cortex-*.instructions.md          (6 rules)`,
+        `<span class="t-ok">[WRITE]</span> .windsurf/rules/cortex-*.md                          (6 rules)`,
+        `<span class="t-ok">[WRITE]</span> .clinerules/cortex-*.md                              (6 rules)`,
+        `<span class="t-ok">[MERGE]</span> CLAUDE.md, AGENTS.md, GEMINI.md                      (preserved user blocks)`,
+        ``,
+        `Compiled <span class="t-ok">27 files</span> across 7 targets with SHA-256 provenance headers.`
+      ],
+      mcp: [
+        `<span class="t-dim">$ npx @jovianops/cortex mcp --project-dir .</span>`,
+        `<span class="t-hi">Cortex MCP Server v2.0.0 (protocol 2025-03-26, stdio JSON-RPC 2.0)</span>`,
+        ``,
+        `<span class="t-ok">[READY]</span> Tools (8):      list_skills, run_verifier, compile_rules, scan_repo...`,
+        `<span class="t-ok">[READY]</span> Resources (38): cortex://skills/&lt;slug&gt;, cortex://packs, cortex://checksums`,
+        `<span class="t-ok">[READY]</span> Prompts (36):   cortex/&lt;slug&gt; invocable workflows`,
+        `<span class="t-ok">[GUARD]</span> Workspace path confinement enforced on all verifiers.`
+      ],
+      detect: [
+        `<span class="t-dim">$ npx @jovianops/cortex detect</span>`,
+        `<span class="t-hi">Cortex v2.0.0 — Agent Environment Detection</span>`,
+        ``,
+        `Agent          Platform                  Status      Locked  Signals`,
+        `-----------------------------------------------------------------------------`,
+        `claude-code    Claude Code               <span class="t-ok">DETECTED</span>         6  ~/.claude, cli:claude`,
+        `codex          OpenAI Codex CLI          <span class="t-ok">DETECTED</span>         0  ./.agents`,
+        `cursor         Cursor                    <span class="t-ok">DETECTED</span>         0  ~/.cursor`,
+        `vscode         Visual Studio Code        <span class="t-ok">DETECTED</span>         0  ./.vscode, cli:code`,
+        `copilot        GitHub Copilot            <span class="t-ok">DETECTED</span>         0  ./.github`,
+        `gemini-cli     Gemini CLI                <span class="t-ok">DETECTED</span>         0  ~/.gemini, cli:gemini`,
+        ``,
+        `Suggested install command:`,
+        `  <span class="t-accent">npx @jovianops/cortex install --agent claude-code --pack cloud-native</span>`
+      ]
     };
+
+    const SCAN_FIXTURES = {
+      k8s: {
+        file: 'deploy.yaml',
+        scanner: 'kubernetes',
+        skill: 'kubernetes-architect',
+        badLines: [
+          'apiVersion: apps/v1',
+          'kind: Deployment',
+          'spec:',
+          '  replicas: 1',
+          '  template:',
+          '    spec:',
+          '      containers:',
+          '        - name: api',
+          '          image: ghcr.io/acme/api:latest',
+          '          securityContext:',
+          '            privileged: true'
+        ],
+        goodLines: [
+          'apiVersion: apps/v1',
+          'kind: Deployment',
+          'spec:',
+          '  replicas: 2',
+          '  template:',
+          '    spec:',
+          '      containers:',
+          '        - name: api',
+          '          image: ghcr.io/acme/api:2.4.1@sha256:9f86d081',
+          '          securityContext:',
+          '            privileged: false',
+          '            allowPrivilegeEscalation: false',
+          '            readOnlyRootFilesystem: true',
+          '            runAsNonRoot: true'
+        ],
+        findings: [
+          { line: 9, severity: 'HIGH', rule: 'k8s-mutable-image-tag', msg: 'Container image uses mutable :latest tag; pin an immutable release tag or @sha256 digest.' },
+          { line: 11, severity: 'CRITICAL', rule: 'k8s-privileged-container', msg: 'securityContext.privileged=true violates Kubernetes Restricted Pod Security Standards.' },
+          { line: 10, severity: 'MEDIUM', rule: 'k8s-missing-probes-and-limits', msg: 'Deployment lacks readinessProbe/livenessProbe and explicit CPU/memory limits.' }
+        ]
+      },
+      tf: {
+        file: 'main.tf',
+        scanner: 'terraform',
+        skill: 'terraform-generator',
+        badLines: [
+          'resource "aws_db_instance" "prod" {',
+          '  identifier          = "orders-db"',
+          '  engine              = "postgres"',
+          '  instance_class      = "db.t3.large"',
+          '  storage_encrypted   = false',
+          '  publicly_accessible = true',
+          '  skip_final_snapshot = true',
+          '}'
+        ],
+        goodLines: [
+          'resource "aws_db_instance" "prod" {',
+          '  identifier          = "orders-db"',
+          '  engine              = "postgres"',
+          '  instance_class      = "db.t3.large"',
+          '  storage_encrypted   = true',
+          '  publicly_accessible = false',
+          '  skip_final_snapshot = false',
+          '  deletion_protection = true',
+          '}'
+        ],
+        findings: [
+          { line: 5, severity: 'CRITICAL', rule: 'tf-unencrypted-storage', msg: 'aws_db_instance has storage_encrypted = false; enable encryption at rest with KMS.' },
+          { line: 6, severity: 'HIGH', rule: 'tf-public-database', msg: 'publicly_accessible = true exposes the RDS instance to external network interfaces.' },
+          { line: 7, severity: 'MEDIUM', rule: 'tf-skip-final-snapshot', msg: 'skip_final_snapshot = true risks permanent data loss on destroy.' }
+        ]
+      },
+      graphql: {
+        file: 'schema.graphql',
+        scanner: 'graphql',
+        skill: 'graphql-architect',
+        badLines: [
+          'type Order {',
+          '  id: ID!',
+          '  totalCents: Int!',
+          '}',
+          '',
+          'type Query {',
+          '  orders: [Order]',
+          '  user(id: ID!): User',
+          '}'
+        ],
+        goodLines: [
+          'type Order implements Node {',
+          '  id: ID!',
+          '  totalCents: Int!',
+          '}',
+          '',
+          'type Query {',
+          '  orders(first: Int!, after: String): OrderConnection!',
+          '  node(id: ID!): Node',
+          '}'
+        ],
+        findings: [
+          { line: 7, severity: 'HIGH', rule: 'gql-unbounded-list-field', msg: 'Root list field Query.orders lacks Relay pagination arguments (first/after) and Connection wrapper.' },
+          { line: 7, severity: 'MEDIUM', rule: 'gql-nullable-collection', msg: 'List return type [Order] should be non-null Connection! to prevent client null-handling drift.' }
+        ]
+      },
+      py: {
+        file: 'app.py',
+        scanner: 'secrets',
+        skill: 'security-auditor',
+        badLines: [
+          'import subprocess',
+          '',
+          'AWS_ACCESS_KEY = "AKIAIOSFODNN7EXAMPLE"',
+          '',
+          'def run_task(user_cmd: str) -> bytes:',
+          '    return subprocess.check_output(user_cmd, shell=True)'
+        ],
+        goodLines: [
+          'import os',
+          'import shlex',
+          'import subprocess',
+          '',
+          'AWS_ACCESS_KEY = os.environ["AWS_ACCESS_KEY_ID"]',
+          '',
+          'def run_task(args: list[str]) -> bytes:',
+          '    return subprocess.check_output(args, shell=False)'
+        ],
+        findings: [
+          { line: 3, severity: 'CRITICAL', rule: 'CWE-798-hardcoded-secret', msg: 'Hardcoded AWS access key pattern detected (AKIA************MPLE — redacted).' },
+          { line: 6, severity: 'HIGH', rule: 'CWE-78-shell-injection', msg: 'subprocess call with shell=True enables OS command injection when given untrusted input.' }
+        ]
+      }
+    };
+
+    const MCP_SURFACE = {
+      tools: [
+        { name: 'cortex_list_skills', desc: 'List all 36 Cortex skills with tier, script path, and SHA-256.' },
+        { name: 'cortex_get_skill', desc: 'Retrieve full SKILL.md playbook instructions and metadata for a slug.' },
+        { name: 'cortex_search_skills', desc: 'Keyword search across slugs, descriptions, tags, and verifiers.' },
+        { name: 'cortex_list_packs', desc: 'Return all 10 curated 6-skill role packs from packs.json.' },
+        { name: 'cortex_verify_workspace', desc: 'Run supply-chain SHA-256, manifest, eval, and lockfile verification.' },
+        { name: 'cortex_run_verifier', desc: 'Execute any bundled Python verifier inside workspace-confined root.' },
+        { name: 'cortex_compile_rules', desc: 'Compile SKILL.md playbooks into 7 native IDE/agent formats.' },
+        { name: 'cortex_scan_repo', desc: 'Run the 14-verifier policy & SARIF 2.1.0 scanner over workspace.' }
+      ],
+      resources: [
+        { name: 'cortex://skills/<slug> (36)', desc: 'Read-only live access to every core & extended SKILL.md specification.' },
+        { name: 'cortex://packs', desc: 'Canonical packs.json bundle definitions validated by schema.' },
+        { name: 'cortex://checksums', desc: 'Full 72-file SHA-256 cryptographic manifest (checksums.json).' }
+      ],
+      prompts: [
+        { name: 'cortex/security-auditor', desc: 'Invocable OWASP + secrets + CWE audit prompt with task argument.' },
+        { name: 'cortex/kubernetes-architect', desc: 'Restricted Pod Security Standards & Helm review workflow.' },
+        { name: 'cortex/rust-systems-engineer', desc: 'Safe Rust ownership, unsafe invariant proof & cargo check prompt.' },
+        { name: 'cortex/typescript-architect', desc: 'Strict TypeScript + runtime boundary schema verification prompt.' },
+        { name: 'cortex/llm-security-auditor', desc: 'OWASP LLM Top 10 prompt-injection & tool-guardrail audit.' },
+        { name: '+ 31 more cortex/<slug> prompts', desc: 'All 36 skills exposed as standardized MCP prompt templates.' }
+      ]
+    };
+
+    const QUICK_TOPICS = ['security', 'kubernetes', 'testing', 'rust', 'go', 'typescript', 'ai-security', 'sre', 'finops', 'python'];
 
     const state = {
       target: 'cortex-cli',
       shell: 'bash',
       filter: 'all',
+      tagFilter: '',
+      view: 'table',
       query: '',
       selected: new Set(PACKS[0].skills),
-      activePack: PACKS[0].id,
-      inspectSlug: null
+      inspectSlug: null,
+      rtTab: 'scan',
+      scanFixture: 'k8s',
+      scanFixed: false,
+      scanFmt: 'table',
+      mcpTab: 'tools',
+      paletteOpen: false,
+      paletteIndex: 0
     };
 
     const $ = (id) => document.getElementById(id);
+    let toastTimer = null;
+    let replayTimer = null;
 
-    function copyText(text, btn) {
+    function showToast(msg) {
+      const el = $('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function copyText(text, btn, label) {
       const done = () => {
-        if (!btn) return;
-        const orig = btn.textContent;
-        btn.textContent = 'copied';
-        btn.classList.add('copied');
-        setTimeout(() => {
-          btn.textContent = orig;
-          btn.classList.remove('copied');
-        }, 1300);
+        if (btn) {
+          const orig = btn.textContent;
+          btn.textContent = 'copied';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.textContent = orig;
+            btn.classList.remove('copied');
+          }, 1300);
+        }
+        showToast(label || 'Copied to clipboard');
       };
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(done).catch(done);
@@ -2204,19 +3415,42 @@ Next steps:
       return `npx @jovianops/cortex detect`;
     }
 
+    function setActiveTarget(targetId, announce) {
+      state.target = targetId;
+      $('heroAgent').value = targetId;
+      $('builderAgent').value = targetId;
+      const t = TARGETS.find((x) => x.id === targetId);
+      if (t) $('activePlatformLabel').textContent = t.label;
+      document.querySelectorAll('#platformsGrid .plat-card').forEach((card) => {
+        card.setAttribute('aria-pressed', String(card.dataset.target === targetId));
+      });
+      renderCommands();
+      if (state.inspectSlug) openDrawer(state.inspectSlug);
+      if (announce && t) showToast(`Target switched to ${t.label}`);
+    }
+
     function populateSelects() {
       for (const id of ['heroAgent', 'builderAgent']) {
         const sel = $(id);
         sel.innerHTML = TARGETS.map((t) => `<option value="${t.id}">${t.label}</option>`).join('');
         sel.value = state.target;
-        sel.addEventListener('change', (e) => {
-          state.target = e.target.value;
-          $('heroAgent').value = state.target;
-          $('builderAgent').value = state.target;
-          renderCommands();
-          if (state.inspectSlug) openDrawer(state.inspectSlug);
-        });
+        sel.addEventListener('change', (e) => setActiveTarget(e.target.value, false));
       }
+
+      $('platformsGrid').innerHTML = TARGETS.map((t) => `
+        <button type="button" class="plat-card" data-target="${t.id}" aria-pressed="${t.id === state.target}">
+          <div class="plat-head">
+            <span class="plat-name">${t.label}</span>
+            <span class="plat-badge">${t.badge}</span>
+          </div>
+          <span class="plat-path">${t.path}</span>
+        </button>
+      `).join('');
+
+      $('platformsGrid').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-target]');
+        if (btn) setActiveTarget(btn.dataset.target, true);
+      });
     }
 
     function syncShellButtons() {
@@ -2236,7 +3470,7 @@ Next steps:
       if (matched) {
         $('builderStatus').innerHTML = `pack <strong>${matched.id}</strong> (${selCount} skills)`;
       } else if (selCount === 0) {
-        $('builderStatus').innerHTML = `<strong>all 24 skills</strong> (none checked = full catalog)`;
+        $('builderStatus').innerHTML = `<strong>all ${SKILLS.length} skills</strong> (none checked = full catalog)`;
       } else {
         $('builderStatus').innerHTML = `<strong>${selCount} skill${selCount === 1 ? '' : 's'}</strong> selected`;
       }
@@ -2248,16 +3482,185 @@ Next steps:
       });
 
       $('verifyCmd').textContent = state.shell === 'powershell'
-        ? `$t="$env:TEMP\\cortex-1.0.0.tgz"\nInvoke-WebRequest https://registry.npmjs.org/@jovianops/cortex/-/cortex-1.0.0.tgz -OutFile $t\n(Get-FileHash $t -Algorithm SHA256).Hash  # expect ${NPM_SHA256.toUpperCase()}\nRemove-Item $t\nnpm audit signatures\nnpx @jovianops/cortex doctor`
-        : `# 1. Verify published npm tarball SHA-256 (expect ${NPM_SHA256})\ncurl -fsSL https://registry.npmjs.org/@jovianops/cortex/-/cortex-1.0.0.tgz | sha256sum\n\n# 2. Verify SLSA v1 provenance signatures & all 24 bundled skill hashes\nnpm audit signatures\nnpx @jovianops/cortex doctor`;
+        ? `$t="$env:TEMP\\cortex-1.0.0.tgz"\nInvoke-WebRequest https://registry.npmjs.org/@jovianops/cortex/-/cortex-1.0.0.tgz -OutFile $t\n(Get-FileHash $t -Algorithm SHA256).Hash  # expect ${NPM_SHA256.toUpperCase()}\nRemove-Item $t\nnpm audit signatures\nnpx @jovianops/cortex verify --json\nnpx @jovianops/cortex doctor`
+        : `# 1. Verify published npm tarball SHA-256 (expect ${NPM_SHA256})\ncurl -fsSL https://registry.npmjs.org/@jovianops/cortex/-/cortex-1.0.0.tgz | sha256sum\n\n# 2. Verify SLSA v1 provenance & all 36 bundled skill hashes (72 files)\nnpm audit signatures\nnpx @jovianops/cortex verify --json\nnpx @jovianops/cortex doctor`;
     }
 
+    function renderTerminal(key, animate) {
+      const lines = TERM_VIEWS[key] || TERM_VIEWS.doctor;
+      clearInterval(replayTimer);
+      const body = $('termBody');
+      const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!animate || reduceMotion) {
+        body.innerHTML = lines.join('\n');
+        return;
+      }
+      body.innerHTML = '';
+      let idx = 0;
+      const step = () => {
+        if (idx >= lines.length) {
+          clearInterval(replayTimer);
+          return;
+        }
+        body.innerHTML += (idx > 0 ? '\n' : '') + lines[idx];
+        body.scrollTop = body.scrollHeight;
+        idx += 1;
+      };
+      step();
+      replayTimer = setInterval(step, 75);
+    }
+
+    /* Live Runtime Workbench */
+    function renderScannerSim() {
+      const fx = SCAN_FIXTURES[state.scanFixture];
+      const lines = state.scanFixed ? fx.goodLines : fx.badLines;
+      const activeFindings = state.scanFixed ? [] : fx.findings;
+      const flaggedMap = new Map(activeFindings.map((f) => [f.line, f]));
+
+      $('scanSource').innerHTML = lines.map((line, i) => {
+        const ln = i + 1;
+        const hit = flaggedMap.get(ln);
+        const cls = hit ? 'flagged' : (state.scanFixed && ln >= 4 ? 'clean-hl' : '');
+        return `<div class="code-line ${cls}"><span class="ln">${ln}</span><span>${escapeHtml(line)}</span></div>`;
+      }).join('');
+
+      const fixBtn = $('scanFixToggle');
+      fixBtn.textContent = state.scanFixed ? 'restore vulnerable sample' : 'apply hardened fix';
+      fixBtn.classList.toggle('primary', !state.scanFixed);
+
+      $('scanMetaLabel').textContent = `${fx.skill} (${fx.scanner})`;
+      if (state.scanFixed) {
+        $('scanSummaryBar').innerHTML = `<span class="sev-pill ok">PASSED &middot; 0 FINDINGS</span><span class="t-ok">exit 0 &middot; policy gate satisfied</span>`;
+      } else {
+        const crit = activeFindings.filter((f) => f.severity === 'CRITICAL').length;
+        const high = activeFindings.filter((f) => f.severity === 'HIGH').length;
+        const med = activeFindings.filter((f) => f.severity === 'MEDIUM').length;
+        $('scanSummaryBar').innerHTML = `<span><span class="sev-pill critical">${crit} crit</span> <span class="sev-pill high">${high} high</span> <span class="sev-pill medium">${med} med</span></span><span class="t-accent">exit 1 on --fail-on high</span>`;
+      }
+
+      const wrap = $('scanOutputWrap');
+      if (state.scanFmt === 'table') {
+        if (!activeFindings.length) {
+          wrap.innerHTML = `<div class="finding-list"><div class="finding-item"><div class="finding-top"><span class="sev-pill ok">CLEAN</span><strong>${fx.file}</strong></div><p class="finding-msg">All deterministic checks passed with 0 policy violations.</p></div></div>`;
+        } else {
+          wrap.innerHTML = `<div class="finding-list">${activeFindings.map((f) => `
+            <div class="finding-item">
+              <div class="finding-top">
+                <span class="sev-pill ${f.severity.toLowerCase()}">${f.severity}</span>
+                <strong>${f.rule}</strong>
+                <span style="color:var(--faint);">${fx.file}:${f.line}</span>
+              </div>
+              <p class="finding-msg">${escapeHtml(f.msg)}</p>
+            </div>
+          `).join('')}</div>`;
+        }
+      } else if (state.scanFmt === 'sarif') {
+        const sarif = {
+          $schema: 'https://raw.githubusercontent.com/oasis-tcs/sarif-spec/main/sarif-2.1/schema/sarif-schema-2.1.0.json',
+          version: '2.1.0',
+          runs: [{
+            tool: { driver: { name: 'cortex-scan', version: '2.0.0' } },
+            results: activeFindings.map((f) => ({
+              ruleId: f.rule,
+              level: f.severity === 'MEDIUM' ? 'warning' : 'error',
+              message: { text: f.msg },
+              locations: [{ physicalLocation: { artifactLocation: { uri: fx.file }, region: { startLine: f.line } } }]
+            }))
+          }]
+        };
+        wrap.innerHTML = `<pre class="raw-out">${escapeHtml(JSON.stringify(sarif, null, 2))}</pre>`;
+      } else {
+        const cases = activeFindings.length
+          ? activeFindings.map((f) => `  <testcase classname="${fx.scanner}" name="${f.rule} (${fx.file}:${f.line})">\n    <failure message="${escapeHtml(f.msg)}" type="${f.severity}"/>\n  </testcase>`).join('\n')
+          : `  <testcase classname="${fx.scanner}" name="${fx.file} policy gate"/>`;
+        const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<testsuite name="cortex-scan" tests="${Math.max(1, activeFindings.length)}" failures="${activeFindings.length}">\n${cases}\n</testsuite>`;
+        wrap.innerHTML = `<pre class="raw-out">${escapeHtml(xml)}</pre>`;
+      }
+    }
+
+    function buildCompiledRule(skillSlug, format) {
+      const s = SKILLS.find((x) => x.slug === skillSlug) || SKILLS[0];
+      const globs = SKILL_GLOBS[s.slug] || '**/*';
+      const prov = `<!-- Compiled by Cortex v2.0.0 | skill=${s.slug}@2.0.0 | sha256=${s.sha256} -->`;
+      const body = `# ${s.slug}\n\n${s.desc}\n\n## Deterministic Execution Contract\n1. Inspect workspace evidence before proposing changes.\n2. Run bundled verifier: \`python ${s.dir}/${s.slug}/${s.script} <target> --json\`.\n3. Fail closed on non-zero exit codes and report exact file:line citations.`;
+
+      if (format === 'cursor') {
+        return {
+          path: `.cursor/rules/cortex-${s.slug}.mdc`,
+          text: `---\ndescription: ${JSON.stringify(s.desc)}\nglobs: ${JSON.stringify(globs)}\nalwaysApply: false\n---\n\n${prov}\n\n${body}`
+        };
+      }
+      if (format === 'vscode') {
+        return {
+          path: `.github/instructions/cortex-${s.slug}.instructions.md`,
+          text: `---\napplyTo: ${JSON.stringify(globs)}\n---\n\n${prov}\n\n${body}`
+        };
+      }
+      if (format === 'windsurf') {
+        return {
+          path: `.windsurf/rules/cortex-${s.slug}.md`,
+          text: `${prov}\n\n${body}`
+        };
+      }
+      if (format === 'cline') {
+        return {
+          path: `.clinerules/cortex-${s.slug}.md`,
+          text: `${prov}\n\n${body}`
+        };
+      }
+      const targetFiles = { claude: 'CLAUDE.md', agents: 'AGENTS.md', gemini: 'GEMINI.md' };
+      const targetLabels = { claude: 'Claude Code', agents: 'AGENTS.md', gemini: 'Gemini CLI' };
+      return {
+        path: targetFiles[format] || 'AGENTS.md',
+        text: `<!-- BEGIN CORTEX MANAGED -->\n<!-- Compiled for ${targetLabels[format] || format} | skill=${s.slug}@2.0.0 | sha256=${s.sha256} -->\n\n${body}\n<!-- END CORTEX MANAGED -->`
+      };
+    }
+
+    function renderCompileSim() {
+      const slug = $('compileSkillSel').value || SKILLS[0].slug;
+      const fmt = $('compileTargetSel').value || 'cursor';
+      const out = buildCompiledRule(slug, fmt);
+      $('compileOutPath').textContent = out.path;
+      $('compilePreview').textContent = out.text;
+    }
+
+    function renderMcpSim() {
+      const client = $('mcpClientSel').value;
+      let cfg = '';
+      if (client === 'vscode') {
+        cfg = JSON.stringify({
+          servers: {
+            cortex: { type: 'stdio', command: 'npx', args: ['-y', '@jovianops/cortex', 'mcp', '--project-dir', '${workspaceFolder}'] }
+          }
+        }, null, 2);
+      } else if (client === 'codex') {
+        cfg = `[mcp_servers.cortex]\ncommand = "npx"\nargs = ["-y", "@jovianops/cortex", "mcp", "--project-dir", "."]`;
+      } else {
+        cfg = JSON.stringify({
+          mcpServers: {
+            cortex: { command: 'npx', args: ['-y', '@jovianops/cortex', 'mcp', '--project-dir', '.'] }
+          }
+        }, null, 2);
+      }
+      $('mcpConfigPreview').textContent = cfg;
+
+      const items = MCP_SURFACE[state.mcpTab] || MCP_SURFACE.tools;
+      $('mcpSurfaceGrid').innerHTML = items.map((item) => `
+        <div class="mcp-item">
+          <div class="mcp-item-title">${escapeHtml(item.name)}</div>
+          <p class="mcp-item-desc">${escapeHtml(item.desc)}</p>
+        </div>
+      `).join('');
+    }
+
+    /* Skill Catalog */
     function filteredSkills() {
       const q = state.query.trim().toLowerCase();
       return SKILLS.filter((s) => {
         if (state.filter === 'core' && s.tier !== 'core') return false;
         if (state.filter === 'extended' && s.tier !== 'extended') return false;
         if (state.filter === 'scripts' && !s.script) return false;
+        if (state.tagFilter && !s.tags.includes(state.tagFilter)) return false;
         if (!q) return true;
         return (
           s.slug.includes(q) ||
@@ -2268,32 +3671,63 @@ Next steps:
       });
     }
 
-    function renderTable() {
+    function renderTagStrip() {
+      $('tagStrip').innerHTML = `<span class="mono" style="font-size:11px;color:var(--faint);margin-right:2px;">topics:</span>` +
+        QUICK_TOPICS.map((tag) => `<button type="button" class="chip ${state.tagFilter === tag ? 'active' : ''}" data-topic="${tag}">#${tag}</button>`).join('') +
+        (state.tagFilter ? `<button type="button" class="chip" data-topic="">reset</button>` : '');
+    }
+
+    function renderCatalog() {
       const rows = filteredSkills();
       $('countLabel').textContent = `${rows.length} of ${SKILLS.length} shown`;
-      const tbody = $('skillRows');
 
-      if (!rows.length) {
-        tbody.innerHTML = `<tr><td colspan="5" class="empty-row">No skills match "${state.query.replace(/</g, '&lt;')}".</td></tr>`;
-        $('selectAllChk').checked = false;
-        return;
+      if (state.view === 'table') {
+        $('tableViewWrap').style.display = '';
+        $('cardsViewWrap').style.display = 'none';
+        const tbody = $('skillRows');
+        if (!rows.length) {
+          tbody.innerHTML = `<tr><td colspan="5" class="empty-row">No skills match your active filter.</td></tr>`;
+          $('selectAllChk').checked = false;
+          return;
+        }
+        tbody.innerHTML = rows.map((s) => {
+          const checked = state.selected.has(s.slug);
+          const scriptHtml = s.script
+            ? `<span class="script-tag">${s.script.replace('scripts/', '')}</span>`
+            : `<span class="none-tag">&mdash;</span>`;
+          return `<tr data-slug="${s.slug}" class="${checked ? 'selected' : ''}">
+            <td class="col-chk"><input class="chk row-chk" type="checkbox" data-slug="${s.slug}" ${checked ? 'checked' : ''} aria-label="Select ${s.slug}" /></td>
+            <td><span class="slug">${s.slug}</span></td>
+            <td><span class="tier ${s.tier === 'core' ? 'core' : ''}">${s.tier}</span></td>
+            <td>${scriptHtml}</td>
+            <td class="desc-cell">${s.desc}</td>
+          </tr>`;
+        }).join('');
+        $('selectAllChk').checked = rows.length > 0 && rows.every((s) => state.selected.has(s.slug));
+      } else {
+        $('tableViewWrap').style.display = 'none';
+        $('cardsViewWrap').style.display = 'grid';
+        const grid = $('cardsViewWrap');
+        if (!rows.length) {
+          grid.innerHTML = `<div class="empty-row" style="grid-column:1/-1;">No skills match your active filter.</div>`;
+          return;
+        }
+        grid.innerHTML = rows.map((s) => {
+          const checked = state.selected.has(s.slug);
+          return `<div class="skill-card ${checked ? 'selected' : ''}" data-slug="${s.slug}">
+            <div class="skill-card-top">
+              <span class="slug">${s.slug}</span>
+              <input class="chk row-chk" type="checkbox" data-slug="${s.slug}" ${checked ? 'checked' : ''} aria-label="Select ${s.slug}" />
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+              <span class="tier ${s.tier === 'core' ? 'core' : ''}">${s.tier}</span>
+              <span class="script-tag">${s.script ? s.script.replace('scripts/', '') : '—'}</span>
+            </div>
+            <p style="margin:0;font-size:13px;color:var(--muted);flex:1;">${s.desc}</p>
+            <div class="skill-card-tags">${s.tags.slice(0, 4).map((t) => `<span class="mini-tag">${t}</span>`).join('')}</div>
+          </div>`;
+        }).join('');
       }
-
-      tbody.innerHTML = rows.map((s) => {
-        const checked = state.selected.has(s.slug);
-        const scriptHtml = s.script
-          ? `<span class="script-tag">${s.script.replace('scripts/', '')}</span>`
-          : `<span class="none-tag">—</span>`;
-        return `<tr data-slug="${s.slug}" class="${checked ? 'selected' : ''}">
-          <td class="col-chk"><input class="chk row-chk" type="checkbox" data-slug="${s.slug}" ${checked ? 'checked' : ''} aria-label="Select ${s.slug}" /></td>
-          <td><span class="slug">${s.slug}</span></td>
-          <td><span class="tier ${s.tier === 'core' ? 'core' : ''}">${s.tier}</span></td>
-          <td>${scriptHtml}</td>
-          <td class="desc-cell">${s.desc}</td>
-        </tr>`;
-      }).join('');
-
-      $('selectAllChk').checked = rows.length > 0 && rows.every((s) => state.selected.has(s.slug));
     }
 
     function renderPacks() {
@@ -2301,10 +3735,12 @@ Next steps:
         <div class="pack-card">
           <div class="pack-top">
             <span class="pack-id">${p.id}</span>
-            <span class="pack-label">${p.label} &middot; ${p.skills.length}</span>
+            <span class="pack-label">${p.label} &middot; ${p.skills.length} skills</span>
           </div>
           <p class="pack-desc">${p.desc}</p>
-          <div class="pack-skills">${p.skills.join(', ')}</div>
+          <div class="pack-skill-chips">
+            ${p.skills.map((slug) => `<button type="button" class="pack-skill-btn" data-inspect-slug="${slug}">${slug}</button>`).join('')}
+          </div>
           <div class="pack-actions">
             <button type="button" class="btn-sm primary" data-load-pack="${p.id}">load in builder</button>
             <button type="button" class="btn-sm" data-copy-pack="${p.id}">copy cli</button>
@@ -2315,6 +3751,14 @@ Next steps:
       $('builderPackPills').innerHTML = PACKS.map((p) =>
         `<button type="button" class="chip" data-pack="${p.id}">${p.id}</button>`
       ).join('');
+    }
+
+    /* Drawer Inspector + WebCrypto SHA-256 Verifier */
+    async function computeSha256Hex(text) {
+      const normalized = text.replace(/\r\n/g, '\n');
+      const data = new TextEncoder().encode(normalized);
+      const hashBuf = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(hashBuf)).map((b) => b.toString(16).padStart(2, '0')).join('');
     }
 
     function openDrawer(slug) {
@@ -2328,6 +3772,7 @@ Next steps:
       const installCmd = buildCommand(state.target, state.shell, [s.slug]);
       const rawUrl = `https://github.com/JovianOps/cortex/blob/main/${s.dir}/${s.slug}/SKILL.md`;
       const zipUrl = `https://raw.githubusercontent.com/JovianOps/cortex/main/${s.zipDir}/${s.slug}.zip`;
+      const compiledCursor = buildCompiledRule(s.slug, 'cursor');
       const scriptRow = s.script
         ? `<div class="kv"><span class="kv-k">script</span><span class="kv-v"><a href="https://github.com/JovianOps/cortex/blob/main/${s.dir}/${s.slug}/${s.script}" target="_blank" rel="noreferrer" style="color:var(--accent);">${s.dir}/${s.slug}/${s.script}</a></span></div>`
         : '';
@@ -2345,8 +3790,8 @@ Next steps:
 
         <div>
           <div class="mono" style="font-size:11.5px;color:var(--muted);margin-bottom:6px;">install (${state.target} / ${state.shell})</div>
-          <div class="cmd-row" style="border-radius:var(--radius);">
-            <pre><span class="prompt">$</span>${installCmd.replace(/</g, '&lt;')}</pre>
+          <div class="cmd-row" style="border:1px solid var(--border);">
+            <pre><span class="prompt">$</span>${escapeHtml(installCmd)}</pre>
             <button type="button" class="copy-btn" id="drawerCopyCmd">copy</button>
           </div>
         </div>
@@ -2354,8 +3799,21 @@ Next steps:
         <div class="drawer-links">
           <a class="btn-sm primary" href="${rawUrl}" target="_blank" rel="noreferrer">read SKILL.md</a>
           <a class="btn-sm" href="${zipUrl}" target="_blank" rel="noreferrer">download .zip</a>
-          <button type="button" class="btn-sm" id="drawerCopySha">copy SKILL.md sha-256</button>
+          <button type="button" class="btn-sm" id="drawerCopySha">copy SHA-256</button>
           <button type="button" class="btn-sm" id="drawerToggleSel">${state.selected.has(s.slug) ? 'remove from builder' : 'add to builder'}</button>
+        </div>
+
+        <div class="drawer-box">
+          <h3>Live Browser SHA-256 Verifier (WebCrypto)</h3>
+          <p style="margin:0 0 8px;font-size:12px;color:var(--muted);">Choose a local <code>SKILL.md</code> file or paste its contents to verify LF-normalized SHA-256 against <code>checksums.json</code>.</p>
+          <input type="file" id="drawerFileVerify" class="ctrl" style="width:100%;margin-bottom:8px;" accept=".md,.txt" aria-label="Choose SKILL.md file to verify SHA-256" />
+          <textarea id="drawerTextVerify" class="ctrl" rows="3" style="width:100%;resize:vertical;" placeholder="Or paste SKILL.md contents here to compute SHA-256..." aria-label="Paste SKILL.md contents to verify SHA-256"></textarea>
+          <div id="drawerHashResult" class="hash-status">Waiting for file or text input...</div>
+        </div>
+
+        <div class="drawer-box">
+          <h3>Compiled Cursor Rule Preview (${compiledCursor.path})</h3>
+          <pre class="raw-out" style="max-height:170px;border:1px solid var(--border);">${escapeHtml(compiledCursor.text)}</pre>
         </div>
       `;
 
@@ -2364,9 +3822,42 @@ Next steps:
       $('drawerToggleSel').addEventListener('click', () => {
         if (state.selected.has(s.slug)) state.selected.delete(s.slug);
         else state.selected.add(s.slug);
-        renderTable();
+        renderCatalog();
         renderCommands();
         openDrawer(s.slug);
+      });
+
+      const verifyText = async (txt) => {
+        const resEl = $('drawerHashResult');
+        if (!txt) {
+          resEl.className = 'hash-status';
+          resEl.textContent = 'Waiting for file or text input...';
+          return;
+        }
+        if (!window.crypto || !window.crypto.subtle) {
+          resEl.className = 'hash-status';
+          resEl.textContent = 'WebCrypto unavailable in this browser context (requires https or localhost).';
+          return;
+        }
+        const actual = await computeSha256Hex(txt);
+        const match = actual === s.sha256;
+        resEl.className = 'hash-status ' + (match ? 'match' : 'mismatch');
+        resEl.innerHTML = match
+          ? `<strong>MATCH [OK]</strong> &middot; ${actual}`
+          : `<strong>MISMATCH</strong><br/>actual:   ${actual}<br/>expected: ${s.sha256}`;
+      };
+
+      $('drawerTextVerify').addEventListener('input', (e) => verifyText(e.target.value));
+      $('drawerFileVerify').addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const content = String(reader.result || '');
+          $('drawerTextVerify').value = content;
+          verifyText(content);
+        };
+        reader.readAsText(file);
       });
 
       $('backdrop').classList.add('open');
@@ -2383,14 +3874,135 @@ Next steps:
       $('drawer').setAttribute('aria-hidden', 'true');
     }
 
+    /* Command Palette */
+    function paletteEntries(q) {
+      const query = q.trim().toLowerCase();
+      const items = [
+        { kind: 'action', title: 'Toggle Light / Dark theme', sub: 'Switch color scheme', run: () => {
+          const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+          document.querySelector(`[data-theme-set="${next}"]`).click();
+        }},
+        { kind: 'runtime', title: 'Open cortex scan simulator', sub: 'Live SARIF 2.1.0 & policy workbench', run: () => {
+          document.querySelector('[data-rt="scan"]').click();
+          $('runtime').scrollIntoView({ behavior: 'smooth' });
+        }},
+        { kind: 'runtime', title: 'Open cortex compile transpiler', sub: '7 native IDE/agent formats', run: () => {
+          document.querySelector('[data-rt="compile"]').click();
+          $('runtime').scrollIntoView({ behavior: 'smooth' });
+        }},
+        { kind: 'runtime', title: 'Open cortex mcp inspector', sub: '8 tools, 38 resources, 36 prompts', run: () => {
+          document.querySelector('[data-rt="mcp"]').click();
+          $('runtime').scrollIntoView({ behavior: 'smooth' });
+        }}
+      ];
+      for (const p of PACKS) {
+        items.push({
+          kind: 'pack',
+          title: p.id,
+          sub: `${p.label} — load 6 skills into builder`,
+          run: () => {
+            state.selected = new Set(p.skills);
+            renderCatalog();
+            renderCommands();
+            $('builder').scrollIntoView({ behavior: 'smooth' });
+            showToast(`Loaded pack: ${p.id}`);
+          }
+        });
+      }
+      for (const t of TARGETS) {
+        items.push({
+          kind: 'target',
+          title: t.label,
+          sub: t.path,
+          run: () => setActiveTarget(t.id, true)
+        });
+      }
+      for (const s of SKILLS) {
+        items.push({
+          kind: 'skill',
+          title: s.slug,
+          sub: s.desc,
+          run: () => openDrawer(s.slug)
+        });
+      }
+      if (!query) return items.slice(0, 14);
+      return items.filter((it) =>
+        it.title.toLowerCase().includes(query) ||
+        it.sub.toLowerCase().includes(query) ||
+        it.kind.toLowerCase().includes(query)
+      ).slice(0, 18);
+    }
+
+    let currentPaletteHits = [];
+
+    function renderPalette() {
+      currentPaletteHits = paletteEntries($('paletteInput').value);
+      if (state.paletteIndex >= currentPaletteHits.length) state.paletteIndex = 0;
+      const list = $('paletteList');
+      if (!currentPaletteHits.length) {
+        list.innerHTML = `<div class="empty-row">No matching commands, skills, or packs.</div>`;
+        return;
+      }
+      list.innerHTML = currentPaletteHits.map((it, idx) => `
+        <button type="button" class="palette-item ${idx === state.paletteIndex ? 'active' : ''}" data-pidx="${idx}">
+          <span class="palette-item-left">
+            <span class="palette-kind">${it.kind}</span>
+            <span class="palette-title">${escapeHtml(it.title)}</span>
+            <span class="palette-sub">${escapeHtml(it.sub)}</span>
+          </span>
+        </button>
+      `).join('');
+    }
+
+    function openPalette() {
+      state.paletteOpen = true;
+      state.paletteIndex = 0;
+      $('cmdPalette').classList.add('open');
+      $('cmdPalette').setAttribute('aria-hidden', 'false');
+      $('paletteInput').value = '';
+      renderPalette();
+      setTimeout(() => $('paletteInput').focus(), 20);
+    }
+
+    function closePalette() {
+      state.paletteOpen = false;
+      $('cmdPalette').classList.remove('open');
+      $('cmdPalette').setAttribute('aria-hidden', 'true');
+    }
+
+    function animateKpis() {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      document.querySelectorAll('[data-count-to]').forEach((el) => {
+        const target = parseInt(el.dataset.countTo, 10);
+        const start = performance.now();
+        const dur = 520;
+        const tick = (now) => {
+          const p = Math.min(1, (now - start) / dur);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = String(Math.round(target * eased));
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+    }
+
     function init() {
       populateSelects();
       renderPacks();
-      renderTable();
+      renderTagStrip();
+      renderCatalog();
       renderCommands();
-      $('termBody').innerHTML = TERM_VIEWS.doctor;
+      renderTerminal('doctor', false);
+      animateKpis();
 
-      // Explicit Light / Dark segmented theme toggle
+      // Compile dropdown
+      $('compileSkillSel').innerHTML = SKILLS.map((s) => `<option value="${s.slug}">${s.slug} (${s.tier})</option>`).join('');
+      $('compileSkillSel').value = 'kubernetes-architect';
+      renderScannerSim();
+      renderCompileSim();
+      renderMcpSim();
+
+      // Theme toggle
       const applyTheme = (mode) => {
         const next = mode === 'dark' ? 'dark' : 'light';
         document.documentElement.dataset.theme = next;
@@ -2404,7 +4016,25 @@ Next steps:
         btn.addEventListener('click', () => applyTheme(btn.dataset.themeSet));
       });
 
-      // Shell toggles (synchronized everywhere)
+      // Scroll progress + active nav link
+      const navLinks = Array.from(document.querySelectorAll('nav a[href^="#"]'));
+      const updateScroll = () => {
+        const doc = document.documentElement;
+        const max = doc.scrollHeight - window.innerHeight;
+        const pct = max > 0 ? Math.min(100, Math.max(0, (window.scrollY / max) * 100)) : 0;
+        $('scrollProgress').style.width = `${pct.toFixed(1)}%`;
+
+        let currentId = '';
+        for (const link of navLinks) {
+          const sec = document.querySelector(link.getAttribute('href'));
+          if (sec && sec.getBoundingClientRect().top <= 120) currentId = link.getAttribute('href');
+        }
+        navLinks.forEach((l) => l.classList.toggle('active', l.getAttribute('href') === currentId));
+      };
+      window.addEventListener('scroll', updateScroll, { passive: true });
+      updateScroll();
+
+      // Shell toggles
       document.querySelectorAll('[data-shell]').forEach((btn) => {
         btn.addEventListener('click', () => {
           state.shell = btn.dataset.shell;
@@ -2414,32 +4044,144 @@ Next steps:
         });
       });
 
-      // Terminal tabs
+      // Terminal tabs + replay
       document.querySelectorAll('[data-term]').forEach((btn) => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('[data-term]').forEach((b) => b.setAttribute('aria-selected', 'false'));
           btn.setAttribute('aria-selected', 'true');
-          $('termBody').innerHTML = TERM_VIEWS[btn.dataset.term];
+          renderTerminal(btn.dataset.term, true);
+        });
+      });
+      $('termReplay').addEventListener('click', () => {
+        const active = document.querySelector('[data-term][aria-selected="true"]');
+        renderTerminal(active ? active.dataset.term : 'doctor', true);
+      });
+
+      // Runtime tabs
+      document.querySelectorAll('[data-rt]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.rtTab = btn.dataset.rt;
+          document.querySelectorAll('[data-rt]').forEach((b) => b.setAttribute('aria-selected', String(b === btn)));
+          document.querySelectorAll('.runtime-panel').forEach((p) => p.classList.remove('active'));
+          $('rt-' + state.rtTab).classList.add('active');
         });
       });
 
-      // Filter tabs
+      // Scanner controls
+      $('scanFixture').addEventListener('change', (e) => {
+        state.scanFixture = e.target.value;
+        state.scanFixed = false;
+        renderScannerSim();
+      });
+      $('scanFixToggle').addEventListener('click', () => {
+        state.scanFixed = !state.scanFixed;
+        renderScannerSim();
+        showToast(state.scanFixed ? 'Applied hardened fix — 0 findings' : 'Restored vulnerable fixture');
+      });
+      document.querySelectorAll('[data-scan-fmt]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.scanFmt = btn.dataset.scanFmt;
+          document.querySelectorAll('[data-scan-fmt]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+          renderScannerSim();
+        });
+      });
+
+      // Compiler controls
+      $('compileSkillSel').addEventListener('change', renderCompileSim);
+      $('compileTargetSel').addEventListener('change', renderCompileSim);
+      $('compileCopyBtn').addEventListener('click', (e) => copyText($('compilePreview').textContent, e.currentTarget, 'Copied compiled rule'));
+
+      // MCP controls
+      $('mcpClientSel').addEventListener('change', renderMcpSim);
+      $('mcpCopyBtn').addEventListener('click', (e) => copyText($('mcpConfigPreview').textContent, e.currentTarget, 'Copied MCP client config'));
+      document.querySelectorAll('[data-mcp-tab]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.mcpTab = btn.dataset.mcpTab;
+          document.querySelectorAll('[data-mcp-tab]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+          renderMcpSim();
+        });
+      });
+
+      // Filter tabs & view toggle
       document.querySelectorAll('[data-filter]').forEach((btn) => {
         btn.addEventListener('click', () => {
           state.filter = btn.dataset.filter;
           document.querySelectorAll('[data-filter]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-          renderTable();
+          renderCatalog();
         });
       });
 
-      // Search + '/' shortcut
+      document.querySelectorAll('[data-view]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.view = btn.dataset.view;
+          document.querySelectorAll('[data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+          renderCatalog();
+        });
+      });
+
+      $('tagStrip').addEventListener('click', (e) => {
+        const chip = e.target.closest('[data-topic]');
+        if (!chip) return;
+        state.tagFilter = state.tagFilter === chip.dataset.topic ? '' : chip.dataset.topic;
+        renderTagStrip();
+        renderCatalog();
+      });
+
+      // Search & keyboard shortcuts
       $('searchInput').addEventListener('input', (e) => {
         state.query = e.target.value;
-        renderTable();
+        renderCatalog();
+      });
+
+      $('cmdkBtn').addEventListener('click', openPalette);
+      $('paletteClose').addEventListener('click', closePalette);
+      $('cmdPalette').addEventListener('click', (e) => {
+        if (e.target === $('cmdPalette')) closePalette();
+      });
+      $('paletteInput').addEventListener('input', () => {
+        state.paletteIndex = 0;
+        renderPalette();
+      });
+      $('paletteList').addEventListener('click', (e) => {
+        const item = e.target.closest('[data-pidx]');
+        if (!item) return;
+        const hit = currentPaletteHits[Number(item.dataset.pidx)];
+        if (hit) {
+          closePalette();
+          hit.run();
+        }
       });
 
       document.addEventListener('keydown', (e) => {
-        if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          if (state.paletteOpen) closePalette();
+          else openPalette();
+          return;
+        }
+        if (state.paletteOpen) {
+          if (e.key === 'Escape') { closePalette(); return; }
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (currentPaletteHits.length) state.paletteIndex = (state.paletteIndex + 1) % currentPaletteHits.length;
+            renderPalette();
+            return;
+          }
+          if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (currentPaletteHits.length) state.paletteIndex = (state.paletteIndex - 1 + currentPaletteHits.length) % currentPaletteHits.length;
+            renderPalette();
+            return;
+          }
+          if (e.key === 'Enter' && currentPaletteHits[state.paletteIndex]) {
+            e.preventDefault();
+            const hit = currentPaletteHits[state.paletteIndex];
+            closePalette();
+            hit.run();
+            return;
+          }
+        }
+        if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
           e.preventDefault();
           $('searchInput').focus();
         } else if (e.key === 'Escape') {
@@ -2447,46 +4189,54 @@ Next steps:
         }
       });
 
-      // Table interactions
-      $('skillRows').addEventListener('click', (e) => {
+      // Catalog interactions (both Table and Cards)
+      const handleCatalogClick = (e) => {
         const chk = e.target.closest('.row-chk');
         if (chk) {
           const slug = chk.dataset.slug;
           if (chk.checked) state.selected.add(slug);
           else state.selected.delete(slug);
-          renderTable();
+          renderCatalog();
           renderCommands();
           return;
         }
-        const tr = e.target.closest('tr[data-slug]');
-        if (tr) openDrawer(tr.dataset.slug);
-      });
+        const item = e.target.closest('[data-slug]');
+        if (item) openDrawer(item.dataset.slug);
+      };
+      $('skillRows').addEventListener('click', handleCatalogClick);
+      $('cardsViewWrap').addEventListener('click', handleCatalogClick);
 
       $('selectAllChk').addEventListener('change', (e) => {
         const visible = filteredSkills();
         if (e.target.checked) visible.forEach((s) => state.selected.add(s.slug));
         else visible.forEach((s) => state.selected.delete(s.slug));
-        renderTable();
+        renderCatalog();
         renderCommands();
       });
 
       // Pack actions
       $('packsGrid').addEventListener('click', (e) => {
+        const inspectBtn = e.target.closest('[data-inspect-slug]');
+        if (inspectBtn) {
+          openDrawer(inspectBtn.dataset.inspectSlug);
+          return;
+        }
         const loadBtn = e.target.closest('[data-load-pack]');
         if (loadBtn) {
           const p = PACKS.find((x) => x.id === loadBtn.dataset.loadPack);
           if (p) {
             state.selected = new Set(p.skills);
-            renderTable();
+            renderCatalog();
             renderCommands();
-            document.getElementById('builder').scrollIntoView({ behavior: 'smooth' });
+            $('builder').scrollIntoView({ behavior: 'smooth' });
+            showToast(`Loaded pack: ${p.id} (6 skills)`);
           }
           return;
         }
         const copyBtn = e.target.closest('[data-copy-pack]');
         if (copyBtn) {
           const cmd = `npx @jovianops/cortex install --agent claude-code --pack ${copyBtn.dataset.copyPack}`;
-          copyText(cmd, copyBtn);
+          copyText(cmd, copyBtn, `Copied CLI for ${copyBtn.dataset.copyPack}`);
         }
       });
 
@@ -2496,15 +4246,17 @@ Next steps:
         const p = PACKS.find((x) => x.id === chip.dataset.pack);
         if (p) {
           state.selected = new Set(p.skills);
-          renderTable();
+          renderCatalog();
           renderCommands();
+          showToast(`Selected pack: ${p.id}`);
         }
       });
 
       $('clearSelBtn').addEventListener('click', () => {
         state.selected.clear();
-        renderTable();
+        renderCatalog();
         renderCommands();
+        showToast('Cleared skill selection (defaulting to full catalog)');
       });
 
       // Copy buttons

@@ -16,10 +16,16 @@ npx @jovianops/cortex mcp --print-config claude-code
 # Cursor (.cursor/mcp.json)
 npx @jovianops/cortex mcp --print-config cursor
 
+<<<<<<< HEAD
 # OpenAI Codex CLI / Windsurf / OpenCode
 npx @jovianops/cortex mcp --print-config codex
 npx @jovianops/cortex mcp --print-config windsurf
 npx @jovianops/cortex mcp --print-config opencode
+=======
+# OpenAI Codex CLI / Windsurf
+npx @jovianops/cortex mcp --print-config codex
+npx @jovianops/cortex mcp --print-config windsurf
+>>>>>>> origin/main
 ```
 
 ### Example `.vscode/mcp.json`

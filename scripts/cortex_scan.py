@@ -57,10 +57,17 @@ def normalize_finding(scanner_id: str, skill: str, raw: dict, target_dir: Path) 
         "scanner": scanner_id,
         "skill": skill,
         "severity": sev,
+<<<<<<< HEAD
         "rule": str(raw.get("rule") or raw.get("rule_id") or raw.get("cwe") or f"{scanner_id}-finding"),
         "file": file_val or ".",
         "line": int(raw.get("line", 1) or 1),
         "message": str(raw.get("message") or raw.get("detail") or raw.get("title") or "Finding reported."),
+=======
+        "rule": str(raw.get("rule", raw.get("rule_id", f"{scanner_id}-finding"))),
+        "file": file_val or ".",
+        "line": int(raw.get("line", 1) or 1),
+        "message": str(raw.get("message", raw.get("detail", "Finding reported."))),
+>>>>>>> origin/main
     }
 
 

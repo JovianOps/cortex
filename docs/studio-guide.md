@@ -22,7 +22,11 @@ npx @jovianops/cortex studio --host 0.0.0.0 --port 4310
 3. **03 / Tool Runner**: Execute any of the 36 bundled Python verifiers directly against files/folders in your workspace and inspect structured JSON findings.
 4. **04 / Compiler**: Preview (`dry_run: true`) or generate native rule files for Cursor, VS Code, Windsurf, Cline, `CLAUDE.md`, `AGENTS.md`, and `GEMINI.md`.
 5. **05 / Policy & SARIF**: Run unified repository scans with configurable severity gates and export **SARIF 2.1.0** (`cortex-scan.sarif`) directly from the browser.
+<<<<<<< HEAD
 6. **06 / MCP Server**: Generate copy-paste MCP client configs for VS Code, Claude Code, Cursor, Codex, Windsurf, and OpenCode.
+=======
+6. **06 / MCP Server**: Generate copy-paste MCP client configs for VS Code, Claude Code, Cursor, Codex, and Windsurf.
+>>>>>>> origin/main
 
 ## REST API Reference
 
@@ -33,7 +37,11 @@ npx @jovianops/cortex studio --host 0.0.0.0 --port 4310
 | `GET /api/skills/<slug>` | Skill metadata + full `SKILL.md` + bundled script source |
 | `GET /api/packs` | All 10 role packs (`packs.json`) |
 | `GET /api/verify` | Runs `cortex verify --json` against the workspace |
+<<<<<<< HEAD
 | `GET /api/mcp-config?client=vscode` | Returns MCP JSON config for `vscode`, `claude-code`, `cursor`, `codex`, `windsurf`, or `opencode` |
+=======
+| `GET /api/mcp-config?client=vscode` | Returns MCP JSON config for `vscode`, `claude-code`, `cursor`, `codex`, or `windsurf` |
+>>>>>>> origin/main
 | `POST /api/run-tool` | Body `{"slug": "...", "target": "."}` — runs bundled Python verifier |
 | `POST /api/compile` | Body `{"pack": "fullstack", "targets": ["cursor","vscode"], "dry_run": true}` |
 | `POST /api/scan` | Body `{"fail_on": "high", "only": []}` — returns `{report, sarif}` |
