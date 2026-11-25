@@ -47,7 +47,7 @@ python3 -m unittest discover -s tests -v
 
 ## Cutting a Release
 
-Use the atomic release script so all 24 skills, 9 manifests, ZIPs, `checksums.json`, CLI constants, and `index.html` stay in lockstep:
+Use the atomic release script so all 36 skills, 9 manifests, ZIPs, `checksums.json`, CLI constants, and `index.html` stay in lockstep:
 
 ```bash
 python3 scripts/bump_version.py 1.1.0

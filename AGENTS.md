@@ -52,5 +52,5 @@ This repository ships **36 modular, deterministic v2.0.0 Agent Skills** followin
 
 1. Treat `skills/<slug>/` and `premium-skills/<slug>/` as the single source of truth.
 2. After editing any `SKILL.md` or bundled script, regenerate ZIP archives and `checksums.json` with `python scripts/cortex.py package` and verify everything with `python scripts/cortex.py doctor && npm test`.
-3. Keep all 7 platform manifests (`.claude-plugin/`, `.agents/plugins/`, `.cursor-plugin/`, `plugin.json`, `gemini-extension.json`) and `packs.json` synchronized with all 36 skills.
+3. Keep all 9 platform manifests (`.claude-plugin/`, `.agents/plugins/`, `.cursor-plugin/`, `plugin.json`, `gemini-extension.json`) and `packs.json` synchronized with all 36 skills.
 4. Use `python scripts/cortex.py new <slug> --with-script` to scaffold new 100/100 audit-ready skills.

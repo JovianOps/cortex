@@ -53,7 +53,7 @@ jobs:
       - name: Validate multi-agent plugin & extension manifests
         run: python scripts/validate_manifests.py
 
-      - name: Audit skill quality & validate 24-task eval suite
+      - name: Audit skill quality & validate 36-task eval suite
         run: python scripts/eval_skills.py
 
       - name: Run automated test suite

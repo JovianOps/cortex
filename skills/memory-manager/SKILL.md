@@ -59,7 +59,7 @@ Always store memory in a strict, versioned JSON schema rather than unstructured 
   ],
   "verified_facts": [
     {
-      "fact": "All 20 skills pass scripts/validate_skills.py",
+      "fact": "All 36 skills pass scripts/validate_skills.py",
       "source": "scripts/validate_skills.py",
       "file_sha256": "<optional-hash>",
       "verified_at": "2026-01-01T00:00:00Z"
