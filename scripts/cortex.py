@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cortex Unified CLI (v2.0.1) — detect agents, diagnose installs, search skills, install packs, and scaffold new skills.
+"""Cortex Unified CLI (v3.0.0) — detect agents, diagnose installs, search skills, install packs, and scaffold new skills.
 
 Zero external dependencies (Python 3 stdlib only). Works on Linux, macOS, and Windows.
 
@@ -9,6 +9,9 @@ Usage:
   python scripts/cortex.py search [query] [--tier core|extended] [--has-script]
   python scripts/cortex.py packs
   python scripts/cortex.py install --agent claude-code --pack fullstack
+  python scripts/cortex.py graph [--format json|mermaid|dot] [--check]
+  python scripts/cortex.py bundle --pack cloud-native --out dist/cortex.zip
+  python scripts/cortex.py guard check [--json]
   python scripts/cortex.py new <slug> [--tier core|extended] [--with-script]
   python scripts/cortex.py status|upgrade|uninstall|audit|eval|package|verify
 """
@@ -26,7 +29,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
-VERSION = "2.0.1"
+VERSION = "3.0.0"
 
 AGENT_PROBES: tuple[tuple[str, str, str, str, tuple[str, ...]], ...] = (
     ("claude-code", "Claude Code", ".claude", ".claude", ("claude",)),
@@ -681,6 +684,9 @@ def main(argv: list[str] | None = None) -> int:
             "  studio       Launch local Light/Dark Swiss web workbench (cortex studio --port 4310)\n"
             "  compile      Compile SKILL.md playbooks to Cursor .mdc, VS Code, Windsurf, Cline & more\n"
             "  scan         Run unified multi-tool repo scan (Table, JSON, SARIF 2.1.0, JUnit XML)\n"
+            "  graph        Build the skill/pack capability graph (JSON, Mermaid, Graphviz DOT)\n"
+            "  bundle       Build or --verify a deterministic offline skill bundle (ZIP + SHA-256)\n"
+            "  guard        Run the full release gate or emit hardened CI / pre-commit hooks\n"
             "  detect       Auto-detect installed AI agents & locked Cortex skills\n"
             "  doctor       Run environment, lockfile SHA-256, checksum & manifest diagnostics\n"
             "  info <slug>  Inspect a skill's metadata, bundled script, packs, and SHA-256 hashes\n"
@@ -708,6 +714,12 @@ def main(argv: list[str] | None = None) -> int:
         return delegate("cortex_compile", rest)
     if cmd == "scan":
         return delegate("cortex_scan", rest)
+    if cmd == "graph":
+        return delegate("cortex_graph", rest, use_root_cwd=True)
+    if cmd == "bundle":
+        return delegate("cortex_bundle", rest, use_root_cwd=True)
+    if cmd == "guard":
+        return delegate("cortex_guard", rest)
 
     if cmd == "init":
         p = argparse.ArgumentParser(prog="cortex init")

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cortex v2.0.1 Multi-Agent Skill Manager — install, verify, upgrade, and uninstall SKILL.md playbooks.
+"""Cortex v3.0.0 Multi-Agent Skill Manager — install, verify, upgrade, and uninstall SKILL.md playbooks.
 
 Zero external dependencies (Python 3 stdlib only). Works on Linux, macOS, and Windows.
 
@@ -184,7 +184,7 @@ def fetch_bytes(url: str, timeout: int = 20) -> bytes:
     parsed = urllib.parse.urlparse(url)
     if parsed.scheme != "https" or not parsed.netloc:
         raise ValueError(f"Refusing non-HTTPS remote URL: {url!r}")
-    req = urllib.request.Request(url, headers={"User-Agent": "cortex-installer/2.0.1"})
+    req = urllib.request.Request(url, headers={"User-Agent": "cortex-installer/3.0.0"})
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:  # nosec B310
             return resp.read()
@@ -198,7 +198,7 @@ def load_local_catalog() -> dict:
     if checksums_path.is_file():
         return json.loads(checksums_path.read_text(encoding="utf-8"))
 
-    pkg_version = "2.0.1"
+    pkg_version = "3.0.0"
     pkg_json = ROOT / "package.json"
     if pkg_json.is_file():
         pkg_version = json.loads(pkg_json.read_text(encoding="utf-8")).get("version", pkg_version)
@@ -223,7 +223,7 @@ def load_local_catalog() -> dict:
                 "files": files_map,
             }
     return {
-        "schema_version": "2.0.1",
+        "schema_version": "3.0.0",
         "release_version": pkg_version,
         "skill_count": len(skills_index),
         "skills": skills_index,
@@ -331,7 +331,7 @@ def read_lockfile(dest_base: Path) -> dict:
                 return data
         except json.JSONDecodeError:
             pass
-    return {"schema_version": "2.0.1", "skills": {}}
+    return {"schema_version": "3.0.0", "skills": {}}
 
 
 def write_lockfile(dest_base: Path, lock_data: dict) -> None:
@@ -518,7 +518,7 @@ def cmd_check_updates(
     ref: str,
     dry_run: bool,
 ) -> int:
-    latest_version = catalog.get("release_version", "2.0.1")
+    latest_version = catalog.get("release_version", "3.0.0")
     skills_map = catalog["skills"]
     updates_found = 0
 
@@ -605,7 +605,7 @@ def cmd_uninstall(
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Install, verify, upgrade, and uninstall Cortex v2.0.1 SKILL.md playbooks across 12 AI agent & IDE targets."
+        description="Install, verify, upgrade, and uninstall Cortex v3.0.0 SKILL.md playbooks across 12 AI agent & IDE targets."
     )
     parser.add_argument(
         "--agent",
@@ -692,7 +692,7 @@ def main(argv: list[str] | None = None) -> int:
             print(
                 f"  {target.key:<12} {target.label:<38} global: ~/{target.global_rel}   project: {target.project_rel}"
             )
-        print(f"\nAvailable Cortex Skills (v{catalog.get('release_version', '2.0.1')} — {len(catalog['skills'])} total):")
+        print(f"\nAvailable Cortex Skills (v{catalog.get('release_version', '3.0.0')} — {len(catalog['skills'])} total):")
         for slug, meta in catalog["skills"].items():
             extras = [f for f in meta.get("files", {}) if f != "SKILL.md"]
             badge = f"  [+{len(extras)} script(s)]" if extras else ""
@@ -728,7 +728,7 @@ def main(argv: list[str] | None = None) -> int:
 
     packs = load_packs(args.remote, args.repo, args.ref) if args.pack else {}
     skills = select_skills(catalog, args.collection, args.skill, args.pack, packs)
-    release_ver = catalog.get("release_version", "2.0.1")
+    release_ver = catalog.get("release_version", "3.0.0")
 
     for target in agents:
         dest_base = destination_dir(target, args.scope, project_root)

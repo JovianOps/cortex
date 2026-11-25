@@ -1,7 +1,7 @@
 ---
 name: kubernetes-architect
 description: Design hardened Kubernetes and Helm workloads with probes.
-version: 2.0.1
+version: 3.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,7 +27,7 @@ Design production-ready, least-privilege Kubernetes manifests and Helm charts en
 
 ## How to Run
 
-> **Bundled Helper Script (`v2.0.0`):** Run `python premium-skills/kubernetes-architect/scripts/lint_k8s.py k8s/` to audit manifests for `privileged: true`, `:latest` tags, missing `runAsNonRoot`/`readOnlyRootFilesystem`, missing resource limits, and missing probes.
+> **Bundled Helper Script (`v3.0.0`):** Run `python premium-skills/kubernetes-architect/scripts/lint_k8s.py k8s/` to audit manifests for `privileged: true`, `:latest` tags, missing `runAsNonRoot`/`readOnlyRootFilesystem`, missing resource limits, and missing probes.
 
 ```bash
 npx @jovianops/cortex install --agent vscode --skill kubernetes-architect --scope project

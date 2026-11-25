@@ -2,6 +2,25 @@
 
 All notable changes to **Cortex** are documented in this file. This project follows [Semantic Versioning](https://semver.org/).
 
+## [3.0.0] — 2026-11-25
+
+**Agent OS Release.** Cortex stops being only a catalog plus runtime and becomes a closed-loop platform: a **capability graph** that models how skills and role packs actually connect (`cortex graph`), **deterministic portable bundles** with per-file SHA-256 manifests for offline and air-gapped delivery (`cortex bundle`), and a **single release gate** that runs every check and can generate its own hardened CI and Git hooks (`cortex guard`). The MCP server grows to **11 tools and 39 resources**, Studio to **7 panels and 12 REST endpoints**, the docs to **9 guides**, and the whole catalog, manifests, ZIPs, checksums and site are graduated to **`3.0.0`**.
+
+### Added
+- **Capability Graph Engine (`scripts/cortex_graph.py`, CLI: `cortex graph`)**: Builds a deterministic directed graph from all 36 skills, 10 role packs, pack membership and `metadata.hermes.related_skills`. Reports nodes, typed edges, per-skill degree centrality (`hub_score`), the top hubs, orphaned skills, and dangling pack/related references. Emits JSON, **Mermaid**, or **Graphviz DOT**, with `--check` and `--strict` CI gates and `--out` file output.
+- **Portable Bundle Engine (`scripts/cortex_bundle.py`, CLI: `cortex bundle`)**: Builds a single reproducible ZIP containing selected skills, a `bundle.json` manifest with a SHA-256 for every file, and an install README. Supports `--pack`, `--skill`, `--collection core|extended|all`, deterministic timestamps and sorted members, and offline `--verify` that fails on any missing, extra, or modified file.
+- **Guard Gate & Enforcement Generator (`scripts/cortex_guard.py`, CLI: `cortex guard`)**: `guard check` runs packaging, skill validation, manifest validation, the 100-point audit, the capability graph, and the policy/SARIF scan in one pass with stable JSON output and `--only`/`--fail-fast`; `--print-workflow` / `--write-workflow` emit a hardened, SHA-pinned GitHub Actions workflow that passes `lint_actions.py`; `--print-pre-commit` / `guard install` write a Git pre-commit hook into versionable `.githooks/` and configure `core.hooksPath`.
+- **MCP Expansion (`cortex mcp`)**: 3 new tools (`cortex_skill_graph`, `cortex_build_bundle`, `cortex_release_gate`) for **11 tools total**, plus the `cortex://graph` resource for **39 resources total**. Prompt surface remains 36.
+- **Studio Expansion (`cortex studio`)**: New **07 / Capability Graph** panel with live JSON/Mermaid graph rendering and a one-click release gate, backed by `GET /api/graph` and `POST /api/guard` for **12 REST endpoints across 7 panels**, plus a graph-edge KPI.
+- **Documentation**: Added [docs/graph-guide.md](docs/graph-guide.md), [docs/bundle-guide.md](docs/bundle-guide.md), and [docs/guard-guide.md](docs/guard-guide.md) with report schemas, exit codes, CI usage, and enforcement recipes.
+- **Tests (`tests/test_cortex_v3.py`)**: End-to-end coverage for graph construction/checking/rendering, bundle determinism and tamper detection, guard check aggregation, workflow and hook generation, CLI dispatch, MCP tools/resources, and the new Studio endpoints.
+
+### Changed
+- Graduated all 36 `SKILL.md` playbooks, 9 multi-agent manifests, `package.json`, `packs.json`, `evals/skill_evals.json`, `checksums.json`, all 36 ZIPs, the CLI engines, and `index.html` to **`3.0.0`**.
+- `scripts/bump_version.py` now also bumps the three new engines so future releases stay atomic.
+- `cortex guard check` is the documented pre-release and pre-commit command; `cortex verify` remains the fast integrity-only check.
+- `web-scraper` now ships in the `python-pro` role pack, so every skill belongs to at least one pack (no graph orphans); the guard's graph gate runs `--strict` to keep it that way, and `index.html` reads pack sizes from `packs.json` instead of assuming six skills per pack.
+
 ## [2.0.1] — 2026-11-25
 
 **Release Hardening, npm Publish Fix, CLI/MCP Parity & Security Remediation.** Fixes npm tag matching for uppercase/lowercase tags, achieves 100% `--json` and `opencode` parity across CLI/MCP/Studio/site, adds root `.cortex-policy.json`, hardens remote URL/path-traversal/CSRF checks, and eliminates all hardcoded demo secret/PII literal fixtures across the codebase.

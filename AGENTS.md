@@ -1,6 +1,8 @@
 # Cortex Agent Skills Index
 
-This repository ships **36 modular, deterministic v2.0.1 Agent Skills** following the open `SKILL.md` standard, with bundled deterministic helper scripts and SHA-256 integrity verification (`checksums.json`).
+This repository ships **36 modular, deterministic v3.0.0 Agent Skills** following the open `SKILL.md` standard, with bundled deterministic helper scripts and SHA-256 integrity verification (`checksums.json`).
+
+Runtime engines: `cortex mcp` (11 tools / 39 resources), `cortex studio` (7 panels / 12 endpoints), `cortex compile`, `cortex scan`, `cortex graph`, `cortex bundle`, and the `cortex guard` release gate.
 
 ## Core Skills (`skills/`)
 
@@ -54,3 +56,4 @@ This repository ships **36 modular, deterministic v2.0.1 Agent Skills** followin
 2. After editing any `SKILL.md` or bundled script, regenerate ZIP archives and `checksums.json` with `python scripts/cortex.py package` and verify everything with `python scripts/cortex.py doctor && npm test`.
 3. Keep all 9 platform manifests (`.claude-plugin/`, `.agents/plugins/`, `.cursor-plugin/`, `plugin.json`, `gemini-extension.json`) and `packs.json` synchronized with all 36 skills.
 4. Use `python scripts/cortex.py new <slug> --with-script` to scaffold new 100/100 audit-ready skills.
+5. Before release, run `python scripts/cortex.py guard check` (see `docs/guard-guide.md`).

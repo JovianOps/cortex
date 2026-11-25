@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Zero-dependency Model Context Protocol (MCP 2025-03-26) JSON-RPC 2.0 server for Cortex v2.0.1."""
+"""Zero-dependency Model Context Protocol (MCP 2025-03-26) JSON-RPC 2.0 server for Cortex v3.0.0."""
 from __future__ import annotations
 
 import argparse
@@ -12,7 +12,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
-VERSION = "2.0.1"
+VERSION = "3.0.0"
 PROTOCOL_VERSION = "2025-03-26"
 
 
@@ -156,6 +156,40 @@ class CortexMCPServer:
                     },
                 },
             },
+            {
+                "name": "cortex_skill_graph",
+                "description": "Build the Cortex skill/pack capability graph: nodes, pack and related-skill edges, hubs, orphans, and dangling references.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "format": {"type": "string", "enum": ["json", "mermaid", "dot"], "default": "json"},
+                    },
+                },
+            },
+            {
+                "name": "cortex_build_bundle",
+                "description": "Build a deterministic offline Cortex skill bundle (ZIP + SHA-256 manifest) inside the workspace.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "packs": {"type": "array", "items": {"type": "string"}},
+                        "skills": {"type": "array", "items": {"type": "string"}},
+                        "collection": {"type": "string", "enum": ["core", "extended", "all"]},
+                        "out": {"type": "string", "description": "Workspace-relative output path (default: dist/cortex-bundle.zip)."},
+                    },
+                },
+            },
+            {
+                "name": "cortex_release_gate",
+                "description": "Run the Cortex Guard release gate (packaging, manifests, validation, audit, graph, and policy scan) against the workspace.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "only": {"type": "array", "items": {"type": "string"}},
+                        "fail_fast": {"type": "boolean", "default": False},
+                    },
+                },
+            },
         ]
 
     def call_tool(self, name: str, args: dict[str, Any]) -> dict:
@@ -239,6 +273,29 @@ class CortexMCPServer:
             only = [str(x) for x in args["only"]] if args.get("only") else None
             return scanner.run_scan(self.workspace_dir, only=only, policy=pol, fail_on_override=args.get("fail_on"))
 
+        if name == "cortex_skill_graph":
+            graph_mod = load_local_module("cortex_graph")
+            graph = graph_mod.build_graph(ROOT)
+            fmt = str(args.get("format") or "json")
+            if fmt == "mermaid":
+                return {"format": fmt, "graph": graph_mod.to_mermaid(graph), "ok": graph["ok"]}
+            if fmt == "dot":
+                return {"format": fmt, "graph": graph_mod.to_dot(graph), "ok": graph["ok"]}
+            return graph
+
+        if name == "cortex_build_bundle":
+            bundle_mod = load_local_module("cortex_bundle")
+            out = args.get("out") or "dist/cortex-bundle.zip"
+            dest = self._safe_workspace_path(str(out))
+            packs = [str(p) for p in args["packs"]] if isinstance(args.get("packs"), list) else None
+            skills = [str(s) for s in args["skills"]] if isinstance(args.get("skills"), list) else None
+            return bundle_mod.build_bundle(ROOT, dest, packs=packs, skills=skills, collection=args.get("collection"))
+
+        if name == "cortex_release_gate":
+            guard_mod = load_local_module("cortex_guard")
+            only = [str(x) for x in args["only"]] if isinstance(args.get("only"), list) else None
+            return guard_mod.guard_check(self.workspace_dir, only=only, fail_fast=bool(args.get("fail_fast", False)))
+
         raise ValueError(f"Unknown MCP tool: {name!r}")
 
     def handle_request(self, req: dict[str, Any]) -> dict[str, Any] | None:
@@ -283,6 +340,7 @@ class CortexMCPServer:
                 resources.extend([
                     {"uri": "cortex://packs", "name": "packs.json", "description": "Curated Cortex role-based skill packs", "mimeType": "application/json"},
                     {"uri": "cortex://checksums", "name": "checksums.json", "description": "SHA-256 supply-chain checksums", "mimeType": "application/json"},
+                    {"uri": "cortex://graph", "name": "capability-graph", "description": "Skill/pack capability graph with hubs, orphans, and dangling references", "mimeType": "application/json"},
                 ])
                 result = {"resources": resources}
             elif method == "resources/read":
@@ -291,6 +349,9 @@ class CortexMCPServer:
                     result = {"contents": [{"uri": uri, "mimeType": "application/json", "text": (ROOT / "packs.json").read_text(encoding="utf-8")}]}
                 elif uri == "cortex://checksums":
                     result = {"contents": [{"uri": uri, "mimeType": "application/json", "text": (ROOT / "checksums.json").read_text(encoding="utf-8")}]}
+                elif uri == "cortex://graph":
+                    graph_mod = load_local_module("cortex_graph")
+                    result = {"contents": [{"uri": uri, "mimeType": "application/json", "text": json.dumps(graph_mod.build_graph(ROOT), indent=2)}]}
                 elif uri.startswith("cortex://skills/"):
                     slug = uri.removeprefix("cortex://skills/")
                     if slug not in self.skills:

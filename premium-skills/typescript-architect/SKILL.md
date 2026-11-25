@@ -1,7 +1,7 @@
 ---
 name: typescript-architect
 description: Build strict TypeScript and React apps with runtime safety.
-version: 2.0.1
+version: 3.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,7 +27,7 @@ Design strictly typed, boundary-validated TypeScript applications (Node.js and R
 
 ## How to Run
 
-> **Bundled Helper Script (`v2.0.0`):** Run `python premium-skills/typescript-architect/scripts/lint_ts.py src/` to audit `tsconfig.json` strict flags and scan `.ts/.tsx` files for `: any`, `@ts-ignore`, `dangerouslySetInnerHTML`, `eval()`, and chained `!` assertions.
+> **Bundled Helper Script (`v3.0.0`):** Run `python premium-skills/typescript-architect/scripts/lint_ts.py src/` to audit `tsconfig.json` strict flags and scan `.ts/.tsx` files for `: any`, `@ts-ignore`, `dangerouslySetInnerHTML`, `eval()`, and chained `!` assertions.
 
 ```bash
 npx @jovianops/cortex install --agent vscode --skill typescript-architect --scope project

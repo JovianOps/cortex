@@ -1,7 +1,7 @@
 ---
 name: graphql-architect
 description: Design schema-first GraphQL APIs with Relay pagination.
-version: 2.0.1
+version: 3.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,7 +27,7 @@ Design schema-first, backwards-compatible GraphQL APIs featuring Relay cursor pa
 
 ## How to Run
 
-> **Bundled Helper Script (`v2.0.0`):** Run `python premium-skills/graphql-architect/scripts/lint_graphql.py schema.graphql` to audit GraphQL SDL for unbounded list queries, mutations missing Input types, nullable `id: ID`, and `@deprecated` directives lacking a reason.
+> **Bundled Helper Script (`v3.0.0`):** Run `python premium-skills/graphql-architect/scripts/lint_graphql.py schema.graphql` to audit GraphQL SDL for unbounded list queries, mutations missing Input types, nullable `id: ID`, and `@deprecated` directives lacking a reason.
 
 ```bash
 npx @jovianops/cortex install --agent vscode --skill graphql-architect --scope project

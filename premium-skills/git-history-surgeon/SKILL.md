@@ -1,7 +1,7 @@
 ---
 name: git-history-surgeon
 description: Execute safe Git rebases, bisects, and repo hygiene audits.
-version: 2.0.1
+version: 3.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,7 +27,7 @@ Execute zero-data-loss Git history operations (`git bisect`, interactive rebase,
 
 ## How to Run
 
-> **Bundled Helper Script (`v2.0.0`):** Run `python premium-skills/git-history-surgeon/scripts/audit_git_hygiene.py .` to scan for unresolved `<<<<<<<` merge conflict markers, oversized files (`--max-file-kb`), and Conventional Commits compliance across recent history.
+> **Bundled Helper Script (`v3.0.0`):** Run `python premium-skills/git-history-surgeon/scripts/audit_git_hygiene.py .` to scan for unresolved `<<<<<<<` merge conflict markers, oversized files (`--max-file-kb`), and Conventional Commits compliance across recent history.
 
 ```bash
 npx @jovianops/cortex install --agent vscode --skill git-history-surgeon --scope project

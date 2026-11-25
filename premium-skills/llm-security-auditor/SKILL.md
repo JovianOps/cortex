@@ -1,7 +1,7 @@
 ---
 name: llm-security-auditor
 description: Audit AI agents and prompts against OWASP LLM Top 10.
-version: 2.0.1
+version: 3.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,7 +27,7 @@ Audit LLM applications, RAG pipelines, MCP servers, and agent `SKILL.md` playboo
 
 ## How to Run
 
-> **Bundled Helper Script (`v2.0.0`):** Run `python premium-skills/llm-security-auditor/scripts/audit_prompts.py .` to scan prompts, skills, and source files for instruction-override payloads, hidden Unicode/BiDi obfuscation, `curl | sh` agent commands, untrusted system-prompt interpolation, and unrestricted auto-approve flags.
+> **Bundled Helper Script (`v3.0.0`):** Run `python premium-skills/llm-security-auditor/scripts/audit_prompts.py .` to scan prompts, skills, and source files for instruction-override payloads, hidden Unicode/BiDi obfuscation, `curl | sh` agent commands, untrusted system-prompt interpolation, and unrestricted auto-approve flags.
 
 ```bash
 npx @jovianops/cortex install --agent vscode --skill llm-security-auditor --scope project
