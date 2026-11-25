@@ -520,6 +520,10 @@ GEMINI_API_KEY=... python scripts/eval_skills.py --run --provider gemini --model
 
 Contributions and new skills are welcome! Read the **[Contributing Guide](CONTRIBUTING.md)** and **[Skill Authoring Guide](docs/skill-authoring.md)** for the `SKILL.md` frontmatter schema, verifier rules, and pull request checklist.
 
+## Support the Project
+
+If Cortex saved you a review cycle or caught a bug before production, a ⭐ helps other engineers find it. Feature requests and new-skill ideas are open in [Discussions](https://github.com/JovianOps/cortex/discussions).
+
 ## License
 
 Released under the **MIT License** — see [`LICENSE`](LICENSE) for details.
