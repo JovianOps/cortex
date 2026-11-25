@@ -8,7 +8,7 @@ This repository houses **Cortex v2.0.1** — 36 modular, deterministic `SKILL.md
    - Run `python scripts/package_skills.py` whenever any file under `skills/` or `premium-skills/` changes.
    - If any `SKILL.md` or `.zip` SHA-256 changes, sync `index.html` and verify with `python scripts/verify_site.py`.
 2. **Keep multi-agent manifests in sync**:
-   - Every manifest (`.github/plugin.json`, `.github/plugin/marketplace.json`, `plugin.json`, `.claude-plugin/`, `.agents/plugins/`, `.cursor-plugin/`, `gemini-extension.json`, `packs.json`) must agree on the release version and all 24 skills.
+   - Every manifest (`.github/plugin.json`, `.github/plugin/marketplace.json`, `plugin.json`, `.claude-plugin/`, `.agents/plugins/`, `.cursor-plugin/`, `gemini-extension.json`, `packs.json`) must agree on the release version and all 36 skills.
    - Verify with `python scripts/validate_manifests.py`.
 3. **Run the full validation gate before pushing**:
    - `python scripts/package_skills.py --check`

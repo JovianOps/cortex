@@ -1,5 +1,5 @@
 blank_issues_enabled: true
 contact_links:
   - name: Interactive Skill Catalog
-    url: https://github.com/JovianOps/cortex#readme
-    about: Browse all 20 core and extended skills and installation commands
+    url: https://jovianops.github.io/cortex/
+    about: Browse all 36 core and extended skills and build a custom install command

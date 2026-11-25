@@ -61,6 +61,7 @@
     "gemini-extension.json",
     "AGENTS.md",
     "GEMINI.md",
+    "llms.txt",
     "packs.json",
     "checksums.json",
     "schemas/",

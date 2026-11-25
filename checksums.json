@@ -67,9 +67,9 @@
       "collection": "core",
       "dir": "skills",
       "zip": "zips/memory-manager.zip",
-      "zip_sha256": "6a8e2e2e5f1b941b6b9b8f6dd3e06bec7571a6dc0cb3c74433c671f26b1418b9",
+      "zip_sha256": "0cbadd56d102fcb8d1ebd1ca851878394bb52cf068ab27751b42ae7641d3b521",
       "files": {
-        "SKILL.md": "b65bb6b2bd6524b1f943f1283160e6917f93c2715058294ded69b0f999ebdd42",
+        "SKILL.md": "9c9ca5563fc840c945a6f2e9dec8ffa66ac2a7042e8f8371ac877a5c71f95465",
         "scripts/memory_store.py": "012064e49e0bf2aff8cb0574ede1e49f77af7bc85c397b74165a320ceff0d4bd"
       }
     },
