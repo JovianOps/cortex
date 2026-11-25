@@ -21,7 +21,7 @@
       <img src="https://img.shields.io/npm/dt/%40jovianops%2Fcortex?style=flat&color=CB3837&label=npm%20downloads" alt="npm downloads" />
     </a>
     <a href="CHANGELOG.md">
-      <img src="https://img.shields.io/badge/release-v2.0.0-EA580C?style=flat" alt="Release v2.0.0" />
+      <img src="https://img.shields.io/badge/release-v2.0.1-EA580C?style=flat" alt="Release v2.0.1" />
     </a>
     <a href="#supported-agents--platforms">
       <img src="https://img.shields.io/badge/standard-SKILL.md%20%2B%20MCP-2C2B28?style=flat" alt="SKILL.md and MCP Standard" />
@@ -63,7 +63,7 @@
 
 ---
 
-**Cortex `v2.0.0`** is the next-generation, zero-dependency AI-agent skill & runtime platform shipping **36 modular, deterministic Agent Skills (`SKILL.md`)** across **10 core skills** (`skills/`) and **26 extended engineering skills** (`premium-skills/`), with **36/36 bundled zero-dependency Python verifiers (100% coverage)**, a **native MCP 2025-03-26 JSON-RPC stdio server (`cortex mcp`)**, a **local Light/Dark Swiss Web Workbench (`cortex studio`)**, a **Universal Agent Rule Compiler (`cortex compile`)**, a **Unified Policy & SARIF 2.1.0 / JUnit XML Scanner (`cortex scan`)**, **10 curated Role-Based Skill Packs** (`packs.json`), **4 stable JSON Schemas (`schemas/`)**, **SHA-256 integrity verification (`checksums.json`, 72 bundled files + 36 ZIPs)**, and a **36-task live A/B benchmark harness**.
+**Cortex `v2.0.1`** is the next-generation, zero-dependency AI-agent skill & runtime platform shipping **36 modular, deterministic Agent Skills (`SKILL.md`)** across **10 core skills** (`skills/`) and **26 extended engineering skills** (`premium-skills/`), with **36/36 bundled zero-dependency Python verifiers (100% coverage)**, a **native MCP 2025-03-26 JSON-RPC stdio server (`cortex mcp`)**, a **local Light/Dark Swiss Web Workbench (`cortex studio`)**, a **Universal Agent Rule Compiler (`cortex compile`)**, a **Unified Policy & SARIF 2.1.0 / JUnit XML Scanner (`cortex scan`)**, **10 curated Role-Based Skill Packs** (`packs.json`), **4 stable JSON Schemas (`schemas/`)**, **SHA-256 integrity verification (`checksums.json`, 72 bundled files + 36 ZIPs)**, and a **36-task live A/B benchmark harness**.
 
 Built on the open **`SKILL.md`** and **MCP** standards, Cortex works natively across **Visual Studio Code**, **GitHub Copilot**, **Claude** (Claude Code & Claude apps), **OpenAI** (Codex CLI & ChatGPT), **Gemini CLI**, **Cursor**, **Windsurf**, **OpenCode**, **OpenClaw**, **Goose**, **Aider**, **Cline**, and **Hermes Agent**.
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cortex — deterministic agent skills &amp; runtime (v2.0.0)</title>
+  <title>cortex — deterministic agent skills &amp; runtime (v2.0.1)</title>
   <meta name="description" content="36 versioned SKILL.md playbooks, 36 zero-dependency Python helper scripts, native MCP 2025-03-26 server, Local Studio UI, Universal Rule Compiler, SARIF 2.1.0 scanner, 10 role packs, and SHA-256 verification." />
   <link rel="canonical" href="https://jovianops.github.io/cortex/" />
   <meta property="og:type" content="website" />
@@ -2091,7 +2091,7 @@
       <a href="#top" class="brand">
         <span class="brand-mark" aria-hidden="true"></span>
         <span>cortex</span>
-        <span class="ver">v2.0.0</span>
+        <span class="ver">v2.0.1</span>
         <span class="live-badge" title="All 36 skill verifiers audited at 100/100">
           <span class="live-dot" aria-hidden="true"></span>
           <span>36/36 verified</span>
@@ -2136,7 +2136,7 @@
         <div class="hero-grid">
           <div class="hero-copy">
             <p class="kicker">
-              <span class="kicker-ver">v2.0.0</span>
+              <span class="kicker-ver">v2.0.1</span>
               <span>/</span>
               <span>MIT</span>
               <span>/</span>
@@ -2222,7 +2222,7 @@
         <div class="sec-head">
           <div>
             <span class="sec-num">01 / RUNTIME ENGINE</span>
-            <h2>Live v2.0.0 Workbench</h2>
+            <h2>Live v2.0.1 Workbench</h2>
             <p class="sec-desc">Test Cortex's four zero-dependency runtime pillars right here: simulate deterministic <code>cortex scan</code> findings &amp; fixes, transpile rules with <code>cortex compile</code>, inspect <code>cortex mcp</code>, or explore the <code>cortex studio</code> topology.</p>
           </div>
         </div>
@@ -2320,6 +2320,7 @@
                     <option value="cursor">Cursor (.cursor/mcp.json)</option>
                     <option value="codex">OpenAI Codex CLI (~/.codex/config.toml)</option>
                     <option value="windsurf">Windsurf (~/.codeium/windsurf/mcp_config.json)</option>
+                    <option value="opencode">OpenCode (opencode.json)</option>
                   </select>
                 </div>
                 <button type="button" id="mcpCopyBtn" class="btn-sm">copy config</button>
@@ -2344,7 +2345,7 @@
               <pre><span class="prompt">$</span>npx @jovianops/cortex studio --port 4173</pre>
               <button type="button" class="copy-btn" data-copy="npx @jovianops/cortex studio --port 4173">copy</button>
             </div>
-            <svg class="topo-svg" viewBox="0 0 920 290" role="img" aria-label="Cortex v2.0.0 System Topology Diagram">
+            <svg class="topo-svg" viewBox="0 0 920 290" role="img" aria-label="Cortex v2.0.1 System Topology Diagram">
               <defs>
                 <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                   <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--border-strong)" />
@@ -2353,7 +2354,7 @@
               <!-- Canonical Catalog Box -->
               <rect x="210" y="18" width="500" height="78" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.8" />
               <rect x="210" y="18" width="500" height="5" fill="var(--accent)" />
-              <text x="460" y="45" text-anchor="middle" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600">CORTEX CANONICAL CATALOG (v2.0.0)</text>
+              <text x="460" y="45" text-anchor="middle" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600">CORTEX CANONICAL CATALOG (v2.0.1)</text>
               <text x="460" y="66" text-anchor="middle" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="11">36 SKILL.md + 36 Python Verifiers &middot; 10 Packs &middot; 72 SHA-256 Digests</text>
               <text x="460" y="83" text-anchor="middle" fill="var(--ok)" font-family="IBM Plex Mono, monospace" font-size="10.5">4 JSON Schemas &middot; 36 Paired 100-pt Eval Rubrics &middot; Zero External Deps</text>
 
@@ -2578,7 +2579,7 @@
 
   <footer>
     <div class="wrap foot">
-      <div>JovianOps / cortex &middot; v2.0.0 &middot; MIT License</div>
+      <div>JovianOps / cortex &middot; v2.0.1 &middot; MIT License</div>
       <div class="foot-links">
         <a href="https://github.com/JovianOps/cortex" target="_blank" rel="noreferrer">repository</a>
         <a href="https://www.npmjs.com/package/@jovianops/cortex" target="_blank" rel="noreferrer">npm</a>
@@ -2637,8 +2638,8 @@
       "memory"
     ],
     "script": "scripts/citation_check.py",
-    "sha256": "dddff527fe53bd86a9123a57ce5d0ccdea94518682120d1e69454bae44f6f961",
-    "zipSha256": "87d8f88f634035ca9d80f028a28597c6ab3838b8c262d20fa47cdeb7b2cac49f"
+    "sha256": "b2c3c0fc403cbf37c0d39dadf48bb3a715ba9b8867df25194bc2b89c0df61526",
+    "zipSha256": "c0f50753e64ffdf83fdbeef3353867e35766d9a60187cf37523c5a1d0b4bb4c9"
   },
   {
     "slug": "anti-hallucination",
@@ -2653,8 +2654,8 @@
       "fact-checking"
     ],
     "script": "scripts/verify_claims.py",
-    "sha256": "77a9ba465691c81ab8047bfe7a3cd7c5832d1d51a7d7eca7f008843d38bad522",
-    "zipSha256": "6405c75ad9965dda7fac51f79423dbf9b9c815a39ba2dfd206d84f1fd0a15653"
+    "sha256": "ead88e4aeb8c9566cf16390db7e3cfda028d12ea024ef46fade14a6509ead48d",
+    "zipSha256": "4ef4c61c55640c7333e72c884809861b024ce7996eb69baa475f75488dbdc97a"
   },
   {
     "slug": "blender-3d-modeling",
@@ -2669,8 +2670,8 @@
       "validation"
     ],
     "script": "scripts/bmesh_check.py",
-    "sha256": "5ffc66a8eaa0ed7a92d7efbd8065fc9a3a9e8cac11cd156049992d5b13a6001e",
-    "zipSha256": "f123daf7c64127f1f5226bb130c44525b95b8fe1ac987d179a1ef17e96b3fe5e"
+    "sha256": "70bb0415ac44bb25e9a69c6287cac4785a6de7e2bdb50030ef6c5c8122120bcd",
+    "zipSha256": "36514b9a86c6ef064cf2036790c33add974d5d100e604844d8cc353089213318"
   },
   {
     "slug": "code-review-assistant",
@@ -2685,8 +2686,8 @@
       "quality"
     ],
     "script": "scripts/diff_review.py",
-    "sha256": "2db2345510e619bb30209a851a770f6d4dbcdaecf590953a118fd7f24904ba49",
-    "zipSha256": "7857024a16d13d432a324dfbef4c1a2f834659b48b241f73311351a310118e7f"
+    "sha256": "893e8216bef54c15f75a259558e0615ca944edf06bce6e1693b91e9c5029e190",
+    "zipSha256": "0a8db5e3585106d9b93dfb45f00e7c88db1bdc0b5636dcbec9336721b7a769b6"
   },
   {
     "slug": "college-report-card",
@@ -2702,8 +2703,8 @@
       "memory"
     ],
     "script": "scripts/grade_calc.py",
-    "sha256": "626796450b9ba2957b8f1205a921da43a5130c03b01aacd7186a6dc700b17442",
-    "zipSha256": "28f935611667e4d5c0d530f8f330f68043385d255d9ad662d6b4a14a53753e98"
+    "sha256": "aff361842a4a04da033343cc69a744aa7109cc02368bd7fc6154a2fbad6245ff",
+    "zipSha256": "db297edb4dcd97ae152531dcec71bcf8883c5fa8b989cfeda076a0787270d3da"
   },
   {
     "slug": "documentation-generator",
@@ -2719,8 +2720,8 @@
       "validation"
     ],
     "script": "scripts/check_docs.py",
-    "sha256": "deb26d2ad98169b6a4ead7a6e9ac325c0d2fae488a751d0f280b869081fa071d",
-    "zipSha256": "24c4895f49c4b8aea0893e7315e79c012c08ab3a16f61c6a71eb8b31aa652430"
+    "sha256": "dd904885fb521106e88d38bd4ce96cad2ffc5f6a1372d2e270fb354c95543c8e",
+    "zipSha256": "bfd80e36fd1d3c19285c97ca5eea778aef7fd4163f185ff94ed2bbbea9d3ba00"
   },
   {
     "slug": "memory-manager",
@@ -2735,8 +2736,8 @@
       "anti-forgetting"
     ],
     "script": "scripts/memory_store.py",
-    "sha256": "beec0fea3c6e8596c66b062c2da44b74c245b5144704332f3aa161f0ebbffc3d",
-    "zipSha256": "37213c9ec70c8163fef5f9730d7fd0b331627b7e97f3f136a0a20477ff74f849"
+    "sha256": "9c9ca5563fc840c945a6f2e9dec8ffa66ac2a7042e8f8371ac877a5c71f95465",
+    "zipSha256": "0cbadd56d102fcb8d1ebd1ca851878394bb52cf068ab27751b42ae7641d3b521"
   },
   {
     "slug": "python-coding-assistant",
@@ -2751,8 +2752,8 @@
       "anti-hallucination"
     ],
     "script": "scripts/check_python_ast.py",
-    "sha256": "972b4a4a1a644e82a50b3ebfa43d7d155a3881876f933df2fdb72606b4777069",
-    "zipSha256": "81ed359974e3a87b79f4154712376782d94309dc570c75a1c0e0fc07d4a6d275"
+    "sha256": "effd67db1cfa5ecd4f9f31d5f92cae68c9ba01e5efb29e5a73942b5f4616576d",
+    "zipSha256": "e6e5223b616b5dc599efbf84623046cbc316dcbc0805eda6261a140e45051951"
   },
   {
     "slug": "testing-automation",
@@ -2768,8 +2769,8 @@
       "coverage"
     ],
     "script": "scripts/check_test_coverage_map.py",
-    "sha256": "8b51bec53b495e4b25954cd4e40ea78e26a743c0a9b3a60282f180f43e32c87b",
-    "zipSha256": "c1787faad67f5b94b5a511da711459881b595d7158ef9c006c82fd7e7aa1d4a1"
+    "sha256": "dba37efc4a03cf37b81725c018f7be7dd90c3835a2268247e32361b0ae82bb8d",
+    "zipSha256": "93d4d8d805abf8ed2ce4b6c12cdfcb7597e9a06a9a80c15fc3ef4f93b800e51a"
   },
   {
     "slug": "web-scraper",
@@ -2784,8 +2785,8 @@
       "validation"
     ],
     "script": "scripts/check_robots.py",
-    "sha256": "b20d9428ab5ccfe96007231ea48be98a0e534c1c982a734ea53f14ab9f36741b",
-    "zipSha256": "de8706ff99d459dae154a06934c4ae7f1317db73fe8e88b66b9c91a2cbec8936"
+    "sha256": "e074879d95204d48763b091020f2dab849fa0c351b9a909c079545ef6e8fcded",
+    "zipSha256": "86773118a93746b8dff816ea6767ff72ececee3430279455755fb853e9b10477"
   },
   {
     "slug": "accessibility-auditor",
@@ -2801,8 +2802,8 @@
       "frontend"
     ],
     "script": "scripts/a11y_scan.py",
-    "sha256": "8e2df2ab4d25950e21e2d519d134bf7b439b20b787e678dccc418dfc1f667d6d",
-    "zipSha256": "633bf36227aa3d1c2ce1feeb672b9750f787a62f3b713dc3a708fe2596a23d5c"
+    "sha256": "2be7127c19dbf2bf4882eaa11669fe561d35cf92c185728bab2f45a367f8f0db",
+    "zipSha256": "f4803878fec1f9ab10fddf655ceb943fe2c282722c1780ad8167667a795cdfa3"
   },
   {
     "slug": "api-designer",
@@ -2818,8 +2819,8 @@
       "contract-testing"
     ],
     "script": "scripts/lint_openapi.py",
-    "sha256": "e1325a78880f207649d37fefdee4294e22936dd5ff43a23657e7278567b50628",
-    "zipSha256": "78c13312904033e26c4568cda9852510d7a0061fa32b0d264c9a0cc1d7105c51"
+    "sha256": "2b39028ad45460844b096da2e429c5358290075d0732544f51ca66504b57c38c",
+    "zipSha256": "6823c60e73cd51f7218032abedbe0ebe0fc67e9fe0e7ecd7a2615c6316ef9763"
   },
   {
     "slug": "architecture-decision-records",
@@ -2835,8 +2836,8 @@
       "governance"
     ],
     "script": "scripts/check_adrs.py",
-    "sha256": "cfcfed1deccac1ce95311f0404fdfffcc7886ad5dc7892b76c80f9042baa1bf3",
-    "zipSha256": "6b3bf1840415023bd6ef877f4db5e5f4154a9bc27563c8c240b19d4b8f3c9253"
+    "sha256": "163239d24e2e1e562ceca6c86146f27eefe6ced7b10d567b6b91f01764ba636e",
+    "zipSha256": "bb84218f8651aa36184161cd5e8075b1735ff34b2232433cbc7faf6869b3ce64"
   },
   {
     "slug": "chaos-resilience-engineer",
@@ -2853,8 +2854,8 @@
       "availability"
     ],
     "script": "scripts/audit_resilience.py",
-    "sha256": "8d8dcf2beb0a89653964c8a05c709b2fe1d9f309d8be60017fa9293edb864aa6",
-    "zipSha256": "55d8aadeaa578bce5ed5fe77515ba55466f2db86f1a5687499d9494ef1653c64"
+    "sha256": "d0ef9bea36631b462274576411a27d1919a6f2f019984c837a722bf0c615aadb",
+    "zipSha256": "71647ad1c71e0fbdcf90bdad91bd7b0c94fe32e352c46e89bb005cf89bc5bc89"
   },
   {
     "slug": "code-migration",
@@ -2869,8 +2870,8 @@
       "parity-testing"
     ],
     "script": "scripts/migration_inventory.py",
-    "sha256": "8904b9a67d58a86261e9ebd6ad76e3a0ed25baeb101619ef93d97031e28d22b9",
-    "zipSha256": "0dc8483db2fa291d498c8047f87596cb19784402e3fafb9f69cd44faacab62b2"
+    "sha256": "941fd2937b88fd04aad5f5b7ad0b1ad75f136b2547cb1588238c2c673bf00371",
+    "zipSha256": "a94e81cdee7b9f9066ef7541933f021d17422c19ad8060c4467b7b76263123d5"
   },
   {
     "slug": "db-optimizer",
@@ -2886,8 +2887,8 @@
       "query-optimization"
     ],
     "script": "scripts/lint_sql.py",
-    "sha256": "a9d66cf3065587a4149bc50e0744022ae2a893c382274c2e1eb49f7b5f1842e4",
-    "zipSha256": "afd4402671a36863ec60b51b1b9653d1af55f7998055ff2eee2b9af76b1b40bf"
+    "sha256": "c6cbd7ac375eb751118d76c9a90ef04f6ef41c542d06a45dca3da11ce981e899",
+    "zipSha256": "db61c2579081c1b2c0f5aab1202f6e00dfc444f42461e4f4f8e373c1093fccc5"
   },
   {
     "slug": "devops-pipeline",
@@ -2903,8 +2904,8 @@
       "security"
     ],
     "script": "scripts/lint_actions.py",
-    "sha256": "6cde83f292b5880ea574712d394ce7c9e98396f1473ba7be81db76e306dc1b8b",
-    "zipSha256": "06ca7c2e84141502a901c99bc79eb8d921b55d1c5d197a1e97950ecc7a67f262"
+    "sha256": "196b50d1163e08f3c37dc12944932376473e698b010acbb63ce598b296f361ff",
+    "zipSha256": "b8bf47d84a055933df6d9d13c0baf1897c6cd893ec21087fd26f91840a887b02"
   },
   {
     "slug": "docker-generator",
@@ -2920,8 +2921,8 @@
       "security"
     ],
     "script": "scripts/lint_dockerfile.py",
-    "sha256": "9e2dee7969fb2c39c675b590614bbc25fcd19dad14a189a55da0d590fca428aa",
-    "zipSha256": "9f1bd7227f4ad7c608ff24a2b9d21fb3df3a501c5d476de4d0e3a6522b2ddcfb"
+    "sha256": "9270f8b6ede9e6ea32b55dbbdbb27c58851561179070b46459b2acdff0e90087",
+    "zipSha256": "6cc52c176a9bff15e12dc6d5fc25b14d3dbf7065bea3f252ce050eeb2b69e1db"
   },
   {
     "slug": "finops-cost-optimizer",
@@ -2938,8 +2939,8 @@
       "optimization"
     ],
     "script": "scripts/audit_finops.py",
-    "sha256": "50a1dfada62f5cae905c5ee1bfd38566304de1b81a80c1374fec2f35932e5345",
-    "zipSha256": "a380b82c165f712ee652fa45c0b5a0390300e85e18d0856473b389f31237d811"
+    "sha256": "dc4d3a78a26b96944f83d3a6e2ab42cf457e04b935e51b07d09c837be3ced052",
+    "zipSha256": "7e2c9050d14ea823711276a84c8aa8dada9c364eacc0338710f6e38d9e2cdf9b"
   },
   {
     "slug": "git-history-surgeon",
@@ -2956,8 +2957,8 @@
       "workflow"
     ],
     "script": "scripts/audit_git_hygiene.py",
-    "sha256": "166bb7f8668fac97f876a96260d6e971c0d0ddd36113f0a6418917554f3e0b97",
-    "zipSha256": "1b801fe0155d0584c7fa489700396742cee0d4db250aa9457283d8da7995885f"
+    "sha256": "c4b167b0ce0f21d661ec22b0c6715317df041c55e15729bea4d4700c919bca5d",
+    "zipSha256": "1d4d4a6b295f15d706a2b218da11e6cbb720721a41682a6990a2dc5ef4b44dd0"
   },
   {
     "slug": "go-backend-engineer",
@@ -2973,8 +2974,8 @@
       "microservices"
     ],
     "script": "scripts/lint_go.py",
-    "sha256": "b0a41a766a9ac1d0db8768d3a87ec82d65b2072abf3d49dcc3363085c9c4ed58",
-    "zipSha256": "f7251819cca41541b5b3a2d1d4b5488855f0816b15f8d9418fa923ded8af863c"
+    "sha256": "9646bb54381120bcc9b21460557164076e4d0a04955547c4d4f5c742bdf1277d",
+    "zipSha256": "f7f59c045e7f4f08e3e36267bf0ef02049bca984237a5c59c09345f4b51230da"
   },
   {
     "slug": "graphql-architect",
@@ -2991,8 +2992,8 @@
       "security"
     ],
     "script": "scripts/lint_graphql.py",
-    "sha256": "e353e0a013983672e10a5409bdba3adf5b18f9013e2ece6c01a29018cc398d8a",
-    "zipSha256": "12a24b5058b282594a32ea3a62e16332fbd69e9dead23e1f0b880fb5d2808856"
+    "sha256": "90fefe64cdac5e3bb5b404be5b23a4f89c85a4a6bf994302a8ebd3095a9623b2",
+    "zipSha256": "2b178561c0ef22d2a2dfed3df9c966ac6cf52383eb4b0a30e35b1f6130a6e2ec"
   },
   {
     "slug": "incident-response",
@@ -3008,8 +3009,8 @@
       "triage"
     ],
     "script": "scripts/incident_timeline.py",
-    "sha256": "089c282ffe19be9f43174127e0f79c39de4efc448e7677d3af014a6f76ef55a4",
-    "zipSha256": "e58ed3ddb0998adb60b831fe9c738dd5299473e29ec8809bde04cb8400db02fd"
+    "sha256": "0fbe0c1c70b170e3976e05d984aef3468cf9d718ed3e5a1b1a4bf6001619cc46",
+    "zipSha256": "90f83a905bc166f783216844b9f424a2ebec208a65cb0fc644b9a81c5f5b3dc0"
   },
   {
     "slug": "kubernetes-architect",
@@ -3026,8 +3027,8 @@
       "sre"
     ],
     "script": "scripts/lint_k8s.py",
-    "sha256": "a932149c2445e346889346330821eb8920532288eee5782ff6b2cb8f57a3179d",
-    "zipSha256": "1a1168be447c1f754a0d3e6f780320f3cf03ce883057ba33f2e3ca56983b83d9"
+    "sha256": "0e6afc9866c572c4e62fd51ef9c6653ec562d186139be835aa4f1dc96e03d476",
+    "zipSha256": "0d5b21eba956a1380435d05b418937f0a5b05c6e2a186d2adce2462ea544d882"
   },
   {
     "slug": "llm-security-auditor",
@@ -3044,8 +3045,8 @@
       "agents"
     ],
     "script": "scripts/audit_prompts.py",
-    "sha256": "a49024fe23eb7a6d8107d303f6c5be6549b8f57c7c24623851888355e24b6463",
-    "zipSha256": "eda6bf4b090c4f28d444fed31f0fa8906747534539a6438c0d5c3b4836de8a8e"
+    "sha256": "9ee2872572b94f2d2ba43861a4c2c387041e7de062468d97356ae28b1ce0128c",
+    "zipSha256": "d2ac3db5d883f2aa8462d0523255904be40a560b5db99f7d21ae1c8ff26beabb"
   },
   {
     "slug": "observability-setup",
@@ -3061,8 +3062,8 @@
       "slo"
     ],
     "script": "scripts/check_slo.py",
-    "sha256": "1a84bc55c624212fcb459c64fc6aa5d15e59c490f7d618ac219974066987e4d8",
-    "zipSha256": "837684e84aeda15360ce43ac045fa1aa2a8ac70e04c326c808fe9cb27637ef16"
+    "sha256": "4465fc2d9ade6c2521c03918ca537ead735e450333e0f386b47cd2aab4ee71ad",
+    "zipSha256": "a8b82d5b908d2d98e805df815714470a340a5eaede5cb553ec8a38832ef7d350"
   },
   {
     "slug": "performance-profiler",
@@ -3078,8 +3079,8 @@
       "memory"
     ],
     "script": "scripts/bench_compare.py",
-    "sha256": "c206c1ead738e002ddb7a16f655569d9ac016ec53b54853dd4ef502b1824ecad",
-    "zipSha256": "1ac82308d2fc286059c51a209d7b37ce958e85a554e7a02415b2c6e35c8dd826"
+    "sha256": "a0de911c04b3449c483ed389c0f1bffb9583a3ef3a61011db1eca0cd9e6f448f",
+    "zipSha256": "dc45de7401ecf04184a7ef7ed07b7e8a4a7376bb1c3cfc374f9fe3e0f4e00cac"
   },
   {
     "slug": "privacy-compliance-auditor",
@@ -3096,8 +3097,8 @@
       "security"
     ],
     "script": "scripts/scan_pii.py",
-    "sha256": "54acf76d70f9927f0250e2d05143fb70b169742de39814e0ec4f025fab2e7423",
-    "zipSha256": "22c6c14651d897ee91f55c7976fa5cdbabf60c0bdc38750901d381d8e013f3f0"
+    "sha256": "8870a11de46d0e839f9c587109cef12f943dc68a53356e6466ab90c13ca1ddbc",
+    "zipSha256": "0f684533d710174db9c11d6b887901034863c6cda45c4554563a1db8c627213b"
   },
   {
     "slug": "refactoring-assistant",
@@ -3113,8 +3114,8 @@
       "maintainability"
     ],
     "script": "scripts/complexity_scan.py",
-    "sha256": "02f15fb02b9a652db95963c424ff8a5645eb4654d30c821c326a6b08cf25ee0a",
-    "zipSha256": "848f759a8827b8d0af65011cbdc9b238707edc818f2071386b65357e93cd2e7c"
+    "sha256": "1152232c67b20553c1850222287111c2b584754eec35b29e9847a902e52e00a7",
+    "zipSha256": "f30a440f68399fbd14b9f2824995e39a3b17ce252cfe1ce3ab6dfef6c026e0ed"
   },
   {
     "slug": "release-engineering",
@@ -3130,8 +3131,8 @@
       "devops"
     ],
     "script": "scripts/semver_bump.py",
-    "sha256": "0674caa4bc41128a045d18a07b063f7f89fd7a35b1f6911a1ee30e4d29959c29",
-    "zipSha256": "4c41c593f1fcfd90998c08b952baeee26194ab70dcd624a782bd918c5d8f94a3"
+    "sha256": "b9e3dee41fa5ca7fa754145ddef809f82c4bace72fb4365e85d9fa2ff88b3d3d",
+    "zipSha256": "9e1e2f260563ab46116c0cb465397c2e4a5effd6395a26cca9b2f462dc830b71"
   },
   {
     "slug": "rust-systems-engineer",
@@ -3147,8 +3148,8 @@
       "cargo"
     ],
     "script": "scripts/lint_rust.py",
-    "sha256": "e87818213da6e61123b4b53fae8a5e557791514990519a43fb5d45ab49dbac3d",
-    "zipSha256": "f721896191d3a69cd400d7d00bd5a9b292a9ceaf8df2dc44895329062031610d"
+    "sha256": "a002fd49787b5f79f40b60cf235d78614e66da418e18b5742d06462c7a096dd8",
+    "zipSha256": "361f6ad9f22fc872a8e574e1ed9df994ba877dd387768338d7b4923bf352be66"
   },
   {
     "slug": "security-auditor",
@@ -3164,8 +3165,8 @@
       "vulnerability-scanning"
     ],
     "script": "scripts/secret_scan.py",
-    "sha256": "f798bee2f84e1b058e9f6c3edc5af4dbebb09864cecf439737fe6d8f8e39492c",
-    "zipSha256": "8f7895067f636de0e8d64e2d85b9db83b55c1623dfac10900bbed4060f546c5d"
+    "sha256": "05c1d2a8228b610f6e757924c90e43343e1cec53023d112bd9c43e37d0800d6a",
+    "zipSha256": "03ecf73801da9daf355585c0ef6d4d2dedb6317fc4dbc7cee3eccf84b162b1f0"
   },
   {
     "slug": "supply-chain-sbom",
@@ -3182,8 +3183,8 @@
       "cyclonedx"
     ],
     "script": "scripts/audit_sbom.py",
-    "sha256": "cab05052e796b1ae6c02f5ac093d72a3ded88b0037ca1899b8d7aacbc6f0c41a",
-    "zipSha256": "991b75e7dd1c26e2b5939aedcb6ae791ece0d6f4265e3a46620ab399b453ab6f"
+    "sha256": "ce5b1347a86ae408a5eefba62a16b3819df90642a3b20dc512f5f064b6a03825",
+    "zipSha256": "6d3f6dc363390561d2ab3918a5fc8fa9a850532e057dffaa3aa00d34bef193f3"
   },
   {
     "slug": "terraform-generator",
@@ -3200,8 +3201,8 @@
       "security"
     ],
     "script": "scripts/lint_terraform.py",
-    "sha256": "33ebe627afa6e9dcb27856f1e382e5c77bdb6e6a8c1df2b48ac606b6912676ac",
-    "zipSha256": "6f8689efaa06e39d71ced9a190abb980c92b1c88554b82614b5a109341c2429c"
+    "sha256": "cbc39cbf8fddecd1a2b745035071828ae9d69dca73051da226ef7d936e492bd9",
+    "zipSha256": "984fde70a75ca8649181a3acca9f237f71ee3ed0de12e0e9b83169279c28777c"
   },
   {
     "slug": "typescript-architect",
@@ -3218,8 +3219,8 @@
       "testing"
     ],
     "script": "scripts/lint_ts.py",
-    "sha256": "7169afa86e43c775c41c0278f339cc02a67bdcba4ba38b44613bbc01a62a7deb",
-    "zipSha256": "b1a39c28d235a775d1feead3019b7cdbd8e6e0f0cd5428540304286493f50c3f"
+    "sha256": "3599717a6c4de86c2d91e6aabc904b9d02277351f3797bda0f2fcf761504015c",
+    "zipSha256": "fce9e313a8d55da2e9a1fadaccf30a1d924317fa2d8331c0764322404cfcc30a"
   },
   {
     "slug": "unit-test-generator",
@@ -3235,8 +3236,8 @@
       "tdd"
     ],
     "script": "scripts/test_skeleton.py",
-    "sha256": "d5d0256ee237bdb2c19c123773621b7faf10e42d3968f08c5c245817de4ca20f",
-    "zipSha256": "1fb40bc40ba7434a24d8ba95ae7d51b482a12c1a1e37b79b5e1c38de7d52a5ca"
+    "sha256": "80b964899893109e09672c077449bf51d99eae59e0b1eb8bbc2d8c781c77f129",
+    "zipSha256": "4f57228178f7423517d755106ac57faefde2e65ad2a6c44b013089c647c4041c"
   }
 ];
     const PACKS = [
@@ -3434,24 +3435,24 @@
     const TERM_VIEWS = {
       doctor: [
         `<span class="t-dim">$ npx @jovianops/cortex doctor</span>`,
-        `<span class="t-hi">Cortex v2.0.0 — Environment &amp; Integrity Doctor</span>`,
+        `<span class="t-hi">Cortex v2.0.1 — Environment &amp; Integrity Doctor</span>`,
         ``,
         `<span class="t-ok">[OK]</span>   Python 3.12.4 (/usr/bin/python3)`,
         `<span class="t-ok">[OK]</span>   git found at /usr/bin/git`,
         `<span class="t-ok">[OK]</span>   node found at /usr/local/bin/node`,
         `<span class="t-ok">[OK]</span>   Verified SHA-256 checksums for 36 bundled skills (72 files).`,
-        `<span class="t-ok">[OK]</span>   Validated 11 multi-agent manifests (36 skills, v2.0.0).`,
+        `<span class="t-ok">[OK]</span>   Validated 9 multi-agent manifests (36 skills, v2.0.1).`,
         `<span class="t-ok">[OK]</span>   Eval suite: 36/36 tasks &middot; average 100.0/100.`,
         ``,
         `<span class="t-dim">==&gt; Claude Code (project: ./.claude/skills)</span>`,
-        `  kubernetes-architect      v2.0.0    <span class="t-ok">[OK]</span>`,
-        `  security-auditor          v2.0.0    <span class="t-ok">[OK]</span>`,
+        `  kubernetes-architect      v2.0.1    <span class="t-ok">[OK]</span>`,
+        `  security-auditor          v2.0.1    <span class="t-ok">[OK]</span>`,
         ``,
         `Doctor finished with <span class="t-ok">0 issue(s)</span>.`
       ],
       scan: [
         `<span class="t-dim">$ npx @jovianops/cortex scan . --format sarif --fail-on high</span>`,
-        `<span class="t-hi">Cortex v2.0.0 — Unified Policy &amp; SARIF 2.1.0 Scanner (14 verifiers)</span>`,
+        `<span class="t-hi">Cortex v2.0.1 — Unified Policy &amp; SARIF 2.1.0 Scanner (14 verifiers)</span>`,
         ``,
         `Severity  Scanner     Rule                        Target`,
         `----------------------------------------------------------------------`,
@@ -3464,7 +3465,7 @@
       ],
       compile: [
         `<span class="t-dim">$ npx @jovianops/cortex compile --pack cloud-native --target all</span>`,
-        `<span class="t-hi">Cortex v2.0.0 — Universal Agent Rule Compiler</span>`,
+        `<span class="t-hi">Cortex v2.0.1 — Universal Agent Rule Compiler</span>`,
         ``,
         `<span class="t-ok">[WRITE]</span> .cursor/rules/cortex-kubernetes-architect.mdc        (6 rules)`,
         `<span class="t-ok">[WRITE]</span> .github/instructions/cortex-*.instructions.md          (6 rules)`,
@@ -3476,7 +3477,7 @@
       ],
       mcp: [
         `<span class="t-dim">$ npx @jovianops/cortex mcp --project-dir .</span>`,
-        `<span class="t-hi">Cortex MCP Server v2.0.0 (protocol 2025-03-26, stdio JSON-RPC 2.0)</span>`,
+        `<span class="t-hi">Cortex MCP Server v2.0.1 (protocol 2025-03-26, stdio JSON-RPC 2.0)</span>`,
         ``,
         `<span class="t-ok">[READY]</span> Tools (8):      list_skills, run_verifier, compile_rules, scan_repo...`,
         `<span class="t-ok">[READY]</span> Resources (38): cortex://skills/&lt;slug&gt;, cortex://packs, cortex://checksums`,
@@ -3485,7 +3486,7 @@
       ],
       detect: [
         `<span class="t-dim">$ npx @jovianops/cortex detect</span>`,
-        `<span class="t-hi">Cortex v2.0.0 — Agent Environment Detection</span>`,
+        `<span class="t-hi">Cortex v2.0.1 — Agent Environment Detection</span>`,
         ``,
         `Agent          Platform                  Status      Locked  Signals`,
         `-----------------------------------------------------------------------------`,
@@ -3610,7 +3611,7 @@
         badLines: [
           'import subprocess',
           '',
-          'AWS_ACCESS_KEY = "AKIAIOSFODNN7EXAMPLE"',
+          'AWS_ACCESS_KEY = "AKIA-DEMO-KEY-PLACEHOLDER"',
           '',
           'def run_task(user_cmd: str) -> bytes:',
           '    return subprocess.check_output(user_cmd, shell=True)'
@@ -3626,7 +3627,7 @@
           '    return subprocess.check_output(args, shell=False)'
         ],
         findings: [
-          { line: 3, severity: 'CRITICAL', rule: 'CWE-798-hardcoded-secret', msg: 'Hardcoded AWS access key pattern detected (AKIA************MPLE — redacted).' },
+          { line: 3, severity: 'CRITICAL', rule: 'CWE-798-hardcoded-secret', msg: 'Hardcoded credential pattern detected (AKIA****LDER — redacted).' },
           { line: 6, severity: 'HIGH', rule: 'CWE-78-shell-injection', msg: 'subprocess call with shell=True enables OS command injection when given untrusted input.' }
         ]
       }
@@ -3691,7 +3692,12 @@
     }
 
     function escapeHtml(str) {
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
     function copyText(text, btn, label) {
@@ -3829,18 +3835,18 @@
     function populateSelects() {
       for (const id of ['heroAgent', 'builderAgent']) {
         const sel = $(id);
-        sel.innerHTML = TARGETS.map((t) => `<option value="${t.id}">${t.label}</option>`).join('');
+        sel.innerHTML = TARGETS.map((t) => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.label)}</option>`).join('');
         sel.value = state.target;
         sel.addEventListener('change', (e) => setActiveTarget(e.target.value, false));
       }
 
       $('platformsGrid').innerHTML = TARGETS.map((t) => `
-        <button type="button" class="plat-card" data-target="${t.id}" aria-pressed="${t.id === state.target}">
+        <button type="button" class="plat-card" data-target="${escapeHtml(t.id)}" aria-pressed="${t.id === state.target}">
           <div class="plat-head">
-            <span class="plat-name">${t.label}</span>
-            <span class="plat-badge">${t.badge}</span>
+            <span class="plat-name">${escapeHtml(t.label)}</span>
+            <span class="plat-badge">${escapeHtml(t.badge)}</span>
           </div>
-          <span class="plat-path">${t.path}</span>
+          <span class="plat-path">${escapeHtml(t.path)}</span>
         </button>
       `).join('');
 
@@ -3879,8 +3885,8 @@
       });
 
       $('verifyCmd').textContent = state.shell === 'powershell'
-        ? `$t="$env:TEMP\\cortex-1.0.0.tgz"\nInvoke-WebRequest https://registry.npmjs.org/@jovianops/cortex/-/cortex-1.0.0.tgz -OutFile $t\n(Get-FileHash $t -Algorithm SHA256).Hash  # expect ${NPM_SHA256.toUpperCase()}\nRemove-Item $t\nnpm audit signatures\nnpx @jovianops/cortex verify --json\nnpx @jovianops/cortex doctor`
-        : `# 1. Verify published npm tarball SHA-256 (expect ${NPM_SHA256})\ncurl -fsSL https://registry.npmjs.org/@jovianops/cortex/-/cortex-1.0.0.tgz | sha256sum\n\n# 2. Verify SLSA v1 provenance & all 36 bundled skill hashes (72 files)\nnpm audit signatures\nnpx @jovianops/cortex verify --json\nnpx @jovianops/cortex doctor`;
+        ? `$t="$env:TEMP\\cortex-latest.tgz"\n$v=(npm view @jovianops/cortex@latest version).Trim()\nInvoke-WebRequest "https://registry.npmjs.org/@jovianops/cortex/-/cortex-$v.tgz" -OutFile $t\n(Get-FileHash $t -Algorithm SHA256).Hash\nRemove-Item $t\nnpm view @jovianops/cortex@latest dist.integrity\nnpm audit signatures\nnpx @jovianops/cortex verify --json\nnpx @jovianops/cortex doctor`
+        : `# 1. Inspect latest published npm tarball integrity & signatures\nnpm view @jovianops/cortex@latest version dist.shasum dist.integrity\nnpm audit signatures\n\n# 2. Verify all 36 bundled skill hashes (72 files) & local locks\nnpx @jovianops/cortex verify --json\nnpx @jovianops/cortex doctor`;
     }
 
     function renderTerminal(key, animate) {
@@ -3956,7 +3962,7 @@
           $schema: 'https://raw.githubusercontent.com/oasis-tcs/sarif-spec/main/sarif-2.1/schema/sarif-schema-2.1.0.json',
           version: '2.1.0',
           runs: [{
-            tool: { driver: { name: 'cortex-scan', version: '2.0.0' } },
+            tool: { driver: { name: 'cortex-scan', version: '2.0.1' } },
             results: activeFindings.map((f) => ({
               ruleId: f.rule,
               level: f.severity === 'MEDIUM' ? 'warning' : 'error',
@@ -3978,7 +3984,7 @@
     function buildCompiledRule(skillSlug, format) {
       const s = SKILLS.find((x) => x.slug === skillSlug) || SKILLS[0];
       const globs = SKILL_GLOBS[s.slug] || '**/*';
-      const prov = `<!-- Compiled by Cortex v2.0.0 | skill=${s.slug}@2.0.0 | sha256=${s.sha256} -->`;
+      const prov = `<!-- Compiled by Cortex v2.0.1 | skill=${s.slug}@2.0.1 | sha256=${s.sha256} -->`;
       const body = `# ${s.slug}\n\n${s.desc}\n\n## Deterministic Execution Contract\n1. Inspect workspace evidence before proposing changes.\n2. Run bundled verifier: \`python ${s.dir}/${s.slug}/${s.script} <target> --json\`.\n3. Fail closed on non-zero exit codes and report exact file:line citations.`;
 
       if (format === 'cursor') {
@@ -4009,7 +4015,7 @@
       const targetLabels = { claude: 'Claude Code', agents: 'AGENTS.md', gemini: 'Gemini CLI' };
       return {
         path: targetFiles[format] || 'AGENTS.md',
-        text: `<!-- BEGIN CORTEX MANAGED -->\n<!-- Compiled for ${targetLabels[format] || format} | skill=${s.slug}@2.0.0 | sha256=${s.sha256} -->\n\n${body}\n<!-- END CORTEX MANAGED -->`
+        text: `<!-- BEGIN CORTEX MANAGED -->\n<!-- Compiled for ${targetLabels[format] || format} | skill=${s.slug}@2.0.1 | sha256=${s.sha256} -->\n\n${body}\n<!-- END CORTEX MANAGED -->`
       };
     }
 
@@ -4032,6 +4038,19 @@
         }, null, 2);
       } else if (client === 'codex') {
         cfg = `[mcp_servers.cortex]\ncommand = "npx"\nargs = ["-y", "@jovianops/cortex", "mcp", "--project-dir", "."]`;
+      } else if (client === 'opencode') {
+        cfg = JSON.stringify({
+          $schema: 'https://opencode.ai/config.json',
+          mcp: {
+            servers: {
+              cortex: {
+                type: 'local',
+                command: ['npx', '-y', '@jovianops/cortex', 'mcp', '--project-dir', '.'],
+                enabled: true
+              }
+            }
+          }
+        }, null, 2);
       } else {
         cfg = JSON.stringify({
           mcpServers: {
@@ -4070,7 +4089,7 @@
 
     function renderTagStrip() {
       $('tagStrip').innerHTML = `<span class="mono" style="font-size:11px;color:var(--faint);margin-right:2px;">topics:</span>` +
-        QUICK_TOPICS.map((tag) => `<button type="button" class="chip ${state.tagFilter === tag ? 'active' : ''}" data-topic="${tag}">#${tag}</button>`).join('') +
+        QUICK_TOPICS.map((tag) => `<button type="button" class="chip ${state.tagFilter === tag ? 'active' : ''}" data-topic="${escapeHtml(tag)}">#${escapeHtml(tag)}</button>`).join('') +
         (state.tagFilter ? `<button type="button" class="chip" data-topic="">reset</button>` : '');
     }
 
@@ -4089,15 +4108,17 @@
         }
         tbody.innerHTML = rows.map((s) => {
           const checked = state.selected.has(s.slug);
+          const slug = escapeHtml(s.slug);
+          const tier = escapeHtml(s.tier);
           const scriptHtml = s.script
-            ? `<span class="script-tag">${s.script.replace('scripts/', '')}</span>`
+            ? `<span class="script-tag">${escapeHtml(s.script.replace('scripts/', ''))}</span>`
             : `<span class="none-tag">&mdash;</span>`;
-          return `<tr data-slug="${s.slug}" class="${checked ? 'selected' : ''}">
-            <td class="col-chk"><input class="chk row-chk" type="checkbox" data-slug="${s.slug}" ${checked ? 'checked' : ''} aria-label="Select ${s.slug}" /></td>
-            <td><button type="button" class="slug slug-btn" data-slug="${s.slug}">${s.slug}</button></td>
-            <td><span class="tier ${s.tier === 'core' ? 'core' : ''}">${s.tier}</span></td>
+          return `<tr data-slug="${slug}" class="${checked ? 'selected' : ''}">
+            <td class="col-chk"><input class="chk row-chk" type="checkbox" data-slug="${slug}" ${checked ? 'checked' : ''} aria-label="Select ${slug}" /></td>
+            <td><button type="button" class="slug slug-btn" data-slug="${slug}">${slug}</button></td>
+            <td><span class="tier ${s.tier === 'core' ? 'core' : ''}">${tier}</span></td>
             <td>${scriptHtml}</td>
-            <td class="desc-cell">${s.desc}</td>
+            <td class="desc-cell">${escapeHtml(s.desc)}</td>
           </tr>`;
         }).join('');
         $('selectAllChk').checked = rows.length > 0 && rows.every((s) => state.selected.has(s.slug));
@@ -4111,17 +4132,18 @@
         }
         grid.innerHTML = rows.map((s) => {
           const checked = state.selected.has(s.slug);
-          return `<div class="skill-card ${checked ? 'selected' : ''}" data-slug="${s.slug}">
+          const slug = escapeHtml(s.slug);
+          return `<div class="skill-card ${checked ? 'selected' : ''}" data-slug="${slug}">
             <div class="skill-card-top">
-              <button type="button" class="slug slug-btn" data-slug="${s.slug}">${s.slug}</button>
-              <input class="chk row-chk" type="checkbox" data-slug="${s.slug}" ${checked ? 'checked' : ''} aria-label="Select ${s.slug}" />
+              <button type="button" class="slug slug-btn" data-slug="${slug}">${slug}</button>
+              <input class="chk row-chk" type="checkbox" data-slug="${slug}" ${checked ? 'checked' : ''} aria-label="Select ${slug}" />
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-              <span class="tier ${s.tier === 'core' ? 'core' : ''}">${s.tier}</span>
-              <span class="script-tag">${s.script ? s.script.replace('scripts/', '') : '—'}</span>
+              <span class="tier ${s.tier === 'core' ? 'core' : ''}">${escapeHtml(s.tier)}</span>
+              <span class="script-tag">${s.script ? escapeHtml(s.script.replace('scripts/', '')) : '—'}</span>
             </div>
-            <p style="margin:0;font-size:13px;color:var(--muted);flex:1;">${s.desc}</p>
-            <div class="skill-card-tags">${s.tags.slice(0, 4).map((t) => `<span class="mini-tag">${t}</span>`).join('')}</div>
+            <p style="margin:0;font-size:13px;color:var(--muted);flex:1;">${escapeHtml(s.desc)}</p>
+            <div class="skill-card-tags">${s.tags.slice(0, 4).map((t) => `<span class="mini-tag">${escapeHtml(t)}</span>`).join('')}</div>
           </div>`;
         }).join('');
       }
@@ -4131,22 +4153,22 @@
       $('packsGrid').innerHTML = PACKS.map((p) => `
         <div class="pack-card">
           <div class="pack-top">
-            <span class="pack-id">${p.id}</span>
-            <span class="pack-label">${p.label} &middot; ${p.skills.length} skills</span>
+            <span class="pack-id">${escapeHtml(p.id)}</span>
+            <span class="pack-label">${escapeHtml(p.label)} &middot; ${p.skills.length} skills</span>
           </div>
-          <p class="pack-desc">${p.desc}</p>
+          <p class="pack-desc">${escapeHtml(p.desc)}</p>
           <div class="pack-skill-chips">
-            ${p.skills.map((slug) => `<button type="button" class="pack-skill-btn" data-inspect-slug="${slug}">${slug}</button>`).join('')}
+            ${p.skills.map((slug) => `<button type="button" class="pack-skill-btn" data-inspect-slug="${escapeHtml(slug)}">${escapeHtml(slug)}</button>`).join('')}
           </div>
           <div class="pack-actions">
-            <button type="button" class="btn-sm primary" data-load-pack="${p.id}">load in builder</button>
-            <button type="button" class="btn-sm" data-copy-pack="${p.id}">copy cli</button>
+            <button type="button" class="btn-sm primary" data-load-pack="${escapeHtml(p.id)}">load in builder</button>
+            <button type="button" class="btn-sm" data-copy-pack="${escapeHtml(p.id)}">copy cli</button>
           </div>
         </div>
       `).join('');
 
       $('builderPackPills').innerHTML = PACKS.map((p) =>
-        `<button type="button" class="chip" data-pack="${p.id}">${p.id}</button>`
+        `<button type="button" class="chip" data-pack="${escapeHtml(p.id)}">${escapeHtml(p.id)}</button>`
       ).join('');
     }
 
@@ -4167,26 +4189,26 @@
       $('dSlug').textContent = s.slug;
 
       const installCmd = buildCommand(state.target, state.shell, [s.slug]);
-      const rawUrl = `https://github.com/JovianOps/cortex/blob/main/${s.dir}/${s.slug}/SKILL.md`;
-      const zipUrl = `https://raw.githubusercontent.com/JovianOps/cortex/main/${s.zipDir}/${s.slug}.zip`;
+      const rawUrl = `https://github.com/JovianOps/cortex/blob/main/${encodeURIComponent(s.dir)}/${encodeURIComponent(s.slug)}/SKILL.md`;
+      const zipUrl = `https://raw.githubusercontent.com/JovianOps/cortex/main/${encodeURIComponent(s.zipDir)}/${encodeURIComponent(s.slug)}.zip`;
       const compiledCursor = buildCompiledRule(s.slug, 'cursor');
       const scriptRow = s.script
-        ? `<div class="kv"><span class="kv-k">script</span><span class="kv-v"><a href="https://github.com/JovianOps/cortex/blob/main/${s.dir}/${s.slug}/${s.script}" target="_blank" rel="noreferrer" style="color:var(--accent);">${s.dir}/${s.slug}/${s.script}</a></span></div>`
+        ? `<div class="kv"><span class="kv-k">script</span><span class="kv-v"><a href="https://github.com/JovianOps/cortex/blob/main/${encodeURIComponent(s.dir)}/${encodeURIComponent(s.slug)}/${s.script.split('/').map(encodeURIComponent).join('/')}" target="_blank" rel="noreferrer" style="color:var(--accent);">${escapeHtml(s.dir)}/${escapeHtml(s.slug)}/${escapeHtml(s.script)}</a></span></div>`
         : '';
 
       $('drawerBody').innerHTML = `
-        <p style="margin:0;color:var(--muted);">${s.desc}</p>
+        <p style="margin:0;color:var(--muted);">${escapeHtml(s.desc)}</p>
         <div class="kv-list">
-          <div class="kv"><span class="kv-k">path</span><span class="kv-v">${s.dir}/${s.slug}/SKILL.md</span></div>
-          <div class="kv"><span class="kv-k">version</span><span class="kv-v">2.0.0</span></div>
+          <div class="kv"><span class="kv-k">path</span><span class="kv-v">${escapeHtml(s.dir)}/${escapeHtml(s.slug)}/SKILL.md</span></div>
+          <div class="kv"><span class="kv-k">version</span><span class="kv-v">2.0.1</span></div>
           ${scriptRow}
-          <div class="kv"><span class="kv-k">tags</span><span class="kv-v">${s.tags.join(', ')}</span></div>
-          <div class="kv"><span class="kv-k">SKILL.md SHA</span><span class="kv-v">${s.sha256}</span></div>
-          <div class="kv"><span class="kv-k">.zip SHA-256</span><span class="kv-v">${s.zipSha256}</span></div>
+          <div class="kv"><span class="kv-k">tags</span><span class="kv-v">${escapeHtml(s.tags.join(', '))}</span></div>
+          <div class="kv"><span class="kv-k">SKILL.md SHA</span><span class="kv-v">${escapeHtml(s.sha256)}</span></div>
+          <div class="kv"><span class="kv-k">.zip SHA-256</span><span class="kv-v">${escapeHtml(s.zipSha256)}</span></div>
         </div>
 
         <div>
-          <div class="mono" style="font-size:11.5px;color:var(--muted);margin-bottom:6px;">install (${state.target} / ${state.shell})</div>
+          <div class="mono" style="font-size:11.5px;color:var(--muted);margin-bottom:6px;">install (${escapeHtml(state.target)} / ${escapeHtml(state.shell)})</div>
           <div class="cmd-row" style="border:1px solid var(--border);">
             <pre><span class="prompt">$</span>${escapeHtml(installCmd)}</pre>
             <button type="button" class="copy-btn" id="drawerCopyCmd">copy</button>
@@ -4194,8 +4216,8 @@
         </div>
 
         <div class="drawer-links">
-          <a class="btn-sm primary" href="${rawUrl}" target="_blank" rel="noreferrer">read SKILL.md</a>
-          <a class="btn-sm" href="${zipUrl}" target="_blank" rel="noreferrer">download .zip</a>
+          <a class="btn-sm primary" href="${escapeHtml(rawUrl)}" target="_blank" rel="noreferrer">read SKILL.md</a>
+          <a class="btn-sm" href="${escapeHtml(zipUrl)}" target="_blank" rel="noreferrer">download .zip</a>
           <button type="button" class="btn-sm" id="drawerCopySha">copy SHA-256</button>
           <button type="button" class="btn-sm" id="drawerToggleSel">${state.selected.has(s.slug) ? 'remove from builder' : 'add to builder'}</button>
         </div>

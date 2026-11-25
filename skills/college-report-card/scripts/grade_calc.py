@@ -162,13 +162,18 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("grades_csv", type=Path, help="Path to student grades CSV file.")
     parser.add_argument("syllabus_json", type=Path, help="Path to syllabus weights JSON file.")
     parser.add_argument("--format", choices=("markdown", "json"), default="markdown", help="Output format.")
+    parser.add_argument("--json", action="store_true", dest="as_json", help="Emit JSON output (alias for --format json).")
     args = parser.parse_args(argv)
+    want_json = args.as_json or args.format == "json"
     try:
         report = compute_grades(args.grades_csv, args.syllabus_json)
     except ValueError as exc:
-        print(f"ERROR: {exc}", file=sys.stderr)
+        if want_json:
+            print(json.dumps({"ok": False, "error": str(exc)}, indent=2))
+        else:
+            print(f"ERROR: {exc}", file=sys.stderr)
         return 1
-    if args.format == "json":
+    if want_json:
         print(json.dumps(report, indent=2))
     else:
         print(format_markdown(report), end="")

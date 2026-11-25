@@ -8,6 +8,16 @@ import re
 import sys
 from pathlib import Path
 
+IGNORE_DIRS = {
+    ".git", "node_modules", ".venv", "__pycache__", ".terraform", "dist", "build",
+    ".opencode", ".claude", ".cursor", ".windsurf", ".cline", ".agents",
+}
+
+
+def should_skip(fp: Path, root: Path) -> bool:
+    rel = fp.relative_to(root).parts if fp != root else fp.parts
+    return any(p in IGNORE_DIRS for p in rel) or (len(rel) >= 2 and rel[0] == ".github" and rel[1] == "skills")
+
 
 def audit_graphql(path: Path) -> list[dict]:
     findings: list[dict] = []
@@ -93,7 +103,8 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     files = [args.target] if args.target.is_file() else sorted(
-        p for p in args.target.rglob("*") if p.is_file() and p.suffix.lower() in {".graphql", ".gql"}
+        p for p in args.target.rglob("*")
+        if p.is_file() and p.suffix.lower() in {".graphql", ".gql"} and not should_skip(p, args.target)
     )
     findings: list[dict] = []
     for fp in files:

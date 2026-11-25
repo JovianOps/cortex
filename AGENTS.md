@@ -1,6 +1,6 @@
 # Cortex Agent Skills Index
 
-This repository ships **36 modular, deterministic v2.0.0 Agent Skills** following the open `SKILL.md` standard, with bundled deterministic helper scripts and SHA-256 integrity verification (`checksums.json`).
+This repository ships **36 modular, deterministic v2.0.1 Agent Skills** following the open `SKILL.md` standard, with bundled deterministic helper scripts and SHA-256 integrity verification (`checksums.json`).
 
 ## Core Skills (`skills/`)
 

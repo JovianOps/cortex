@@ -2,6 +2,21 @@
 
 All notable changes to **Cortex** are documented in this file. This project follows [Semantic Versioning](https://semver.org/).
 
+## [2.0.1] — 2026-11-25
+
+**Release Hardening, npm Publish Fix, CLI/MCP Parity & Security Remediation.** Fixes npm tag matching for uppercase/lowercase tags, achieves 100% `--json` and `opencode` parity across CLI/MCP/Studio/site, adds root `.cortex-policy.json`, hardens remote URL/path-traversal/CSRF checks, and eliminates all hardcoded demo secret/PII literal fixtures across the codebase.
+
+### Fixed
+- **npm Release Workflow (`.github/workflows/publish-npm.yml` & `ci.yml`)**: Fixed release tag version comparison (`${GITHUB_REF_NAME#[vV]}`) so both `v*` and `V*` tags verify cleanly against `package.json`, added `ruff` + `cortex scan` + `cortex audit --json` to smoke tests, and fixed CI eval count copy (`24-task` → `36-task`).
+- **Full-Codebase Secret, Key, PII & DOM Sink Remediation**:
+  - Replaced literal demo token/key/SSN/email fixtures in `evals/skill_evals.json`, `premium-skills/db-optimizer/SKILL.md`, `index.html`, and `tests/test_cortex_v2.py` with non-matching placeholder patterns or runtime-constructed test strings (`0` literal credential or PII findings across the repository).
+  - Hardened `scripts/install_skills.py` (`https://` scheme enforcement, `--repo`/`--ref` validation, slug regex, and `.resolve().relative_to()` path-traversal confinement on install/uninstall), `scripts/eval_skills.py` (`https://`/loopback URL scheme check), `scripts/cortex_studio.py` (`1 MiB` request body cap and `Origin` CSRF validation on `POST`), and `index.html` (`escapeHtml()` across catalog, packs, platforms, and inspector DOM templates).
+- **CLI, MCP, Studio & Site Parity**:
+  - Added `--json` parity across `cortex scan . --json` (plus `--init-policy`), `cortex audit --json`, `cortex doctor --json`, `cortex new --json`, `grade_calc.py --json`, `memory_store.py --json`, and `bmesh_check.py --json`, plus fixed `cortex_run_verifier` invocation for `memory-manager`.
+  - Added `opencode` target parity to `scripts/cortex_compile.py` (`AGENTS.md`), `scripts/cortex_studio.py` compiler UI, `scripts/cortex_mcp.py`, and `index.html` MCP simulator; corrected `index.html` manifest count (`11` → `9`) and npm verify commands.
+  - Added `IGNORE_DIRS` and `.github/skills` pruning to `lint_terraform.py`, `lint_k8s.py`, `lint_graphql.py`, and `audit_finops.py` so installed skill trees are skipped cleanly.
+- **Repository Scanner Policy (`.cortex-policy.json`)**: Added starter root policy aligned with `schemas/policy.schema.json` and wired `cortex scan . --format sarif --fail-on high` into `.github/workflows/ci.yml`.
+
 ## [2.0.0] — 2026-11-24
 
 **Next-Generation Multi-Agent Platform Release.** Transforms Cortex from a static skill repository into a complete zero-dependency multi-agent engineering runtime — introducing a native MCP 2025-03-26 JSON-RPC stdio server (`cortex mcp`), Local Light/Dark Swiss Web Workbench (`cortex studio`), Universal Agent Rule Compiler (`cortex compile`), Unified Policy & SARIF 2.1.0 / JUnit XML Scanner (`cortex scan`), 12 brand-new flagship skills (24 → 36 skills & 36 bundled Python verifiers), 4 new role packs (6 → 10 packs), and a 6-guide `docs/` engineering handbook.

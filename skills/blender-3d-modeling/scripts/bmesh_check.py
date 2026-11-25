@@ -6,6 +6,7 @@ Usage inside headless Blender:
 """
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 
@@ -68,11 +69,18 @@ def audit_scene() -> dict:
     return {"passed": overall_pass, "mesh_count": len(results), "meshes": results}
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Deterministic Blender bmesh geometry & transform integrity auditor.")
+    parser.add_argument("target", nargs="?", default=None, help="Optional blend path context (used when invoked inside Blender).")
+    parser.add_argument("--json", action="store_true", dest="as_json", help="Emit structured JSON output.")
+    args, _unknown = parser.parse_known_args(argv)
     try:
         report = audit_scene()
     except RuntimeError as exc:
-        print(f"ERROR: {exc}", file=sys.stderr)
+        if args.as_json:
+            print(json.dumps({"passed": False, "mesh_count": 0, "meshes": [], "error": str(exc)}, indent=2))
+        else:
+            print(f"ERROR: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(report, indent=2))
     return 0 if report["passed"] else 1

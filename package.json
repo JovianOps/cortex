@@ -1,7 +1,7 @@
 {
   "name": "@jovianops/cortex",
-  "version": "2.0.0",
-  "description": "36 modular, deterministic v2.0.0 Agent Skills (SKILL.md) with 36 bundled Python verifiers, native MCP server, Local Studio UI, Universal Rule Compiler, SARIF scanner, and SHA-256 verification",
+  "version": "2.0.1",
+  "description": "36 modular, deterministic v2.0.1 Agent Skills (SKILL.md) with 36 bundled Python verifiers, native MCP server, Local Studio UI, Universal Rule Compiler, SARIF scanner, and SHA-256 verification",
   "keywords": [
     "agent-skills",
     "skill-md",

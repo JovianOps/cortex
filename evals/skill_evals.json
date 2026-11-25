@@ -1,6 +1,6 @@
 {
-  "schema_version": "2.0.0",
-  "description": "Paired 100-point A/B evaluation rubrics for all 36 Cortex v2.0.0 skills (Without-Skill vs. With-Skill).",
+  "schema_version": "2.0.1",
+  "description": "Paired 100-point A/B evaluation rubrics for all 36 Cortex v2.0.1 skills (Without-Skill vs. With-Skill).",
   "tasks": [
     {
       "id": "eval-academic-assistant",
@@ -520,7 +520,7 @@
       "id": "eval-db-optimizer",
       "skill": "db-optimizer",
       "collection": "premium-skills",
-      "prompt": "Optimize this PostgreSQL query on a 50M-row `orders` table: `SELECT * FROM orders WHERE LOWER(customer_email) = 'a@b.com' AND status = 'pending' ORDER BY created_at DESC LIMIT 20 OFFSET 10000;`",
+      "prompt": "Optimize this PostgreSQL query on a 50M-row `orders` table: `SELECT * FROM orders WHERE LOWER(customer_email) = 'user@example.com' AND status = 'pending' ORDER BY created_at DESC LIMIT 20 OFFSET 10000;`",
       "rubric": [
         {
           "id": "explain_analyze_buffers",
@@ -1478,7 +1478,7 @@
       "id": "eval-security-auditor",
       "skill": "security-auditor",
       "collection": "premium-skills",
-      "prompt": "Audit this Flask snippet:\n```python\nAPI_TOKEN = 'sk-live-99887766554433221100'\n@app.get('/files')\ndef get_file():\n    name = request.args['name']\n    return open('/var/data/' + name).read()\n@app.get('/user')\ndef get_user():\n    q = f\"SELECT * FROM users WHERE id = {request.args['id']}\"\n    return db.execute(q).fetchall()\n```",
+      "prompt": "Audit this Flask snippet:\n```python\nAPI_TOKEN = 'demo-api-token-placeholder'\n@app.get('/files')\ndef get_file():\n    name = request.args['name']\n    return open('/var/data/' + name).read()\n@app.get('/user')\ndef get_user():\n    q = f\"SELECT * FROM users WHERE id = {request.args['id']}\"\n    return db.execute(q).fetchall()\n```",
       "rubric": [
         {
           "id": "cwe_mappings",
@@ -1496,7 +1496,7 @@
           "description": "Redacts the hardcoded token instead of echoing the full secret value verbatim",
           "patterns": [
             "\\*{3,}|REDACTED",
-            "sk-live"
+            "API_TOKEN|demo-api-token"
           ]
         },
         {

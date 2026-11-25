@@ -1,7 +1,7 @@
 ---
 name: code-review-assistant
 description: Run evidence-backed code reviews with severity rubrics.
-version: 2.0.0
+version: 2.0.1
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

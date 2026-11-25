@@ -1,7 +1,7 @@
 ---
 name: chaos-resilience-engineer
 description: Design fault-tolerant timeouts, retries, and game days.
-version: 2.0.0
+version: 2.0.1
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

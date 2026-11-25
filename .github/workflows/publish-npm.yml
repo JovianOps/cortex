@@ -40,10 +40,13 @@ jobs:
           python-version: "3.12"
 
       - name: Install Python validation dependencies
-        run: python -m pip install --upgrade pip pyyaml
+        run: python -m pip install --upgrade pip pyyaml ruff
 
       - name: Run full Cortex test & integrity suite
-        run: npm test
+        run: |
+          python -m compileall -q -f scripts skills premium-skills tests
+          ruff check --select E9,F scripts skills premium-skills tests
+          npm test
 
       - name: Verify npm tarball installs and runs cleanly in an isolated directory
         run: |
@@ -54,10 +57,11 @@ jobs:
           (
             cd "$TMPDIR"
             ./node_modules/.bin/cortex detect
-            ./node_modules/.bin/cortex doctor
+            ./node_modules/.bin/cortex doctor --json
             ./node_modules/.bin/cortex packs
             ./node_modules/.bin/cortex search --has-script
-            ./node_modules/.bin/cortex audit
+            ./node_modules/.bin/cortex audit --json
+            ./node_modules/.bin/cortex scan . --json --only secrets
             ./node_modules/.bin/cortex install --agent claude-code --pack fullstack --scope project
             test -f "$TMPDIR/.claude/skills/security-auditor/scripts/secret_scan.py"
           )
@@ -65,7 +69,7 @@ jobs:
       - name: Verify package.json version matches release tag
         if: github.event_name == 'release'
         run: |
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          TAG_VERSION="${GITHUB_REF_NAME#[vV]}"
           PKG_VERSION=$(node -p "require('./package.json').version")
           if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
             echo "::error::Release tag ($GITHUB_REF_NAME) does not match package.json version ($PKG_VERSION)"

@@ -1,6 +1,6 @@
 {
-  "schema_version": "2.0.0",
-  "release_version": "2.0.0",
+  "schema_version": "2.0.1",
+  "release_version": "2.0.1",
   "packs": {
     "fullstack": {
       "label": "Full-Stack Web",

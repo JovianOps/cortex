@@ -1,6 +1,6 @@
 {
   "name": "cortex",
-  "version": "2.0.0",
-  "description": "Cortex v2.0.0 \u2014 36 modular Agent Skills, 36 bundled Python verifiers, MCP server, Studio UI, and SHA-256 verification.",
+  "version": "2.0.1",
+  "description": "Cortex v2.0.1 \u2014 36 modular Agent Skills, 36 bundled Python verifiers, MCP server, Studio UI, and SHA-256 verification.",
   "contextFileName": "GEMINI.md"
 }

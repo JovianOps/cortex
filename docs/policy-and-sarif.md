@@ -12,6 +12,12 @@
 # Run all applicable scanners across the current repo (fails on HIGH/CRITICAL by default)
 npx @jovianops/cortex scan .
 
+# Write a starter .cortex-policy.json in the target directory
+npx @jovianops/cortex scan . --init-policy
+
+# Emit structured JSON (--json or --format json)
+npx @jovianops/cortex scan . --json --fail-on high
+
 # Run selected scanners and export SARIF 2.1.0 for GitHub Code Scanning
 npx @jovianops/cortex scan . --only actions --only secrets --only sbom --format sarif --output cortex.sarif
 

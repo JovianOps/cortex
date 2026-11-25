@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches: [main]
-    tags: ['v*']
+    tags: ['v*', 'V*']
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -142,10 +142,11 @@ jobs:
           (
             cd "$TMPDIR"
             ./node_modules/.bin/cortex detect
-            ./node_modules/.bin/cortex doctor
+            ./node_modules/.bin/cortex doctor --json
             ./node_modules/.bin/cortex packs
             ./node_modules/.bin/cortex search --has-script
-            ./node_modules/.bin/cortex audit
+            ./node_modules/.bin/cortex audit --json
+            ./node_modules/.bin/cortex scan . --json --only secrets
             ./node_modules/.bin/cortex install --agent claude-code --pack fullstack --scope project
             test -f "$TMPDIR/.claude/skills/security-auditor/scripts/secret_scan.py"
           )
@@ -168,6 +169,9 @@ jobs:
 
       - name: Audit GitHub Actions workflows (Cortex lint_actions.py)
         run: python premium-skills/devops-pipeline/scripts/lint_actions.py .github/workflows
+
+      - name: Run Cortex Unified Policy & SARIF Scan
+        run: python scripts/cortex.py scan . --format sarif --output cortex.sarif --fail-on high
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
@@ -196,7 +200,7 @@ jobs:
       - validate-web-and-docs
       - package-smoke-test
       - security-and-workflows
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/V'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

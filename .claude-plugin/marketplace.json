@@ -5,8 +5,8 @@
     "url": "https://github.com/JovianOps"
   },
   "metadata": {
-    "description": "Cortex v2.0.0 \u2014 36 modular Agent Skills, 36 bundled Python verifiers, MCP server, Local Studio UI, and Universal Rule Compiler.",
-    "version": "2.0.0",
+    "description": "Cortex v2.0.1 \u2014 36 modular Agent Skills, 36 bundled Python verifiers, MCP server, Local Studio UI, and Universal Rule Compiler.",
+    "version": "2.0.1",
     "homepage": "https://jovianops.github.io/cortex/",
     "repository": "https://github.com/JovianOps/cortex"
   },
@@ -14,8 +14,8 @@
     {
       "name": "cortex",
       "source": "./",
-      "description": "All 36 Cortex v2.0.0 Agent Skills (10 core + 26 extended with 36 bundled zero-dependency Python helper scripts).",
-      "version": "2.0.0",
+      "description": "All 36 Cortex v2.0.1 Agent Skills (10 core + 26 extended with 36 bundled zero-dependency Python helper scripts).",
+      "version": "2.0.1",
       "author": {
         "name": "Athalla Jovian Maharsa",
         "url": "https://github.com/JovianOps"
@@ -87,8 +87,8 @@
       "name": "cortex-core",
       "source": "./",
       "strict": false,
-      "description": "10 core Cortex v2.0.0 skills with 10 bundled helper scripts.",
-      "version": "2.0.0",
+      "description": "10 core Cortex v2.0.1 skills with 10 bundled helper scripts.",
+      "version": "2.0.1",
       "author": {
         "name": "Athalla Jovian Maharsa",
         "url": "https://github.com/JovianOps"
@@ -122,8 +122,8 @@
       "name": "cortex-extended",
       "source": "./",
       "strict": false,
-      "description": "26 extended Cortex v2.0.0 engineering skills (K8s, TypeScript, Rust, Go, GraphQL, LLM Security, SBOM, PII, FinOps, Chaos, ADRs, Git, plus full DevOps/API/DB/Security suite).",
-      "version": "2.0.0",
+      "description": "26 extended Cortex v2.0.1 engineering skills (K8s, TypeScript, Rust, Go, GraphQL, LLM Security, SBOM, PII, FinOps, Chaos, ADRs, Git, plus full DevOps/API/DB/Security suite).",
+      "version": "2.0.1",
       "author": {
         "name": "Athalla Jovian Maharsa",
         "url": "https://github.com/JovianOps"

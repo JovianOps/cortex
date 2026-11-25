@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cortex v2.0.0 Multi-Agent Skill Manager — install, verify, upgrade, and uninstall SKILL.md playbooks.
+"""Cortex v2.0.1 Multi-Agent Skill Manager — install, verify, upgrade, and uninstall SKILL.md playbooks.
 
 Zero external dependencies (Python 3 stdlib only). Works on Linux, macOS, and Windows.
 
@@ -26,9 +26,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import shutil
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -162,14 +164,29 @@ def normalized_bytes(path: Path) -> bytes:
     return raw
 
 
+SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")
+REPO_RE = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
+REF_RE = re.compile(r"^[A-Za-z0-9_./-]+$")
+
+
 def raw_url(repo: str, ref: str, rel_path: str) -> str:
-    return f"https://raw.githubusercontent.com/{repo}/{ref}/{rel_path}"
+    if not REPO_RE.fullmatch(repo):
+        raise ValueError(f"Invalid --repo format {repo!r}; expected 'owner/repo'.")
+    if not REF_RE.fullmatch(ref) or ".." in ref.split("/"):
+        raise ValueError(f"Invalid --ref value {ref!r}.")
+    clean_rel = rel_path.lstrip("/")
+    if ".." in Path(clean_rel).parts:
+        raise ValueError(f"Unsafe relative remote path: {rel_path!r}")
+    return f"https://raw.githubusercontent.com/{repo}/{ref}/{clean_rel}"
 
 
 def fetch_bytes(url: str, timeout: int = 20) -> bytes:
-    req = urllib.request.Request(url, headers={"User-Agent": "cortex-installer/2.0.0"})
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme != "https" or not parsed.netloc:
+        raise ValueError(f"Refusing non-HTTPS remote URL: {url!r}")
+    req = urllib.request.Request(url, headers={"User-Agent": "cortex-installer/2.0.1"})
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:  # nosec B310
             return resp.read()
     except urllib.error.URLError as exc:
         raise RuntimeError(f"Failed to download {url}: {exc}") from exc
@@ -181,7 +198,7 @@ def load_local_catalog() -> dict:
     if checksums_path.is_file():
         return json.loads(checksums_path.read_text(encoding="utf-8"))
 
-    pkg_version = "2.0.0"
+    pkg_version = "2.0.1"
     pkg_json = ROOT / "package.json"
     if pkg_json.is_file():
         pkg_version = json.loads(pkg_json.read_text(encoding="utf-8")).get("version", pkg_version)
@@ -206,7 +223,7 @@ def load_local_catalog() -> dict:
                 "files": files_map,
             }
     return {
-        "schema_version": "2.0.0",
+        "schema_version": "2.0.1",
         "release_version": pkg_version,
         "skill_count": len(skills_index),
         "skills": skills_index,
@@ -314,7 +331,7 @@ def read_lockfile(dest_base: Path) -> dict:
                 return data
         except json.JSONDecodeError:
             pass
-    return {"schema_version": "2.0.0", "skills": {}}
+    return {"schema_version": "2.0.1", "skills": {}}
 
 
 def write_lockfile(dest_base: Path, lock_data: dict) -> None:
@@ -391,6 +408,16 @@ def update_vscode_settings(project_root: Path, dry_run: bool) -> None:
     print(f"  Updated {settings_path} with chat.useAgentSkills=true.")
 
 
+def _safe_child_path(base_dir: Path, rel_path: str) -> Path:
+    base_resolved = base_dir.resolve()
+    candidate = (base_resolved / rel_path).resolve()
+    try:
+        candidate.relative_to(base_resolved)
+    except ValueError as exc:
+        raise RuntimeError(f"Refusing path traversal outside {base_resolved}: {rel_path!r}") from exc
+    return candidate
+
+
 def install_single_skill(
     slug: str,
     meta: dict,
@@ -401,13 +428,18 @@ def install_single_skill(
     ref: str,
     dry_run: bool,
 ) -> dict[str, str]:
+    if not SLUG_RE.fullmatch(slug):
+        raise RuntimeError(f"Refusing unsafe skill slug: {slug!r}")
+    src_dir_name = str(meta["dir"])
+    if src_dir_name not in {"skills", "premium-skills"}:
+        raise RuntimeError(f"Refusing unexpected skill collection dir: {src_dir_name!r}")
+
     files_meta: dict[str, str] = meta["files"]
-    src_dir_name = meta["dir"]
-    dest_skill_dir = dest_base / slug
+    dest_skill_dir = _safe_child_path(dest_base, slug)
     written_hashes: dict[str, str] = {}
 
     for rel_file, expected_sha in files_meta.items():
-        target_path = dest_skill_dir / rel_file
+        target_path = _safe_child_path(dest_skill_dir, rel_file)
         if remote:
             url = raw_url(repo, ref, f"{src_dir_name}/{slug}/{rel_file}")
             if dry_run:
@@ -486,7 +518,7 @@ def cmd_check_updates(
     ref: str,
     dry_run: bool,
 ) -> int:
-    latest_version = catalog.get("release_version", "2.0.0")
+    latest_version = catalog.get("release_version", "2.0.1")
     skills_map = catalog["skills"]
     updates_found = 0
 
@@ -553,7 +585,10 @@ def cmd_uninstall(
             print("  (nothing to uninstall)")
             continue
         for slug in to_remove:
-            skill_dir = dest_base / slug
+            if not SLUG_RE.fullmatch(slug):
+                print(f"  skipped unsafe slug {slug!r}", file=sys.stderr)
+                continue
+            skill_dir = _safe_child_path(dest_base, slug)
             if dry_run:
                 print(f"  [dry-run] Would remove {skill_dir}")
                 continue
@@ -570,7 +605,7 @@ def cmd_uninstall(
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Install, verify, upgrade, and uninstall Cortex v2.0.0 SKILL.md playbooks across 12 AI agent & IDE targets."
+        description="Install, verify, upgrade, and uninstall Cortex v2.0.1 SKILL.md playbooks across 12 AI agent & IDE targets."
     )
     parser.add_argument(
         "--agent",
@@ -657,7 +692,7 @@ def main(argv: list[str] | None = None) -> int:
             print(
                 f"  {target.key:<12} {target.label:<38} global: ~/{target.global_rel}   project: {target.project_rel}"
             )
-        print(f"\nAvailable Cortex Skills (v{catalog.get('release_version', '2.0.0')} — {len(catalog['skills'])} total):")
+        print(f"\nAvailable Cortex Skills (v{catalog.get('release_version', '2.0.1')} — {len(catalog['skills'])} total):")
         for slug, meta in catalog["skills"].items():
             extras = [f for f in meta.get("files", {}) if f != "SKILL.md"]
             badge = f"  [+{len(extras)} script(s)]" if extras else ""
@@ -693,7 +728,7 @@ def main(argv: list[str] | None = None) -> int:
 
     packs = load_packs(args.remote, args.repo, args.ref) if args.pack else {}
     skills = select_skills(catalog, args.collection, args.skill, args.pack, packs)
-    release_ver = catalog.get("release_version", "2.0.0")
+    release_ver = catalog.get("release_version", "2.0.1")
 
     for target in agents:
         dest_base = destination_dir(target, args.scope, project_root)

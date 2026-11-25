@@ -1,7 +1,7 @@
 ---
 name: finops-cost-optimizer
 description: Audit Terraform and K8s configs for cloud cost waste.
-version: 2.0.0
+version: 2.0.1
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

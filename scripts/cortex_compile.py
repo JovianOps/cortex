@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 
 SKILL_GLOBS: dict[str, str] = {
     "academic-assistant": "**/*.md,**/*.tex",
@@ -51,7 +51,7 @@ SKILL_GLOBS: dict[str, str] = {
     "web-scraper": "**/*.py,**/*.ts,**/robots.txt",
 }
 
-SUPPORTED_TARGETS = ("cursor", "vscode", "windsurf", "cline", "claude", "agents", "gemini")
+SUPPORTED_TARGETS = ("cursor", "vscode", "windsurf", "cline", "claude", "agents", "opencode", "gemini")
 BEGIN_MARKER = "<!-- BEGIN CORTEX MANAGED -->"
 END_MARKER = "<!-- END CORTEX MANAGED -->"
 
@@ -217,7 +217,7 @@ def compile_rules(
             out = project_dir / "CLAUDE.md"
             sec = render_managed_section(skills, "Cortex Skills Index")
             planned.append((out, upsert_managed_file(out, sec, "CLAUDE.md")))
-        elif tgt == "agents":
+        elif tgt in {"agents", "opencode"}:
             out = project_dir / "AGENTS.md"
             sec = render_managed_section(skills, "Cortex Skills Index")
             planned.append((out, upsert_managed_file(out, sec, "AGENTS.md")))

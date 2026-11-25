@@ -1,7 +1,7 @@
 ---
 name: web-scraper
 description: Scrape web data politely with strict schema validation.
-version: 2.0.0
+version: 2.0.1
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

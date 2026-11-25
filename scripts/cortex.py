@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cortex Unified CLI (v2.0.0) — detect agents, diagnose installs, search skills, install packs, and scaffold new skills.
+"""Cortex Unified CLI (v2.0.1) — detect agents, diagnose installs, search skills, install packs, and scaffold new skills.
 
 Zero external dependencies (Python 3 stdlib only). Works on Linux, macOS, and Windows.
 
@@ -26,7 +26,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 
 AGENT_PROBES: tuple[tuple[str, str, str, str, tuple[str, ...]], ...] = (
     ("claude-code", "Claude Code", ".claude", ".claude", ("claude",)),
@@ -138,26 +138,32 @@ def cmd_detect(args: argparse.Namespace) -> int:
 
 def cmd_doctor(args: argparse.Namespace) -> int:
     project_dir = args.project_dir.resolve()
-    print(f"Cortex v{VERSION} — Environment & Integrity Doctor\n")
+    as_json = bool(getattr(args, "as_json", False))
+
+    def log(msg: str) -> None:
+        if not as_json:
+            print(msg)
+
+    log(f"Cortex v{VERSION} — Environment & Integrity Doctor\n")
     issues = 0
 
     # 1. Runtime checks
     py_ver = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
     node_bin = shutil.which("node")
     git_bin = shutil.which("git")
-    print(f"[OK]   Python {py_ver} ({sys.executable})")
-    print(f"[{'OK' if git_bin else 'WARN'}] {'git found at ' + git_bin if git_bin else 'git not found on PATH'}")
-    print(f"[{'OK' if node_bin else 'INFO'}] {'node found at ' + node_bin if node_bin else 'node not found (optional — Python installer works without Node)'}")
+    log(f"[OK]   Python {py_ver} ({sys.executable})")
+    log(f"[{'OK' if git_bin else 'WARN'}] {'git found at ' + git_bin if git_bin else 'git not found on PATH'}")
+    log(f"[{'OK' if node_bin else 'INFO'}] {'node found at ' + node_bin if node_bin else 'node not found (optional — Python installer works without Node)'}")
 
     # 2. Integrity checks (full ZIP check in repo checkout; direct SHA-256 check in npm package)
     if (ROOT / "checksums.json").is_file() and (ROOT / "packs.json").is_file():
         if (ROOT / "zips").is_dir() and (ROOT / "premium-zips").is_dir():
             pkg_res = subprocess.run([sys.executable, str(SCRIPTS / "package_skills.py"), "--check"], cwd=ROOT, capture_output=True, text=True)
             if pkg_res.returncode == 0:
-                print(f"[OK]   {pkg_res.stdout.strip()}")
+                log(f"[OK]   {pkg_res.stdout.strip()}")
             else:
                 issues += 1
-                print(f"[FAIL] package_skills --check: {(pkg_res.stderr or pkg_res.stdout).strip()}")
+                log(f"[FAIL] package_skills --check: {(pkg_res.stderr or pkg_res.stdout).strip()}")
         else:
             manifest = json.loads((ROOT / "checksums.json").read_text(encoding="utf-8"))
             checked_files = 0
@@ -176,16 +182,16 @@ def cmd_doctor(args: argparse.Namespace) -> int:
                     checked_files += 1
             if bad_files:
                 issues += 1
-                print(f"[FAIL] Bundled skill SHA-256 verification failed: {', '.join(bad_files)}")
+                log(f"[FAIL] Bundled skill SHA-256 verification failed: {', '.join(bad_files)}")
             else:
-                print(f"[OK]   Verified SHA-256 checksums for {len(manifest.get('skills', {}))} bundled skills ({checked_files} files).")
+                log(f"[OK]   Verified SHA-256 checksums for {len(manifest.get('skills', {}))} bundled skills ({checked_files} files).")
 
         man_res = subprocess.run([sys.executable, str(SCRIPTS / "validate_manifests.py")], cwd=ROOT, capture_output=True, text=True)
         if man_res.returncode == 0:
-            print(f"[OK]   {man_res.stdout.strip()}")
+            log(f"[OK]   {man_res.stdout.strip()}")
         else:
             issues += 1
-            print(f"[FAIL] validate_manifests: {(man_res.stderr or man_res.stdout).strip()}")
+            log(f"[FAIL] validate_manifests: {(man_res.stderr or man_res.stdout).strip()}")
 
     # 3. Verify any installed .cortex-lock.json files in detected agent directories
     installer = load_script("install_skills")
@@ -195,14 +201,36 @@ def cmd_doctor(args: argparse.Namespace) -> int:
             dest = installer.destination_dir(target, scope, project_dir)
             if (dest / installer.LOCKFILE_NAME).is_file():
                 checked_locks += 1
-                rc = installer.cmd_status([target], scope, project_dir)
+                if as_json:
+                    res = subprocess.run(
+                        [sys.executable, str(SCRIPTS / "install_skills.py"), "--status", "--agent", target, "--scope", scope, "--project-dir", str(project_dir)],
+                        cwd=ROOT,
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                    )
+                    rc = res.returncode
+                else:
+                    rc = installer.cmd_status([target], scope, project_dir)
                 if rc != 0:
                     issues += 1
 
     if checked_locks == 0:
-        print("[INFO] No .cortex-lock.json installations found in this workspace or home directory yet.")
+        log("[INFO] No .cortex-lock.json installations found in this workspace or home directory yet.")
 
-    print(f"\nDoctor finished with {issues} issue(s).")
+    if as_json:
+        print(json.dumps({
+            "version": VERSION,
+            "ok": issues == 0,
+            "issues": issues,
+            "python": py_ver,
+            "git": git_bin,
+            "node": node_bin,
+            "checked_lockfiles": checked_locks,
+        }, indent=2))
+        return 1 if issues else 0
+
+    log(f"\nDoctor finished with {issues} issue(s).")
     return 1 if issues else 0
 
 
@@ -370,10 +398,13 @@ Implement minimal targeted changes, re-run verification checks, and report any r
 ```
 """
 
+    as_json = bool(getattr(args, "as_json", False))
     skill_dir.mkdir(parents=True, exist_ok=True)
     (skill_dir / "SKILL.md").write_text(skill_md, encoding="utf-8")
-    print(f"Created {skill_dir / 'SKILL.md'}")
+    if not as_json:
+        print(f"Created {skill_dir / 'SKILL.md'}")
 
+    created_script: str | None = None
     if args.with_script:
         script_path = skill_dir / script_rel
         script_path.parent.mkdir(parents=True, exist_ok=True)
@@ -394,7 +425,19 @@ Implement minimal targeted changes, re-run verification checks, and report any r
             f'    raise SystemExit(main())\n',
             encoding="utf-8",
         )
-        print(f"Created {script_path}")
+        created_script = script_path.as_posix()
+        if not as_json:
+            print(f"Created {script_path}")
+
+    if as_json:
+        print(json.dumps({
+            "slug": slug,
+            "tier": args.tier,
+            "skill_md": (skill_dir / "SKILL.md").as_posix(),
+            "script": created_script,
+            "version": VERSION,
+        }, indent=2))
+        return 0
 
     print("\nNext steps:")
     print(f"  1. Add a 100-point A/B rubric for `{slug}` in evals/skill_evals.json")
@@ -691,6 +734,7 @@ def main(argv: list[str] | None = None) -> int:
     if cmd == "doctor":
         p = argparse.ArgumentParser(prog="cortex doctor")
         p.add_argument("--project-dir", type=Path, default=Path.cwd())
+        p.add_argument("--json", action="store_true", dest="as_json")
         return cmd_doctor(p.parse_args(rest))
 
     if cmd == "search":
@@ -714,6 +758,7 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--with-script", action="store_true", help="Include starter Python helper script.")
         p.add_argument("--out-dir", type=Path, default=None, help="Optional root directory override.")
         p.add_argument("--force", action="store_true")
+        p.add_argument("--json", action="store_true", dest="as_json")
         return cmd_new(p.parse_args(rest))
 
     if cmd == "install":

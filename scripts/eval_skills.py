@@ -8,6 +8,7 @@ import os
 import re
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -138,14 +139,16 @@ def audit_skill(name: str, path: Path, all_skill_names: set[str]) -> tuple[int, 
     return score, issues
 
 
-def run_audit() -> int:
+def run_audit(as_json: bool = False) -> int:
     skills = discover_skills()
     all_names = set(skills)
     failed = False
     total = 0
+    rows: list[dict[str, object]] = []
 
-    print(f"{'Skill':<26} {'Collection':<15} {'Score':>7}  Status")
-    print("-" * 68)
+    if not as_json:
+        print(f"{'Skill':<26} {'Collection':<15} {'Score':>7}  Status")
+        print("-" * 68)
     for name, path in sorted(skills.items()):
         collection = path.parent.parent.name
         score, issues = audit_skill(name, path, all_names)
@@ -153,17 +156,30 @@ def run_audit() -> int:
         status = "OK" if score == 100 else "; ".join(issues)
         if score < 100:
             failed = True
-        print(f"{name:<26} {collection:<15} {score:>5}/100  {status}")
+        rows.append({"skill": name, "collection": collection, "score": score, "issues": issues})
+        if not as_json:
+            print(f"{name:<26} {collection:<15} {score:>5}/100  {status}")
 
     avg = total / len(skills) if skills else 0.0
-    print("-" * 68)
-    print(f"Audited {len(skills)} skills — average structural quality score: {avg:.1f}/100")
+    if as_json:
+        print(json.dumps({
+            "ok": not failed,
+            "skill_count": len(skills),
+            "average_score": round(avg, 2),
+            "skills": rows,
+        }, indent=2))
+    else:
+        print("-" * 68)
+        print(f"Audited {len(skills)} skills — average structural quality score: {avg:.1f}/100")
     return 1 if failed else 0
 
 
-def validate_evals() -> int:
+def validate_evals(as_json: bool = False) -> int:
     if not EVALS_PATH.is_file():
-        print(f"ERROR: Missing eval suite at {EVALS_PATH}", file=sys.stderr)
+        if as_json:
+            print(json.dumps({"ok": False, "errors": [f"Missing eval suite at {EVALS_PATH}"]}, indent=2))
+        else:
+            print(f"ERROR: Missing eval suite at {EVALS_PATH}", file=sys.stderr)
         return 1
     data = json.loads(EVALS_PATH.read_text(encoding="utf-8"))
     skills = discover_skills()
@@ -195,11 +211,17 @@ def validate_evals() -> int:
         errors.append(f"Skills missing eval coverage: {missing}")
 
     if errors:
-        for err in errors:
-            print(f"ERROR: {err}", file=sys.stderr)
+        if as_json:
+            print(json.dumps({"ok": False, "task_count": len(tasks), "skill_count": len(skills), "errors": errors}, indent=2))
+        else:
+            for err in errors:
+                print(f"ERROR: {err}", file=sys.stderr)
         return 1
 
-    print(f"Eval suite valid: {len(tasks)} tasks covering all {len(skills)} skills (100 pts each).")
+    if as_json:
+        print(json.dumps({"ok": True, "task_count": len(tasks), "skill_count": len(skills), "errors": []}, indent=2))
+    else:
+        print(f"Eval suite valid: {len(tasks)} tasks covering all {len(skills)} skills (100 pts each).")
     return 0
 
 
@@ -273,6 +295,16 @@ def export_prompts(destination: Path) -> int:
     return 0
 
 
+def _validate_provider_url(url: str) -> str:
+    parsed = urllib.parse.urlparse(url)
+    host = (parsed.hostname or "").lower()
+    if parsed.scheme == "https" and host:
+        return url
+    if parsed.scheme == "http" and host in {"127.0.0.1", "localhost", "::1"}:
+        return url
+    raise RuntimeError(f"Refusing insecure provider URL scheme: {url!r} (requires https:// or loopback http://)")
+
+
 def call_provider(
     provider: str,
     model: str,
@@ -286,7 +318,7 @@ def call_provider(
         api_key = os.environ.get("OPENAI_API_KEY", "")
         if not api_key and provider == "openai":
             raise RuntimeError("OPENAI_API_KEY environment variable is required for --provider openai")
-        url = (base_url or "https://api.openai.com/v1").rstrip("/") + "/chat/completions"
+        url = _validate_provider_url((base_url or "https://api.openai.com/v1").rstrip("/") + "/chat/completions")
         messages: list[dict[str, str]] = []
         if system:
             messages.append({"role": "system", "content": system})
@@ -296,7 +328,7 @@ def call_provider(
         if api_key:
             headers["Authorization"] = f"Bearer {api_key}"
         req = urllib.request.Request(url, data=body, headers=headers)
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:  # nosec B310
             payload = json.loads(resp.read().decode("utf-8"))
         return str(payload["choices"][0]["message"]["content"])
 
@@ -304,7 +336,7 @@ def call_provider(
         api_key = os.environ.get("ANTHROPIC_API_KEY", "")
         if not api_key:
             raise RuntimeError("ANTHROPIC_API_KEY environment variable is required for --provider anthropic")
-        url = (base_url or "https://api.anthropic.com/v1").rstrip("/") + "/messages"
+        url = _validate_provider_url((base_url or "https://api.anthropic.com/v1").rstrip("/") + "/messages")
         req_body: dict[str, object] = {
             "model": model,
             "max_tokens": 2048,
@@ -322,7 +354,7 @@ def call_provider(
                 "anthropic-version": "2023-06-01",
             },
         )
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:  # nosec B310
             payload = json.loads(resp.read().decode("utf-8"))
         return "".join(block.get("text", "") for block in payload.get("content", []) if block.get("type") == "text")
 
@@ -331,7 +363,7 @@ def call_provider(
         if not api_key:
             raise RuntimeError("GEMINI_API_KEY environment variable is required for --provider gemini")
         endpoint = (base_url or "https://generativelanguage.googleapis.com/v1beta").rstrip("/")
-        url = f"{endpoint}/models/{model}:generateContent?key={api_key}"
+        url = _validate_provider_url(f"{endpoint}/models/{model}:generateContent?key={api_key}")
         req_body = {
             "contents": [{"role": "user", "parts": [{"text": prompt}]}],
             "generationConfig": {"temperature": 0.2},
@@ -343,7 +375,7 @@ def call_provider(
             data=json.dumps(req_body).encode("utf-8"),
             headers={"Content-Type": "application/json"},
         )
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:  # nosec B310
             payload = json.loads(resp.read().decode("utf-8"))
         parts = payload["candidates"][0]["content"]["parts"]
         return "".join(str(p.get("text", "")) for p in parts)
@@ -421,18 +453,46 @@ def main() -> int:
     parser.add_argument("--base-url", default=None, help="optional custom API base URL for --provider")
     parser.add_argument("--out-dir", type=Path, default=Path("evals/results/latest"), help="output directory for --run")
     parser.add_argument("--skill", action="append", default=[], help="filter --run to specific skill slug(s)")
+    parser.add_argument("--json", action="store_true", dest="as_json", help="emit JSON output for audit/validate checks")
     args = parser.parse_args()
 
     if not any([args.audit_skills, args.validate_evals, args.score, args.export_prompts, args.run]):
+        if args.as_json:
+            skills = discover_skills()
+            all_names = set(skills)
+            audit_rows = []
+            audit_failed = False
+            for name, path in sorted(skills.items()):
+                score, issues = audit_skill(name, path, all_names)
+                if score < 100:
+                    audit_failed = True
+                audit_rows.append({"skill": name, "score": score, "issues": issues})
+            import io
+            buf = io.StringIO()
+            old_out, old_err = sys.stdout, sys.stderr
+            try:
+                sys.stdout = buf
+                sys.stderr = buf
+                rc2 = validate_evals(as_json=True)
+            finally:
+                sys.stdout, sys.stderr = old_out, old_err
+            eval_obj = json.loads(buf.getvalue()) if buf.getvalue().strip().startswith("{") else {"ok": rc2 == 0}
+            print(json.dumps({
+                "ok": (not audit_failed) and bool(eval_obj.get("ok")),
+                "skill_count": len(skills),
+                "audit": audit_rows,
+                "evals": eval_obj,
+            }, indent=2))
+            return 1 if (audit_failed or rc2) else 0
         rc1 = run_audit()
         rc2 = validate_evals()
         return 1 if (rc1 or rc2) else 0
 
     rc = 0
     if args.audit_skills:
-        rc |= run_audit()
+        rc |= run_audit(as_json=args.as_json)
     if args.validate_evals:
-        rc |= validate_evals()
+        rc |= validate_evals(as_json=args.as_json)
     if args.score:
         rc |= run_compare(Path(args.score[0]), Path(args.score[1]))
     if args.export_prompts:

@@ -1,7 +1,7 @@
 ---
 name: accessibility-auditor
 description: Audit HTML/UI for WCAG 2.2 AA flaws with exact code fixes.
-version: 2.0.0
+version: 2.0.1
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -29,7 +29,7 @@ Audit web interfaces (HTML, CSS, React, Vue, Svelte) against **WCAG 2.2 AA** wit
 
 ## How to Run
 
-> **Bundled Helper Script (`v2.0.0`):** Run `python premium-skills/accessibility-auditor/scripts/a11y_scan.py index.html` to detect missing `lang`/`title`, non-semantic click targets, unlabeled inputs, positive `tabindex`, missing `img alt`, and removed focus outlines offline.
+> **Bundled Helper Script (`v2.0.1`):** Run `python premium-skills/accessibility-auditor/scripts/a11y_scan.py index.html` to detect missing `lang`/`title`, non-semantic click targets, unlabeled inputs, positive `tabindex`, missing `img alt`, and removed focus outlines offline.
 
 ```bash
 # Universal CLI (Claude Code, Codex, Gemini CLI, Cursor, Copilot, OpenCode, OpenClaw, Goose, Cline)

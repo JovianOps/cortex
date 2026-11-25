@@ -1,7 +1,7 @@
 ---
 name: typescript-architect
 description: Build strict TypeScript and React apps with runtime safety.
-version: 2.0.0
+version: 2.0.1
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
