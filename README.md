@@ -42,11 +42,8 @@
 
   <p>
     <a href="#whats-new-in-v200">What's New in v2.0.0</a>
-<<<<<<< HEAD
     &nbsp;&middot;&nbsp;
     <a href="#proof-live-opencode-v241-before--after">Live Proof</a>
-=======
->>>>>>> origin/main
     &nbsp;&middot;&nbsp;
     <a href="#quick-start">Quick Start</a>
     &nbsp;&middot;&nbsp;
@@ -66,17 +63,12 @@
 
 ---
 
-<<<<<<< HEAD
 **Cortex `v2.0.0`** is the next-generation, zero-dependency AI-agent skill & runtime platform shipping **36 modular, deterministic Agent Skills (`SKILL.md`)** across **10 core skills** (`skills/`) and **26 extended engineering skills** (`premium-skills/`), with **36/36 bundled zero-dependency Python verifiers (100% coverage)**, a **native MCP 2025-03-26 JSON-RPC stdio server (`cortex mcp`)**, a **local Light/Dark Swiss Web Workbench (`cortex studio`)**, a **Universal Agent Rule Compiler (`cortex compile`)**, a **Unified Policy & SARIF 2.1.0 / JUnit XML Scanner (`cortex scan`)**, **10 curated Role-Based Skill Packs** (`packs.json`), **4 stable JSON Schemas (`schemas/`)**, **SHA-256 integrity verification (`checksums.json`, 72 bundled files + 36 ZIPs)**, and a **36-task live A/B benchmark harness**.
-=======
-**Cortex `v2.0.0`** is the next-generation, zero-dependency AI-agent skill & runtime platform shipping **36 modular, deterministic Agent Skills (`SKILL.md`)** across **10 core skills** (`skills/`) and **26 extended engineering skills** (`premium-skills/`), with **36/36 bundled zero-dependency Python verifiers (100% coverage)**, a **native MCP 2025-03-26 JSON-RPC stdio server (`cortex mcp`)**, a **local Light/Dark Swiss Web Workbench (`cortex studio`)**, a **Universal Agent Rule Compiler (`cortex compile`)**, a **Unified Policy & SARIF 2.1.0 / JUnit XML Scanner (`cortex scan`)**, **10 curated Role-Based Skill Packs** (`packs.json`), **4 stable JSON Schemas (`schemas/`)**, **SHA-256 integrity verification (`checksums.json`, 72 files)**, and a **36-task live A/B benchmark harness**.
->>>>>>> origin/main
 
 Built on the open **`SKILL.md`** and **MCP** standards, Cortex works natively across **Visual Studio Code**, **GitHub Copilot**, **Claude** (Claude Code & Claude apps), **OpenAI** (Codex CLI & ChatGPT), **Gemini CLI**, **Cursor**, **Windsurf**, **OpenCode**, **OpenClaw**, **Goose**, **Aider**, **Cline**, and **Hermes Agent**.
 
 ## What's New in `v2.0.0`
 
-<<<<<<< HEAD
 - **Native Model Context Protocol Server (`cortex mcp`)**: Zero-dependency MCP 2025-03-26 JSON-RPC 2.0 stdio server exposing **8 tools**, **38 resources** (`cortex://skills/<slug>`, `cortex://packs`, `cortex://checksums`), and **36 invocable prompts** (`cortex/<slug>`), plus `--print-config <vscode|claude-code|cursor|codex|windsurf|opencode>`. See [docs/mcp-guide.md](docs/mcp-guide.md).
 - **Cortex Studio Local Web Workbench (`cortex studio`)**: Zero-dependency Light/Dark Swiss local web UI & 10-endpoint REST API for inspecting all 36 skills and scripts, running any bundled verifier live against your workspace, compiling native agent rules, running SARIF scans, and generating MCP configs. See [docs/studio-guide.md](docs/studio-guide.md).
 - **Universal Agent Rule Compiler (`cortex compile`)**: Deterministically transpiles `SKILL.md` playbooks into **7 native IDE/agent formats** — Cursor (`.cursor/rules/*.mdc`), VS Code (`.github/instructions/*.instructions.md`), Windsurf (`.windsurf/rules/*.md`), Cline (`.clinerules/*.md`), `CLAUDE.md`, `AGENTS.md`, and `GEMINI.md` — with `--dry-run` and `--check` CI drift verification. See [docs/compiler-guide.md](docs/compiler-guide.md).
@@ -126,14 +118,6 @@ python scripts/cortex.py scan . --fail-on high
 ```
 
 </details>
-=======
-- **Native Model Context Protocol Server (`cortex mcp`)**: Zero-dependency MCP 2025-03-26 JSON-RPC 2.0 stdio server exposing **8 tools**, **38 resources** (`cortex://skills/<slug>`, `cortex://packs`, `cortex://checksums`), and **36 invocable prompts** (`cortex/<slug>`), plus `--print-config <vscode|claude-code|cursor|codex|windsurf>`. See [docs/mcp-guide.md](docs/mcp-guide.md).
-- **Cortex Studio Local Web Workbench (`cortex studio`)**: Zero-dependency Light/Dark Swiss local web UI & 10-endpoint REST API for inspecting all 36 skills and scripts, running any bundled verifier live against your workspace, compiling native agent rules, running SARIF scans, and generating MCP configs. See [docs/studio-guide.md](docs/studio-guide.md).
-- **Universal Agent Rule Compiler (`cortex compile`)**: Deterministically transpiles `SKILL.md` playbooks into **7 native IDE/agent formats** — Cursor (`.cursor/rules/*.mdc`), VS Code (`.github/instructions/*.instructions.md`), Windsurf (`.windsurf/rules/*.md`), Cline (`.clinerules/*.md`), `CLAUDE.md`, `AGENTS.md`, and `GEMINI.md` — with `--check` CI drift verification. See [docs/compiler-guide.md](docs/compiler-guide.md).
-- **Unified Policy & SARIF 2.1.0 Scanner (`cortex scan`)**: Orchestrates 14 bundled verifiers in one pass with `.cortex-policy.json` (`schemas/policy.schema.json`), severity gates (`--fail-on`), **SARIF 2.1.0** (GitHub Code Scanning), and **JUnit XML** output. See [docs/policy-and-sarif.md](docs/policy-and-sarif.md).
-- **24 → 36 Skills, 36/36 Bundled Python Verifiers & 6 → 10 Role Packs**: Added 12 flagship extended skills (`kubernetes-architect`, `typescript-architect`, `rust-systems-engineer`, `go-backend-engineer`, `graphql-architect`, `llm-security-auditor`, `supply-chain-sbom`, `privacy-compliance-auditor`, `finops-cost-optimizer`, `chaos-resilience-engineer`, `architecture-decision-records`, `git-history-surgeon`) — all scoring **100.0/100** with paired 100-point A/B eval rubrics and 4 new packs (`cloud-native`, `ai-red-team`, `polyglot-systems`, `platform-architecture`).
-- **Complete Technical Documentation (`docs/`)**: Added [architecture.md](docs/architecture.md), [mcp-guide.md](docs/mcp-guide.md), [studio-guide.md](docs/studio-guide.md), [compiler-guide.md](docs/compiler-guide.md), [policy-and-sarif.md](docs/policy-and-sarif.md), and [skill-authoring.md](docs/skill-authoring.md).
->>>>>>> origin/main
 
 ## Quick Start
 
@@ -408,17 +392,10 @@ Every official release of **`@jovianops/cortex`** is published from GitHub Actio
 
 | Artifact | Algorithm | Expected Fingerprint / Location |
 | :--- | :--- | :--- |
-<<<<<<< HEAD
 | **`v2.0.0` Repository Skills, Scripts & ZIPs** (`36` skills, `72` files, `36` ZIPs = `108` hashes) | **SHA-256** | [`checksums.json`](checksums.json) (`package_skills.py --check`) |
 | **Latest Published npm Release (`@jovianops/cortex@1.0.0`)** (`cortex-1.0.0.tgz`) | **SHA-256** | `cbb9ce6a26086fc9481052bead73d9ec9f496cc9628341f0c92d1f72fd5e6247` |
 | **Latest Published npm Release (`@jovianops/cortex@1.0.0`)** (SRI) | **SHA-512** | `sha512-erM0hXT5nh6M0HcUwqbwqJt2nB7IQjTvXQuAfsJtOQJ+HOoIZ5ez74povVkr/vOkxAeQK1LfZU9388V5fcKKsA==` |
 | **npm SLSA v1 Provenance Attestation (`@jovianops/cortex@1.0.0`)** | Sigstore / OIDC | [`registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@1.0.0`](https://registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@1.0.0) |
-=======
-| **`@jovianops/cortex@1.0.0`** npm tarball (`cortex-1.0.0.tgz`) | **SHA-256** | `cbb9ce6a26086fc9481052bead73d9ec9f496cc9628341f0c92d1f72fd5e6247` |
-| **`@jovianops/cortex@1.0.0`** npm tarball (SRI) | **SHA-512** | `sha512-erM0hXT5nh6M0HcUwqbwqJt2nB7IQjTvXQuAfsJtOQJ+HOoIZ5ez74povVkr/vOkxAeQK1LfZU9388V5fcKKsA==` |
-| **SLSA v1 Provenance Attestation** | Sigstore / OIDC | [`registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@1.0.0`](https://registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@1.0.0) |
-| **All 36 Skills, 36 Bundled Scripts & 36 ZIPs** | **SHA-256** | [`checksums.json`](checksums.json) |
->>>>>>> origin/main
 
 ### 1. Verify the Latest Published npm Tarball SHA-256 (`1.0.0`)
 

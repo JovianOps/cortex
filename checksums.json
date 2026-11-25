@@ -247,10 +247,10 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/llm-security-auditor.zip",
-      "zip_sha256": "fe9b853cc4d2d927d16a7f162270b0932bdec1fd8505bbb01025afa2adfa69c8",
+      "zip_sha256": "0c3656fcfdb8107ef3cc2fceed629cde62a06faba2686ef422f3b93c8581fa36",
       "files": {
         "SKILL.md": "a49024fe23eb7a6d8107d303f6c5be6549b8f57c7c24623851888355e24b6463",
-        "scripts/audit_prompts.py": "cdeb61f679deb7503483dfe91306ae0a9b3bdcac64d934e776d1c5bd2e15009a"
+        "scripts/audit_prompts.py": "7f3a0e2222d597d26253497e0ba06a0f0eccd510e3e92915a14355a2eb1304aa"
       }
     },
     "observability-setup": {
