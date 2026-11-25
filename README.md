@@ -21,7 +21,7 @@
       <img src="https://img.shields.io/npm/dt/%40jovianops%2Fcortex?style=flat&color=CB3837&label=npm%20downloads" alt="npm downloads" />
     </a>
     <a href="CHANGELOG.md">
-      <img src="https://img.shields.io/badge/release-v2.0.1-EA580C?style=flat" alt="Release v2.0.1" />
+      <img src="https://img.shields.io/badge/release-v3.0.0-EA580C?style=flat" alt="Release v3.0.0" />
     </a>
     <a href="#supported-agents--platforms">
       <img src="https://img.shields.io/badge/standard-SKILL.md%20%2B%20MCP-2C2B28?style=flat" alt="SKILL.md and MCP Standard" />
@@ -41,7 +41,7 @@
   </p>
 
   <p>
-    <a href="#whats-new-in-v200">What's New in v2.0.0</a>
+    <a href="#whats-new-in-v300">What's New in v3.0.0</a>
     &nbsp;&middot;&nbsp;
     <a href="#proof-live-opencode-v241-before--after">Live Proof</a>
     &nbsp;&middot;&nbsp;
@@ -63,7 +63,7 @@
 
 ---
 
-**Cortex `v2.0.1`** is the next-generation, zero-dependency AI-agent skill & runtime platform shipping **36 modular, deterministic Agent Skills (`SKILL.md`)** across **10 core skills** (`skills/`) and **26 extended engineering skills** (`premium-skills/`), with **36/36 bundled zero-dependency Python verifiers (100% coverage)**, a **native MCP 2025-03-26 JSON-RPC stdio server (`cortex mcp`)**, a **local Light/Dark Swiss Web Workbench (`cortex studio`)**, a **Universal Agent Rule Compiler (`cortex compile`)**, a **Unified Policy & SARIF 2.1.0 / JUnit XML Scanner (`cortex scan`)**, **10 curated Role-Based Skill Packs** (`packs.json`), **4 stable JSON Schemas (`schemas/`)**, **SHA-256 integrity verification (`checksums.json`, 72 bundled files + 36 ZIPs)**, and a **36-task live A/B benchmark harness**.
+**Cortex `v3.0.0`** is a zero-dependency **Agent OS**: **36 modular, deterministic Agent Skills (`SKILL.md`)** across **10 core skills** (`skills/`) and **26 extended engineering skills** (`premium-skills/`), with **36/36 bundled zero-dependency Python verifiers (100% coverage)**, a **native MCP 2025-03-26 JSON-RPC stdio server (`cortex mcp`, 11 tools & 39 resources)**, a **local Light/Dark Swiss Web Workbench (`cortex studio`, 7 panels & 12 endpoints)**, a **Universal Agent Rule Compiler (`cortex compile`)**, a **Unified Policy & SARIF 2.1.0 / JUnit XML Scanner (`cortex scan`)**, a **Skill & Role-Pack Capability Graph (`cortex graph`)**, **deterministic offline Portable Bundles (`cortex bundle`)**, a **single release gate with generated CI and Git hooks (`cortex guard`)**, **10 curated Role-Based Skill Packs** (`packs.json`), **4 stable JSON Schemas (`schemas/`)**, **SHA-256 integrity verification (`checksums.json`, 72 bundled files + 36 ZIPs)**, and a **36-task live A/B benchmark harness**.
 
 Built on the open **`SKILL.md`** and **MCP** standards, Cortex works natively across **Visual Studio Code**, **GitHub Copilot**, **Claude** (Claude Code & Claude apps), **OpenAI** (Codex CLI & ChatGPT), **Gemini CLI**, **Cursor**, **Windsurf**, **OpenCode**, **OpenClaw**, **Goose**, **Aider**, **Cline**, and **Hermes Agent**.
 
@@ -72,19 +72,22 @@ Built on the open **`SKILL.md`** and **MCP** standards, Cortex works natively ac
 | The usual problem | What Cortex does instead |
 | :--- | :--- |
 | Prompt advice you cannot verify | Every skill ships a deterministic Python verifier (**36/36**); a nine-check structural audit scores all 36 playbooks **100/100** in CI |
-| Skills written for one vendor | One `SKILL.md` source compiles to **7 native formats** — Cursor, VS Code, Windsurf, Cline, `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` |
+| Skills written for one vendor | One `SKILL.md` source compiles to **8 native formats** — Cursor, VS Code, Windsurf, Cline, `CLAUDE.md`, `AGENTS.md`, OpenCode, `GEMINI.md` |
 | Silent supply-chain drift | `checksums.json` pins **72 files and 36 ZIPs** with SHA-256; `cortex verify` fails on any mismatch |
 | Security review done by hand | `cortex scan` runs **14 bundled scanners** and emits SARIF 2.1.0 or JUnit XML for CI gates |
-| Agent context you cannot inspect | `cortex studio` serves a local Light/Dark workbench and a 10-endpoint REST API over the same skill files |
+| Agent context you cannot inspect | `cortex studio` serves a local Light/Dark workbench and a 12-endpoint REST API over the same skill files |
+| A catalog you cannot reason about | `cortex graph` exposes hubs, orphaned skills, pack coverage, and dangling references as JSON, Mermaid, or DOT |
+| Installs that depend on GitHub being reachable | `cortex bundle` ships a deterministic ZIP with a per-file SHA-256 manifest and offline `--verify` |
+| Release checks scattered across scripts | `cortex guard check` runs all six gates in one pass and can generate its own CI workflow and pre-commit hook |
 
-## What's New in `v2.0.0`
+## What's New in `v3.0.0`
 
-- **Native Model Context Protocol Server (`cortex mcp`)**: Zero-dependency MCP 2025-03-26 JSON-RPC 2.0 stdio server exposing **8 tools**, **38 resources** (`cortex://skills/<slug>`, `cortex://packs`, `cortex://checksums`), and **36 invocable prompts** (`cortex/<slug>`), plus `--print-config <vscode|claude-code|cursor|codex|windsurf|opencode>`. See [docs/mcp-guide.md](docs/mcp-guide.md).
-- **Cortex Studio Local Web Workbench (`cortex studio`)**: Zero-dependency Light/Dark Swiss local web UI & 10-endpoint REST API for inspecting all 36 skills and scripts, running any bundled verifier live against your workspace, compiling native agent rules, running SARIF scans, and generating MCP configs. See [docs/studio-guide.md](docs/studio-guide.md).
-- **Universal Agent Rule Compiler (`cortex compile`)**: Deterministically transpiles `SKILL.md` playbooks into **7 native IDE/agent formats** — Cursor (`.cursor/rules/*.mdc`), VS Code (`.github/instructions/*.instructions.md`), Windsurf (`.windsurf/rules/*.md`), Cline (`.clinerules/*.md`), `CLAUDE.md`, `AGENTS.md`, and `GEMINI.md` — with `--dry-run` and `--check` CI drift verification. See [docs/compiler-guide.md](docs/compiler-guide.md).
-- **Unified Policy & SARIF 2.1.0 Scanner (`cortex scan`)**: Orchestrates 14 bundled verifiers in one pass with `.cortex-policy.json` (`schemas/policy.schema.json`), severity gates (`--fail-on`), **SARIF 2.1.0** (GitHub Code Scanning), and **JUnit XML** output. See [docs/policy-and-sarif.md](docs/policy-and-sarif.md).
-- **24 → 36 Skills, 36/36 Bundled Python Verifiers & 6 → 10 Role Packs**: Added 12 flagship extended skills (`kubernetes-architect`, `typescript-architect`, `rust-systems-engineer`, `go-backend-engineer`, `graphql-architect`, `llm-security-auditor`, `supply-chain-sbom`, `privacy-compliance-auditor`, `finops-cost-optimizer`, `chaos-resilience-engineer`, `architecture-decision-records`, `git-history-surgeon`) — all scoring **100.0/100** with paired 100-point A/B eval rubrics and 4 new packs (`cloud-native`, `ai-red-team`, `polyglot-systems`, `platform-architecture`).
-- **Complete Technical Documentation (`docs/`)**: Added [architecture.md](docs/architecture.md), [mcp-guide.md](docs/mcp-guide.md), [studio-guide.md](docs/studio-guide.md), [compiler-guide.md](docs/compiler-guide.md), [policy-and-sarif.md](docs/policy-and-sarif.md), and [skill-authoring.md](docs/skill-authoring.md).
+- **Capability Graph (`cortex graph`)**: Models the catalog as a deterministic directed graph — 36 skills, 10 packs, pack-membership edges, and `related_skills` edges (**179 edges** today). Reports degree centrality (`hub_score`), the top hubs, orphaned skills, and dangling references, and emits **JSON**, **Mermaid**, or **Graphviz DOT**. `--check` / `--strict` make it a CI gate. See [docs/graph-guide.md](docs/graph-guide.md).
+- **Portable Bundles (`cortex bundle`)**: Builds one reproducible ZIP for a pack, collection, or explicit skill set, containing the skills, an install README, and `bundle.json` with a **SHA-256 for every file**. Sorted members and fixed timestamps make the archive byte-identical across machines; `--verify` checks it offline and fails on any missing, extra, or modified file. See [docs/bundle-guide.md](docs/bundle-guide.md).
+- **Guard Gate & Enforcement Generator (`cortex guard`)**: `guard check` runs six gates in one pass — packaging, skill validation, manifests, the 100-point audit, the capability graph, and the policy/SARIF scan — with stable JSON and `--only` / `--fail-fast`. `--write-workflow` emits a **SHA-pinned GitHub Actions workflow** that passes `lint_actions.py`, and `guard install` writes a versionable Git pre-commit hook. See [docs/guard-guide.md](docs/guard-guide.md).
+- **MCP & Studio Expansion**: MCP grows to **11 tools** (`cortex_skill_graph`, `cortex_build_bundle`, `cortex_release_gate` added) and **39 resources** (`cortex://graph` added). Studio adds a **07 / Capability Graph** panel with live JSON/Mermaid rendering and a one-click release gate, for **7 panels and 12 REST endpoints**. See [docs/mcp-guide.md](docs/mcp-guide.md) and [docs/studio-guide.md](docs/studio-guide.md).
+- **Still true from `v2.0.0`**: 36 skills, 36/36 bundled verifiers, 10 role packs, the universal rule compiler, the SARIF 2.1.0 / JUnit XML scanner, and the 36-task A/B benchmark harness.
+- **Complete Technical Documentation (`docs/`)**: 9 guides — [architecture.md](docs/architecture.md), [mcp-guide.md](docs/mcp-guide.md), [studio-guide.md](docs/studio-guide.md), [compiler-guide.md](docs/compiler-guide.md), [policy-and-sarif.md](docs/policy-and-sarif.md), [skill-authoring.md](docs/skill-authoring.md), [graph-guide.md](docs/graph-guide.md), [bundle-guide.md](docs/bundle-guide.md), and [guard-guide.md](docs/guard-guide.md).
 
 ## Proof: Live OpenCode (`v2.4.1`) Before & After
 
@@ -141,6 +144,9 @@ npx @jovianops/cortex packs
 npx @jovianops/cortex install --agent opencode --pack cloud-native --scope project
 npx @jovianops/cortex compile --target agents --pack fullstack
 npx @jovianops/cortex scan . --fail-on high
+npx @jovianops/cortex graph --format mermaid
+npx @jovianops/cortex bundle --pack cloud-native --out dist/cortex-cloud-native.zip
+npx @jovianops/cortex guard check --json
 npx @jovianops/cortex studio
 npx @jovianops/cortex mcp
 
@@ -402,31 +408,32 @@ Every official release of **`@jovianops/cortex`** is published from GitHub Actio
 
 | Artifact | Algorithm | Expected Fingerprint / Location |
 | :--- | :--- | :--- |
-| **`v2.0.0` Repository Skills, Scripts & ZIPs** (`36` skills, `72` files, `36` ZIPs = `108` hashes) | **SHA-256** | [`checksums.json`](checksums.json) (`package_skills.py --check`) |
-| **Latest Published npm Release (`@jovianops/cortex@1.0.0`)** (`cortex-1.0.0.tgz`) | **SHA-256** | `cbb9ce6a26086fc9481052bead73d9ec9f496cc9628341f0c92d1f72fd5e6247` |
-| **Latest Published npm Release (`@jovianops/cortex@1.0.0`)** (SRI) | **SHA-512** | `sha512-erM0hXT5nh6M0HcUwqbwqJt2nB7IQjTvXQuAfsJtOQJ+HOoIZ5ez74povVkr/vOkxAeQK1LfZU9388V5fcKKsA==` |
-| **npm SLSA v1 Provenance Attestation (`@jovianops/cortex@1.0.0`)** | Sigstore / OIDC | [`registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@1.0.0`](https://registry.npmjs.org/-/npm/v1/attestations/@jovianops%2fcortex@1.0.0) |
+| **`v3.0.0` Repository Skills, Scripts & ZIPs** (`36` skills, `72` files, `36` ZIPs = `108` hashes) | **SHA-256** | [`checksums.json`](checksums.json) (`package_skills.py --check`) |
+| **Installed npm Release** (`cortex-<version>.tgz`) | **SHA-256** | `npm view @jovianops/cortex dist.integrity` and the commands below |
+| **Installed npm Release** (SRI) | **SHA-512** | `npm view @jovianops/cortex dist.integrity` |
+| **npm SLSA v1 Provenance Attestation** | Sigstore / OIDC | `npm audit signatures` (verifies the installed release) |
 
-### 1. Verify the Latest Published npm Tarball SHA-256 (`1.0.0`)
+### 1. Verify the Installed npm Tarball SHA-256
 
 **Linux / macOS (Bash):**
 
 ```bash
-# Should print: cbb9ce6a26086fc9481052bead73d9ec9f496cc9628341f0c92d1f72fd5e6247
-curl -fsSL https://registry.npmjs.org/@jovianops/cortex/-/cortex-1.0.0.tgz | sha256sum
+# Compare the printed digest with the SRI/hash reported by npm
+VERSION=$(npm view @jovianops/cortex version)
+curl -fsSL "https://registry.npmjs.org/@jovianops/cortex/-/cortex-${VERSION}.tgz" | sha256sum
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
-# Should print: CBB9CE6A26086FC9481052BEAD73D9EC9F496CC9628341F0C92D1F72FD5E6247
-$tmp = "$env:TEMP\cortex-1.0.0.tgz"
-Invoke-WebRequest https://registry.npmjs.org/@jovianops/cortex/-/cortex-1.0.0.tgz -OutFile $tmp
+$version = (npm view @jovianops/cortex version)
+$tmp = "$env:TEMP\cortex-$version.tgz"
+Invoke-WebRequest "https://registry.npmjs.org/@jovianops/cortex/-/cortex-$version.tgz" -OutFile $tmp
 (Get-FileHash $tmp -Algorithm SHA256).Hash
 Remove-Item $tmp
 ```
 
-### 2. Verify npm SLSA Provenance & Installed Skill Integrity (`v2.0.0`)
+### 2. Verify npm SLSA Provenance & Installed Skill Integrity (`v3.0.0`)
 
 ```bash
 # Verify registry signatures & SLSA v1 provenance attestation
@@ -474,8 +481,11 @@ cortex/
 │   ├── cortex.py           # Unified CLI entrypoint (install, compile, scan, mcp, studio, doctor)
 │   ├── cortex_mcp.py       # Zero-dependency MCP 2025-03-26 JSON-RPC stdio server
 │   ├── cortex_studio.py    # Zero-dependency Light/Dark Swiss local web workbench
-│   ├── cortex_compile.py   # Universal rule compiler (7 native IDE/agent output formats)
+│   ├── cortex_compile.py   # Universal rule compiler (8 native IDE/agent output formats)
 │   ├── cortex_scan.py      # Unified 14-scanner policy, SARIF 2.1.0 & JUnit XML runner
+│   ├── cortex_graph.py     # Skill/pack capability graph (JSON, Mermaid, DOT) with CI gates
+│   ├── cortex_bundle.py    # Deterministic offline bundles (ZIP + per-file SHA-256 manifest)
+│   ├── cortex_guard.py     # Six-check release gate + SHA-pinned CI and pre-commit generation
 │   ├── install_skills.py   # Zero-dependency multi-agent skill manager (--remote, lockfile, upgrade)
 │   ├── package_skills.py   # Build or verify reproducible ZIPs & checksums.json
 │   ├── validate_skills.py  # Validate skill frontmatter, sections & ZIP parity
@@ -485,7 +495,8 @@ cortex/
 │   └── eval_skills.py      # Audit skill quality, run live A/B benchmarks & generate scorecards
 ├── tests/
 │   ├── test_cortex_tooling.py # Core CLI, packaging, manifest & verifier test suite
-│   └── test_cortex_v2.py      # v2.0.0 MCP, Studio, Compiler, Scanner & script regression tests
+│   ├── test_cortex_v2.py      # v2.0.0 MCP, Studio, Compiler, Scanner & script regression tests
+│   └── test_cortex_v3.py      # v3.0.0 Graph, Bundle, Guard, MCP & Studio regression tests
 ├── .github/                # CI workflows, Dependabot & issue/PR templates
 ├── index.html              # Interactive 36-skill multi-agent catalog & command builder
 ├── CONTRIBUTING.md         # Authoring standards and contribution workflow
@@ -499,6 +510,11 @@ Before opening a pull request, regenerate ZIP archives and `checksums.json` afte
 ```bash
 # Rebuild reproducible ZIP archives and checksums.json
 python scripts/package_skills.py
+
+# Capability graph gate, portable bundle, and one-command release gate
+python scripts/cortex_graph.py --check
+python scripts/cortex_bundle.py --pack cloud-native --out dist/cortex-cloud-native.zip
+python scripts/cortex_guard.py check
 
 # Run complete validation, audit, and automated test suite
 npm test

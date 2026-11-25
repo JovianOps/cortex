@@ -1,7 +1,7 @@
 ---
 name: architecture-decision-records
 description: Author and validate MADR Architecture Decision Records.
-version: 2.0.1
+version: 3.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,7 +27,7 @@ Author crisp, immutable, MADR-compliant Architecture Decision Records capturing 
 
 ## How to Run
 
-> **Bundled Helper Script (`v2.0.0`):** Run `python premium-skills/architecture-decision-records/scripts/check_adrs.py docs/adr/` to validate `NNNN-kebab-title.md` naming, monotonic sequence numbers, required sections (`Status`, `Context`, `Decision`, `Consequences`), and valid status values.
+> **Bundled Helper Script (`v3.0.0`):** Run `python premium-skills/architecture-decision-records/scripts/check_adrs.py docs/adr/` to validate `NNNN-kebab-title.md` naming, monotonic sequence numbers, required sections (`Status`, `Context`, `Decision`, `Consequences`), and valid status values.
 
 ```bash
 npx @jovianops/cortex install --agent vscode --skill architecture-decision-records --scope project

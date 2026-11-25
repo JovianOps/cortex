@@ -1,7 +1,7 @@
 ---
 name: finops-cost-optimizer
 description: Audit Terraform and K8s configs for cloud cost waste.
-version: 2.0.1
+version: 3.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,7 +27,7 @@ Identify and eliminate cloud infrastructure waste across Terraform, Kubernetes, 
 
 ## How to Run
 
-> **Bundled Helper Script (`v2.0.0`):** Run `python premium-skills/finops-cost-optimizer/scripts/audit_finops.py infra/` to flag oversized instance families, legacy `gp2` EBS volumes, missing FinOps tags (`environment`, `owner`, `cost_center`), and Kubernetes workloads missing `resources.requests`.
+> **Bundled Helper Script (`v3.0.0`):** Run `python premium-skills/finops-cost-optimizer/scripts/audit_finops.py infra/` to flag oversized instance families, legacy `gp2` EBS volumes, missing FinOps tags (`environment`, `owner`, `cost_center`), and Kubernetes workloads missing `resources.requests`.
 
 ```bash
 npx @jovianops/cortex install --agent vscode --skill finops-cost-optimizer --scope project

@@ -1,6 +1,6 @@
 # Cortex
 
-> 36 deterministic, versioned Agent Skills (`SKILL.md`) with a bundled zero-dependency Python verifier for every skill, a native MCP 2025-03-26 stdio server, a universal rule compiler, a 14-scanner policy/SARIF engine, and SHA-256 integrity verification. MIT licensed. Works with Claude Code, OpenAI Codex, Gemini CLI, Cursor, VS Code / GitHub Copilot, Windsurf, OpenCode, OpenClaw, Goose, Aider, Cline and Hermes Agent.
+> 36 deterministic, versioned Agent Skills (`SKILL.md`) with a bundled zero-dependency Python verifier for every skill, a native MCP 2025-03-26 stdio server (11 tools, 39 resources), a universal rule compiler, a 14-scanner policy/SARIF engine, a skill/pack capability graph, deterministic portable bundles, a single release gate, and SHA-256 integrity verification. MIT licensed. Works with Claude Code, OpenAI Codex, Gemini CLI, Cursor, VS Code / GitHub Copilot, Windsurf, OpenCode, OpenClaw, Goose, Aider, Cline and Hermes Agent.
 
 Every playbook is audited to 100/100 by a nine-check structural gate, ships a runnable verifier script, and is covered by a paired 100-point without-skill vs. with-skill evaluation rubric.
 
@@ -8,7 +8,7 @@ Every playbook is audited to 100/100 by a nine-check structural gate, ships a ru
 
 - [README](https://github.com/JovianOps/cortex#readme): install paths, supported agents, core and extended skill tables
 - [Interactive catalog](https://jovianops.github.io/cortex/): filter all 36 skills and 10 role packs, then build a Bash or PowerShell install command
-- [Quick start](https://github.com/JovianOps/cortex#quick-start): `npx @jovianops/cortex detect`, `install`, `compile`, `scan`, `studio`, `mcp`
+- [Quick start](https://github.com/JovianOps/cortex#quick-start): `npx @jovianops/cortex detect`, `install`, `compile`, `scan`, `graph`, `bundle`, `guard`, `studio`, `mcp`
 - [Contributing](https://github.com/JovianOps/cortex/blob/main/CONTRIBUTING.md): skill authoring and the required verification gate
 
 ## Documentation
@@ -18,6 +18,9 @@ Every playbook is audited to 100/100 by a nine-check structural gate, ships a ru
 - [Studio web workbench](https://github.com/JovianOps/cortex/blob/main/docs/studio-guide.md)
 - [Rule compiler](https://github.com/JovianOps/cortex/blob/main/docs/compiler-guide.md)
 - [Policy and SARIF scanning](https://github.com/JovianOps/cortex/blob/main/docs/policy-and-sarif.md)
+- [Capability graph](https://github.com/JovianOps/cortex/blob/main/docs/graph-guide.md)
+- [Portable bundles](https://github.com/JovianOps/cortex/blob/main/docs/bundle-guide.md)
+- [Guard gate, CI and hooks](https://github.com/JovianOps/cortex/blob/main/docs/guard-guide.md)
 - [Skill authoring](https://github.com/JovianOps/cortex/blob/main/docs/skill-authoring.md)
 - [Security policy](https://github.com/JovianOps/cortex/blob/main/SECURITY.md)
 
@@ -44,6 +47,9 @@ npx @jovianops/cortex doctor
 npx @jovianops/cortex install --agent claude-code --pack fullstack --scope project
 npx @jovianops/cortex compile --target agents --pack cloud-native
 npx @jovianops/cortex scan . --fail-on high
+npx @jovianops/cortex graph --format mermaid
+npx @jovianops/cortex bundle --pack cloud-native --out dist/cortex-cloud-native.zip
+npx @jovianops/cortex guard check --json
 npx @jovianops/cortex mcp
 npx @jovianops/cortex studio
 ```

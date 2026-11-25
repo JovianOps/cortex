@@ -76,7 +76,7 @@ class TestCortexMCPServer(unittest.TestCase):
             # Resources & Prompts
             res_list = server.handle_request({"jsonrpc": "2.0", "id": 6, "method": "resources/list", "params": {}})
             assert res_list is not None
-            self.assertEqual(len(res_list["result"]["resources"]), 38)
+            self.assertEqual(len(res_list["result"]["resources"]), 39)
 
             res_read = server.handle_request({"jsonrpc": "2.0", "id": 7, "method": "resources/read", "params": {"uri": "cortex://skills/kubernetes-architect"}})
             assert res_read is not None

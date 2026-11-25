@@ -1,7 +1,7 @@
 ---
 name: rust-systems-engineer
 description: Write safe, idiomatic Rust with verified unsafe invariants.
-version: 2.0.1
+version: 3.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,7 +27,7 @@ Author idiomatic, panic-free, ownership-clean Rust crates with explicit `Result`
 
 ## How to Run
 
-> **Bundled Helper Script (`v2.0.0`):** Run `python premium-skills/rust-systems-engineer/scripts/lint_rust.py .` to audit `.rs` files and `Cargo.toml` for undocumented `unsafe {}`, `.unwrap()` in non-test code, `todo!()`, `mem::transmute`, and wildcard `*` crate versions.
+> **Bundled Helper Script (`v3.0.0`):** Run `python premium-skills/rust-systems-engineer/scripts/lint_rust.py .` to audit `.rs` files and `Cargo.toml` for undocumented `unsafe {}`, `.unwrap()` in non-test code, `todo!()`, `mem::transmute`, and wildcard `*` crate versions.
 
 ```bash
 npx @jovianops/cortex install --agent vscode --skill rust-systems-engineer --scope project

@@ -1,7 +1,7 @@
 ---
 name: privacy-compliance-auditor
 description: Audit code and logs for GDPR, CCPA, and raw PII leaks.
-version: 2.0.1
+version: 3.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,7 +27,7 @@ Audit source code, test fixtures, telemetry pipelines, and database schemas for 
 
 ## How to Run
 
-> **Bundled Helper Script (`v2.0.0`):** Run `python premium-skills/privacy-compliance-auditor/scripts/scan_pii.py .` to detect raw SSNs, Luhn-validated payment card numbers, unmasked PII in logger/print calls, and optional non-example email addresses (`--check-emails`).
+> **Bundled Helper Script (`v3.0.0`):** Run `python premium-skills/privacy-compliance-auditor/scripts/scan_pii.py .` to detect raw SSNs, Luhn-validated payment card numbers, unmasked PII in logger/print calls, and optional non-example email addresses (`--check-emails`).
 
 ```bash
 npx @jovianops/cortex install --agent vscode --skill privacy-compliance-auditor --scope project

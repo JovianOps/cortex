@@ -1,7 +1,7 @@
 ---
 name: supply-chain-sbom
 description: Audit dependencies, lockfiles, SLSA provenance, and SBOMs.
-version: 2.0.1
+version: 3.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,7 +27,7 @@ Harden software supply chains across npm, Python, Rust, and containers with pinn
 
 ## How to Run
 
-> **Bundled Helper Script (`v2.0.0`):** Run `python premium-skills/supply-chain-sbom/scripts/audit_sbom.py . --sbom --json` to detect missing lockfiles, unpinned/wildcard specs, insecure `http://` sources, suspicious install hooks, and generate a CycloneDX 1.6 summary.
+> **Bundled Helper Script (`v3.0.0`):** Run `python premium-skills/supply-chain-sbom/scripts/audit_sbom.py . --sbom --json` to detect missing lockfiles, unpinned/wildcard specs, insecure `http://` sources, suspicious install hooks, and generate a CycloneDX 1.6 summary.
 
 ```bash
 npx @jovianops/cortex install --agent vscode --skill supply-chain-sbom --scope project

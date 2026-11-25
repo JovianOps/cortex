@@ -1,7 +1,7 @@
 ---
 name: go-backend-engineer
 description: Build production Go services with context and timeouts.
-version: 2.0.1
+version: 3.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,7 +27,7 @@ Design clean, race-free, production-grade Go services with explicit `context.Con
 
 ## How to Run
 
-> **Bundled Helper Script (`v2.0.0`):** Run `python premium-skills/go-backend-engineer/scripts/lint_go.py .` to audit `.go` files for `http.ListenAndServe` without timeouts, default `http.Get`/`http.Post`, ignored `_ =` returns, `panic()`, `InsecureSkipVerify: true`, and `context.TODO()`.
+> **Bundled Helper Script (`v3.0.0`):** Run `python premium-skills/go-backend-engineer/scripts/lint_go.py .` to audit `.go` files for `http.ListenAndServe` without timeouts, default `http.Get`/`http.Post`, ignored `_ =` returns, `panic()`, `InsecureSkipVerify: true`, and `context.TODO()`.
 
 ```bash
 npx @jovianops/cortex install --agent vscode --skill go-backend-engineer --scope project

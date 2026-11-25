@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cortex Studio — Zero-dependency Light/Dark Swiss local web workbench for Cortex v2.0.1."""
+"""Cortex Studio — Zero-dependency Light/Dark Swiss local web workbench for Cortex v3.0.0."""
 from __future__ import annotations
 
 import argparse
@@ -15,7 +15,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
-VERSION = "2.0.1"
+VERSION = "3.0.0"
 
 
 def load_local(name: str):
@@ -32,7 +32,7 @@ STUDIO_HTML = """<!DOCTYPE html>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cortex Studio v2.0.1 — Local Workbench</title>
+  <title>Cortex Studio v3.0.0 — Local Workbench</title>
   <style>
     :root, [data-theme="light"] {
       --bg: #ffffff; --surface: #f7f7f5; --surface-2: #efefec;
@@ -93,7 +93,7 @@ STUDIO_HTML = """<!DOCTYPE html>
   <header>
     <div class="brand">
       <h1>Cortex Studio</h1>
-      <span class="badge accent">v2.0.1</span>
+      <span class="badge accent">v3.0.0</span>
       <span class="badge" id="wsBadge">workspace</span>
     </div>
     <nav id="tabs">
@@ -103,6 +103,7 @@ STUDIO_HTML = """<!DOCTYPE html>
       <button type="button" data-tab="compiler">04 / Compiler</button>
       <button type="button" data-tab="scanner">05 / Policy &amp; SARIF</button>
       <button type="button" data-tab="mcp">06 / MCP Server</button>
+      <button type="button" data-tab="graph">07 / Capability Graph</button>
     </nav>
     <div class="theme-seg" role="group" aria-label="Color theme">
       <button type="button" id="btnLight" class="active">Light</button>
@@ -208,6 +209,18 @@ STUDIO_HTML = """<!DOCTYPE html>
           <button type="button" class="primary" id="btnLoadMcp">Generate Config</button>
         </div>
         <pre id="mcpOut">Loading MCP configuration...</pre>
+      </div>
+    </section>
+
+    <section id="tab-graph" class="panel">
+      <div class="box">
+        <h2>Skill &amp; Role-Pack Capability Graph (cortex graph)</h2>
+        <div class="toolbar">
+          <button type="button" class="accent-btn" id="btnLoadGraph">Build Graph (JSON)</button>
+          <button type="button" id="btnLoadMermaid">Mermaid Diagram</button>
+          <button type="button" id="btnRunGuard">Run Release Gate</button>
+        </div>
+        <pre id="graphOut">Build the graph to inspect hubs, orphans, pack coverage, and dangling related-skill edges.</pre>
       </div>
     </section>
   </main>
@@ -336,6 +349,23 @@ STUDIO_HTML = """<!DOCTYPE html>
     $("btnLoadMcp").onclick = loadMcp;
     $("mcpClient").onchange = loadMcp;
 
+    async function loadGraph(fmt) {
+      $("graphOut").textContent = "Building capability graph...";
+      const data = await api("/api/graph?format=" + encodeURIComponent(fmt));
+      $("graphOut").textContent = typeof data.graph === "string" ? data.graph : JSON.stringify(data, null, 2);
+    }
+    $("btnLoadGraph").onclick = () => loadGraph("json");
+    $("btnLoadMermaid").onclick = () => loadGraph("mermaid");
+    $("btnRunGuard").onclick = async () => {
+      $("graphOut").textContent = "Running Cortex release gate...";
+      const data = await api("/api/guard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fail_fast: false }),
+      });
+      $("graphOut").textContent = JSON.stringify(data, null, 2);
+    };
+
     async function boot() {
       const [ov, sk, pk] = await Promise.all([api("/api/overview"), api("/api/skills"), api("/api/packs")]);
       $("wsBadge").textContent = ov.workspace;
@@ -344,6 +374,7 @@ STUDIO_HTML = """<!DOCTYPE html>
         ["Bundled Scripts", ov.script_count + "/" + ov.skill_count],
         ["Role Packs", ov.pack_count],
         ["MCP Tools", ov.mcp_tool_count],
+        ["Graph Edges", ov.graph_edge_count],
       ];
       const grid = $("kpiGrid");
       grid.textContent = "";
@@ -389,6 +420,8 @@ def make_handler(workspace_dir: Path):
     mcp_mod = load_local("cortex_mcp")
     compile_mod = load_local("cortex_compile")
     scan_mod = load_local("cortex_scan")
+    graph_mod = load_local("cortex_graph")
+    guard_mod = load_local("cortex_guard")
     mcp_server = mcp_mod.CortexMCPServer(workspace_dir)
 
     class StudioHandler(BaseHTTPRequestHandler):
@@ -450,6 +483,7 @@ def make_handler(workspace_dir: Path):
                     "mcp_tool_count": len(mcp_server.tool_definitions()),
                     "compile_targets": list(compile_mod.SUPPORTED_TARGETS),
                     "scanners": [s[0] for s in scan_mod.SCANNER_SPECS],
+                    "graph_edge_count": graph_mod.build_graph(ROOT)["edge_count"],
                 })
                 return
 
@@ -495,6 +529,17 @@ def make_handler(workspace_dir: Path):
                 self._send_json(mcp_mod.client_mcp_config(client, workspace_dir))
                 return
 
+            if path == "/api/graph":
+                graph = graph_mod.build_graph(ROOT)
+                fmt = (qs.get("format") or ["json"])[0]
+                if fmt == "mermaid":
+                    self._send_json({"format": fmt, "graph": graph_mod.to_mermaid(graph), "ok": graph["ok"]})
+                elif fmt == "dot":
+                    self._send_json({"format": fmt, "graph": graph_mod.to_dot(graph), "ok": graph["ok"]})
+                else:
+                    self._send_json(graph)
+                return
+
             self._send_json({"error": f"Not found: {path}"}, HTTPStatus.NOT_FOUND)
 
         def do_POST(self) -> None:
@@ -517,6 +562,9 @@ def make_handler(workspace_dir: Path):
                     pol = scan_mod.load_policy(None, workspace_dir)
                     report = scan_mod.run_scan(workspace_dir, only=body.get("only") or None, policy=pol, fail_on_override=body.get("fail_on"))
                     self._send_json({"report": report, "sarif": scan_mod.to_sarif(report)})
+                    return
+                if path == "/api/guard":
+                    self._send_json(guard_mod.guard_check(workspace_dir, only=body.get("only") or None, fail_fast=bool(body.get("fail_fast", False))))
                     return
                 self._send_json({"error": f"Not found: {path}"}, HTTPStatus.NOT_FOUND)
             except Exception as exc:

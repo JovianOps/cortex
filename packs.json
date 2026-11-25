@@ -1,6 +1,6 @@
 {
-  "schema_version": "2.0.1",
-  "release_version": "2.0.1",
+  "schema_version": "3.0.0",
+  "release_version": "3.0.0",
   "packs": {
     "fullstack": {
       "label": "Full-Stack Web",
@@ -88,10 +88,11 @@
     },
     "python-pro": {
       "label": "Python Pro",
-      "description": "Typed Python engineering, branch-tested pytest suites, profiling, refactoring, and docs.",
+      "description": "Typed Python engineering, branch-tested pytest suites, polite schema-validated scraping, profiling, refactoring, and docs.",
       "skills": [
         "python-coding-assistant",
         "testing-automation",
+        "web-scraper",
         "unit-test-generator",
         "performance-profiler",
         "refactoring-assistant",

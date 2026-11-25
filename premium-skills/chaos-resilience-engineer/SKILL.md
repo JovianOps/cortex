@@ -1,7 +1,7 @@
 ---
 name: chaos-resilience-engineer
 description: Design fault-tolerant timeouts, retries, and game days.
-version: 2.0.1
+version: 3.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,7 +27,7 @@ Eliminate cascading failures by enforcing strict timeouts, exponential backoff w
 
 ## How to Run
 
-> **Bundled Helper Script (`v2.0.0`):** Run `python premium-skills/chaos-resilience-engineer/scripts/audit_resilience.py .` to flag Python `requests`/`urlopen` calls missing `timeout=`, JS/TS `fetch()` calls missing `AbortSignal`, single-replica Kubernetes Deployments, and missing `PodDisruptionBudget`s.
+> **Bundled Helper Script (`v3.0.0`):** Run `python premium-skills/chaos-resilience-engineer/scripts/audit_resilience.py .` to flag Python `requests`/`urlopen` calls missing `timeout=`, JS/TS `fetch()` calls missing `AbortSignal`, single-replica Kubernetes Deployments, and missing `PodDisruptionBudget`s.
 
 ```bash
 npx @jovianops/cortex install --agent vscode --skill chaos-resilience-engineer --scope project

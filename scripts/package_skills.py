@@ -87,7 +87,7 @@ def verify_archive(path: Path, name: str, source: Path) -> list[str]:
 
 
 def build_checksums_manifest() -> dict:
-    pkg_version = json.loads((ROOT / "package.json").read_text(encoding="utf-8")).get("version", "2.0.1")
+    pkg_version = json.loads((ROOT / "package.json").read_text(encoding="utf-8")).get("version", "3.0.0")
     skills_index: dict[str, dict] = {}
     for source_dir, archive_dir in COLLECTIONS:
         sources = skill_sources(ROOT / source_dir)
@@ -107,7 +107,7 @@ def build_checksums_manifest() -> dict:
                 "files": file_hashes,
             }
     return {
-        "schema_version": "2.0.1",
+        "schema_version": "3.0.0",
         "release_version": pkg_version,
         "skill_count": len(skills_index),
         "skills": skills_index,

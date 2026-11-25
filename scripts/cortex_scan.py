@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "2.0.1"
+VERSION = "3.0.0"
 
 SEVERITY_RANK = {"INFO": 0, "LOW": 1, "MEDIUM": 2, "HIGH": 3, "CRITICAL": 4}
 FAIL_THRESHOLD = {"none": 99, "low": 1, "medium": 2, "high": 3, "critical": 4}
