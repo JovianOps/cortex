@@ -73,6 +73,8 @@ def scan_path(target: Path) -> list[dict]:
                         "evidence": redact(match.group(1)),
                     })
             for severity, cwe, title, pattern in SINK_RULES:
+                if "re.compile(" in line:
+                    continue
                 if pattern.search(line):
                     findings.append({
                         "severity": severity,
@@ -99,6 +101,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Offline secret & dangerous-sink scanner (CWE-mapped, auto-redacted).")
     parser.add_argument("target", type=Path, help="File or directory to scan.")
     parser.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    parser.add_argument("--json", action="store_true", dest="as_json", help="Shorthand for --format json.")
     args = parser.parse_args(argv)
     if not args.target.exists():
         print(f"ERROR: Path not found: {args.target}", file=sys.stderr)
@@ -111,7 +114,8 @@ def main(argv: list[str] | None = None) -> int:
         f["title"] = str(f.get("title", "Unknown finding"))[:200]
         f["file"] = str(f.get("file", ""))[:500]
         f["line"] = int(f.get("line", 0))
-    if args.format == "json":
+    fmt = "json" if args.as_json else args.format
+    if fmt == "json":
         print(json.dumps({"target": args.target.as_posix(), "count": len(findings_for_output), "findings": findings_for_output}, indent=2))
     else:
         print(f"# Security Scan Summary ({len(findings_for_output)} finding(s))\n")

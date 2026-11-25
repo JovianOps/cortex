@@ -247,10 +247,10 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/llm-security-auditor.zip",
-      "zip_sha256": "59de955ab6e6f3c39435acd017724d5e5126c21675d39fec28dab3a83359f20e",
+      "zip_sha256": "0c3656fcfdb8107ef3cc2fceed629cde62a06faba2686ef422f3b93c8581fa36",
       "files": {
         "SKILL.md": "a49024fe23eb7a6d8107d303f6c5be6549b8f57c7c24623851888355e24b6463",
-        "scripts/audit_prompts.py": "87bf5092c22f92a964dc07d77653c69cd1beff7fcb616df7a74a9c04647daf5b"
+        "scripts/audit_prompts.py": "7f3a0e2222d597d26253497e0ba06a0f0eccd510e3e92915a14355a2eb1304aa"
       }
     },
     "observability-setup": {
@@ -317,10 +317,10 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/security-auditor.zip",
-      "zip_sha256": "6cd5e80f91c1b32c4924b9489cbe78722e1bcd275c73d992bf426e468008d897",
+      "zip_sha256": "c24b9205794574c030c77ab265ebb74b939041087c555e3c5fb20dcb558d8fbd",
       "files": {
         "SKILL.md": "f798bee2f84e1b058e9f6c3edc5af4dbebb09864cecf439737fe6d8f8e39492c",
-        "scripts/secret_scan.py": "3459f9d66eff61e367c21375a2c89b647b91ae71d8179c2b8a4b8325b4c8fd56"
+        "scripts/secret_scan.py": "ffd44dbbaeafda456b74374e7a188ac147aafb4d1043a3fb22ae119a0a615f6b"
       }
     },
     "supply-chain-sbom": {

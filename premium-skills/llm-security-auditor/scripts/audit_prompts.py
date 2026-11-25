@@ -20,12 +20,23 @@ INJECTION_PATTERNS: list[tuple[str, str, re.Pattern[str], str]] = [
 ]
 
 
+INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
+
+
 def audit_file(path: Path) -> list[dict]:
     findings: list[dict] = []
     text = path.read_text(encoding="utf-8", errors="replace")
+    is_markdown = path.suffix.lower() in {".md", ".mdx"}
+    in_fence = False
     for idx, line in enumerate(text.splitlines(), 1):
+        if is_markdown and line.lstrip().startswith("```"):
+            in_fence = not in_fence
+            continue
         for sev, rule, pat, msg in INJECTION_PATTERNS:
-            if pat.search(line):
+            target_line = line
+            if rule == "llm-exfil-shell-pipe" and is_markdown and not in_fence:
+                target_line = INLINE_CODE_RE.sub("", line)
+            if pat.search(target_line):
                 findings.append({
                     "file": path.as_posix(),
                     "line": idx,
