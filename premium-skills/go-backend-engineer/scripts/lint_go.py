@@ -8,16 +8,31 @@ import re
 import sys
 from pathlib import Path
 
-SKIP_DIRS = {"vendor", ".git", "node_modules"}
+SKIP_DIRS = {
+    "vendor", ".git", "node_modules", ".venv", "__pycache__", "dist", "build",
+    ".opencode", ".claude", ".cursor", ".windsurf", ".cline", ".agents",
+    ".codex", ".gemini", ".openclaw", ".goose", ".aider", "zips", "premium-zips",
+}
+
+
+def should_skip(fp: Path, root: Path) -> bool:
+    rel = fp.relative_to(root).parts if fp != root else fp.parts
+    if any(part in SKIP_DIRS for part in rel):
+        return True
+    for i in range(len(rel) - 1):
+        if rel[i] == ".github" and rel[i + 1] == "skills":
+            return True
+    return False
 
 
 def audit_go_file(path: Path) -> list[dict]:
     findings: list[dict] = []
     is_test = path.name.endswith("_test.go")
-    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    text = path.read_text(encoding="utf-8", errors="replace")
+    lines = text.splitlines()
     for idx, line in enumerate(lines, 1):
         stripped = line.strip()
-        if stripped.startswith("//"):
+        if stripped.startswith("//") or stripped.startswith("/*"):
             continue
 
         if not is_test and re.search(r"\bhttp\.ListenAndServe(?:TLS)?\s*\(", line):
@@ -36,6 +51,16 @@ def audit_go_file(path: Path) -> list[dict]:
                 "rule": "go-default-http-client",
                 "message": "Default http.Get/Post has no timeout; use http.NewRequestWithContext and a client with explicit Timeout.",
             })
+        if not is_test and re.search(r"&?http\.Client\s*\{", line):
+            snippet = "\n".join(lines[idx - 1 : min(len(lines), idx + 5)])
+            if "Timeout:" not in snippet:
+                findings.append({
+                    "file": path.as_posix(),
+                    "line": idx,
+                    "severity": "HIGH",
+                    "rule": "go-http-client-no-timeout",
+                    "message": "http.Client{} omits explicit Timeout field.",
+                })
         if not is_test and re.search(r"\b_\s*=\s*\w+(?:\.\w+)*\s*\(", line):
             findings.append({
                 "file": path.as_posix(),
@@ -82,7 +107,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     files = [args.target] if args.target.is_file() else sorted(
-        p for p in args.target.rglob("*.go") if not any(part in SKIP_DIRS for part in p.parts)
+        p for p in args.target.rglob("*.go") if p.is_file() and not should_skip(p, args.target)
     )
     findings: list[dict] = []
     for fp in files:

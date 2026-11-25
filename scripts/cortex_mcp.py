@@ -390,21 +390,28 @@ class CortexMCPServer:
             return {"jsonrpc": "2.0", "id": req_id, "error": {"code": -32603, "message": str(exc)}}
 
 
+MAX_FRAME_BYTES = 10 * 1024 * 1024  # 10 MiB
+
+
 def read_stdio_message(stream) -> tuple[dict[str, Any] | None, str]:
     """Read either Content-Length framed or newline-delimited JSON-RPC message."""
-    first_line = stream.readline()
-    if not first_line:
+    line = stream.readline()
+    if not line:
         return None, "jsonl"
-    stripped = first_line.strip()
+    stripped = line.strip()
     if not stripped:
         return None, "jsonl"
     if stripped.lower().startswith(b"content-length:"):
         length = int(stripped.split(b":", 1)[1].strip())
+        if length < 0 or length > MAX_FRAME_BYTES:
+            raise ValueError(f"Content-Length out of range (0..{MAX_FRAME_BYTES}): {length}")
         while True:
             hdr = stream.readline()
             if not hdr or hdr in (b"\r\n", b"\n"):
                 break
         body = stream.read(length)
+        if len(body) != length:
+            raise ValueError(f"Truncated LSP frame: expected {length} bytes, got {len(body)}")
         return json.loads(body.decode("utf-8")), "lsp"
     return json.loads(stripped.decode("utf-8")), "jsonl"
 

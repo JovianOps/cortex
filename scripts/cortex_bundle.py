@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 import zipfile
 from pathlib import Path
@@ -219,13 +220,25 @@ def verify_bundle(path: Path) -> dict:
         return {"version": VERSION, "ok": False, "path": path.as_posix(), "problems": ["bundle file is missing"]}
     try:
         with zipfile.ZipFile(path) as archive:
+            bad_member = archive.testzip()
+            if bad_member:
+                problems.append(f"corrupt archive member: {bad_member}")
             names = set(archive.namelist())
             if "bundle.json" not in names:
                 return {"version": VERSION, "ok": False, "path": path.as_posix(), "problems": ["bundle.json is missing"]}
+            if "README.md" not in names:
+                problems.append("README.md is missing from archive")
             manifest = json.loads(archive.read("bundle.json").decode("utf-8"))
+            expected_manifest_sha = sha256_bytes(
+                json.dumps({k: v for k, v in manifest.items() if k != "manifest_sha256"}, sort_keys=True, indent=2).encode("utf-8")
+            )
+            if manifest.get("manifest_sha256") != expected_manifest_sha:
+                problems.append("bundle.json manifest_sha256 mismatch")
             expected: set[str] = {"bundle.json", "README.md"}
+            actual_file_count = 0
             for slug, meta in manifest.get("skills", {}).items():
                 for rel, digest in meta.get("files", {}).items():
+                    actual_file_count += 1
                     member = f"skills/{slug}/{rel}"
                     expected.add(member)
                     if member not in names:
@@ -239,7 +252,9 @@ def verify_bundle(path: Path) -> dict:
                 problems.append(f"unexpected archive member(s): {', '.join(unexpected)}")
             if manifest.get("skill_count") != len(manifest.get("skills", {})):
                 problems.append("bundle.json skill_count does not match its skills map")
-    except (OSError, zipfile.BadZipFile, json.JSONDecodeError) as exc:
+            if manifest.get("file_count") != actual_file_count:
+                problems.append("bundle.json file_count does not match enumerated skill files")
+    except (OSError, zipfile.BadZipFile, json.JSONDecodeError, RuntimeError) as exc:
         problems.append(f"invalid bundle ({exc})")
         manifest = {}
     return {
@@ -254,17 +269,88 @@ def verify_bundle(path: Path) -> dict:
     }
 
 
+def install_bundle(path: Path, dest_dir: Path, *, dry_run: bool = False) -> dict:
+    verification = verify_bundle(path)
+    if not verification["ok"]:
+        raise ValueError("Bundle verification failed: " + "; ".join(verification["problems"]))
+    installed: list[str] = []
+    with zipfile.ZipFile(path) as archive:
+        manifest = json.loads(archive.read("bundle.json").decode("utf-8"))
+        for slug, meta in sorted(manifest.get("skills", {}).items()):
+            if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,63}", slug):
+                raise ValueError(f"Unsafe skill slug in bundle: {slug!r}")
+            skill_dest = (dest_dir / slug).resolve()
+            dest_resolved = dest_dir.resolve()
+            if dest_resolved not in skill_dest.parents:
+                raise ValueError(f"Path traversal rejected for skill {slug!r}")
+            for rel, expected_sha in meta.get("files", {}).items():
+                rel_path = Path(rel)
+                if rel_path.is_absolute() or ".." in rel_path.parts:
+                    raise ValueError(f"Unsafe bundle member path: {rel!r}")
+                out_file = (skill_dest / rel_path).resolve()
+                if skill_dest not in out_file.parents:
+                    raise ValueError(f"Path traversal rejected for member {rel!r}")
+                payload = archive.read(f"skills/{slug}/{rel}")
+                if sha256_bytes(payload.replace(b"\r\n", b"\n")) != expected_sha:
+                    raise ValueError(f"SHA-256 verification failed while extracting {slug}/{rel}")
+                if not dry_run:
+                    out_file.parent.mkdir(parents=True, exist_ok=True)
+                    out_file.write_bytes(payload)
+            installed.append(slug)
+        if not dry_run:
+            lock_path = dest_dir / ".cortex-lock.json"
+            lock = json.loads(lock_path.read_text(encoding="utf-8")) if lock_path.is_file() else {"skills": {}}
+            for slug, meta in manifest.get("skills", {}).items():
+                lock.setdefault("skills", {})[slug] = {
+                    "version": manifest.get("cortex_version", VERSION),
+                    "dir": meta.get("dir", "skills"),
+                    "source": f"bundle:{path.name}",
+                    "files": meta.get("files", {}),
+                }
+            lock["release_version"] = manifest.get("cortex_version", VERSION)
+            lock_path.parent.mkdir(parents=True, exist_ok=True)
+            lock_path.write_text(json.dumps(lock, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return {
+        "version": VERSION,
+        "ok": True,
+        "bundle": verification["bundle"],
+        "destination": dest_dir.as_posix(),
+        "dry_run": dry_run,
+        "installed_count": len(installed),
+        "skills": installed,
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Build or verify deterministic offline Cortex skill bundles (ZIP + SHA-256 manifest)."
+        description="Build, verify, or install deterministic offline Cortex skill bundles (ZIP + SHA-256 manifest)."
     )
     parser.add_argument("--pack", "-p", action="append", default=[], help="Role pack ID(s) from packs.json.")
     parser.add_argument("--skill", "-s", action="append", default=[], help="Specific skill slug(s).")
     parser.add_argument("--collection", "-c", choices=("core", "extended", "all"), default=None)
     parser.add_argument("--out", "-o", type=Path, default=None, help="Output bundle path (default: dist/cortex-<selection>.zip).")
     parser.add_argument("--verify", type=Path, default=None, help="Verify an existing bundle and exit.")
+    parser.add_argument("--install", type=Path, default=None, help="Verify and extract a bundle into --dest.")
+    parser.add_argument("--dest", type=Path, default=Path.cwd() / ".claude" / "skills", help="Target skills directory used with --install.")
+    parser.add_argument("--dry-run", action="store_true", help="Verify and preview bundle install without writing files.")
     parser.add_argument("--json", action="store_true", dest="as_json")
     args = parser.parse_args(argv)
+
+    if args.install:
+        try:
+            report = install_bundle(args.install.resolve(), args.dest.resolve(), dry_run=args.dry_run)
+        except (ValueError, OSError, zipfile.BadZipFile, json.JSONDecodeError) as exc:
+            if args.as_json:
+                print(json.dumps({"version": VERSION, "ok": False, "error": str(exc)}, indent=2))
+            else:
+                print(f"ERROR: {exc}", file=sys.stderr)
+            return 1
+        if args.as_json:
+            print(json.dumps(report, indent=2))
+        else:
+            verb = "Would install" if args.dry_run else "Installed"
+            print(f"Cortex Bundle: {verb} {report['installed_count']} verified skill(s) into {report['destination']}")
+        return 0
 
     if args.verify:
         report = verify_bundle(args.verify.resolve())

@@ -10,7 +10,10 @@ from pathlib import Path
 
 
 def inspect_module(source_path: Path) -> list[dict]:
-    tree = ast.parse(source_path.read_text(encoding="utf-8"), filename=source_path.as_posix())
+    try:
+        tree = ast.parse(source_path.read_text(encoding="utf-8", errors="replace"), filename=source_path.as_posix())
+    except SyntaxError as exc:
+        raise ValueError(f"SyntaxError in {source_path}:{exc.lineno}: {exc.msg}") from exc
     items: list[dict] = []
     for node in tree.body:
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and not node.name.startswith("_"):

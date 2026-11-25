@@ -50,14 +50,38 @@ def parse_skill(skill_md: Path, checksums: dict) -> dict:
     }
 
 
-def build_graph(root: Path = ROOT) -> dict:
+def _connected_components(skills: dict[str, dict], packs: dict[str, list[str]], edges: list[dict]) -> int:
+    nodes = {f"skill:{s}" for s in skills} | {f"pack:{p}" for p in packs}
+    adj: dict[str, set[str]] = {n: set() for n in nodes}
+    for edge in edges:
+        src, dst = edge["from"], edge["to"]
+        if src in adj and dst in adj:
+            adj[src].add(dst)
+            adj[dst].add(src)
+    visited: set[str] = set()
+    components = 0
+    for node in nodes:
+        if node in visited:
+            continue
+        components += 1
+        stack = [node]
+        while stack:
+            cur = stack.pop()
+            if cur in visited:
+                continue
+            visited.add(cur)
+            stack.extend(adj[cur] - visited)
+    return components
+
+
+def build_graph(root: Path = ROOT, packs_filter: list[str] | None = None) -> dict:
     checksums_path = root / "checksums.json"
     checksums = (
         json.loads(checksums_path.read_text(encoding="utf-8"))
         if checksums_path.is_file()
         else {}
     )
-    skills: dict[str, dict] = {}
+    all_skills: dict[str, dict] = {}
     for folder, _tier in COLLECTIONS:
         base = root / folder
         if not base.is_dir():
@@ -66,19 +90,30 @@ def build_graph(root: Path = ROOT) -> dict:
             md = entry / "SKILL.md"
             if entry.is_dir() and md.is_file():
                 meta = parse_skill(md, checksums)
-                skills[meta["slug"]] = meta
+                all_skills[meta["slug"]] = meta
 
     packs_data = json.loads((root / "packs.json").read_text(encoding="utf-8"))
-    packs: dict[str, list[str]] = {
+    all_packs: dict[str, list[str]] = {
         pid: list(info.get("skills", []))
         for pid, info in packs_data.get("packs", {}).items()
     }
+
+    if packs_filter:
+        unknown = [pid for pid in packs_filter if pid not in all_packs]
+        if unknown:
+            raise ValueError(f"Unknown pack(s): {', '.join(unknown)}")
+        packs = {pid: all_packs[pid] for pid in packs_filter}
+        selected_slugs = {slug for members in packs.values() for slug in members}
+        skills = {slug: all_skills[slug] for slug in sorted(selected_slugs) if slug in all_skills}
+    else:
+        packs = all_packs
+        skills = all_skills
 
     dangling: list[dict] = []
     pack_edges: list[dict] = []
     for pid, members in packs.items():
         for slug in members:
-            if slug not in skills:
+            if slug not in all_skills:
                 dangling.append({"from": f"pack:{pid}", "to": f"skill:{slug}", "type": "contains"})
                 continue
             pack_edges.append({"from": f"pack:{pid}", "to": f"skill:{slug}", "type": "contains"})
@@ -86,10 +121,11 @@ def build_graph(root: Path = ROOT) -> dict:
     related_edges: list[dict] = []
     for slug, meta in sorted(skills.items()):
         for target in meta["related"]:
-            if target not in skills or target == slug:
+            if target not in all_skills or target == slug:
                 dangling.append({"from": f"skill:{slug}", "to": f"skill:{target}", "type": "related"})
                 continue
-            related_edges.append({"from": f"skill:{slug}", "to": f"skill:{target}", "type": "related"})
+            if target in skills:
+                related_edges.append({"from": f"skill:{slug}", "to": f"skill:{target}", "type": "related"})
 
     pack_count = {slug: 0 for slug in skills}
     for edge in pack_edges:
@@ -128,6 +164,7 @@ def build_graph(root: Path = ROOT) -> dict:
         "edge_count": len(edges),
         "pack_edges": len(pack_edges),
         "related_edges": len(related_edges),
+        "components": _connected_components(skills, packs, edges),
         "skills": {slug: skills[slug] for slug in sorted(skills)},
         "packs": {pid: {"skill_count": len(members), "skills": members} for pid, members in sorted(packs.items())},
         "edges": edges,
@@ -172,6 +209,7 @@ def main(argv: list[str] | None = None) -> int:
         description="Build the Cortex skill/pack capability graph (JSON, Mermaid, or Graphviz DOT)."
     )
     parser.add_argument("--format", "-f", choices=("json", "mermaid", "dot"), default="json")
+    parser.add_argument("--pack", "-p", action="append", default=[], help="Restrict graph output to specific role pack ID(s).")
     parser.add_argument("--out", "-o", type=Path, default=None, help="Write output to a file instead of stdout.")
     parser.add_argument("--check", action="store_true", help="Exit 1 on dangling pack/related references.")
     parser.add_argument("--strict", action="store_true", help="With --check, also fail on skills that no pack includes.")
@@ -180,8 +218,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        graph = build_graph(args.project_dir.resolve())
-    except (OSError, json.JSONDecodeError, KeyError) as exc:
+        graph = build_graph(args.project_dir.resolve(), packs_filter=args.pack or None)
+    except (OSError, json.JSONDecodeError, KeyError, ValueError) as exc:
         print(f"ERROR: could not build capability graph: {exc}", file=sys.stderr)
         return 2
 

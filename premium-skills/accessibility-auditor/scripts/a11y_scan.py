@@ -129,7 +129,7 @@ class A11yHTMLAuditor(HTMLParser):
 
 def scan_html(path: Path) -> list[dict]:
     auditor = A11yHTMLAuditor()
-    auditor.feed(path.read_text(encoding="utf-8"))
+    auditor.feed(path.read_text(encoding="utf-8", errors="replace"))
     return auditor.finalize()
 
 

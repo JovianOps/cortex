@@ -65,5 +65,5 @@ Cortex `v3.0.0` is a **zero-dependency Agent OS**: a `SKILL.md` catalog with det
 | `scripts/cortex_guard.py` | `cortex guard` | Six-check release gate plus SHA-pinned CI workflow and pre-commit hook generation |
 | `scripts/cortex_compile.py` | `cortex compile` | Compiles `SKILL.md` into Cursor `.mdc`, VS Code `.instructions.md`, Windsurf, Cline, `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` |
 | `scripts/cortex_scan.py` | `cortex scan` | Unified multi-tool repository scanner with `.cortex-policy.json`, SARIF 2.1.0, and JUnit XML |
-| `scripts/install_skills.py` | `cortex install` | Multi-agent skill installer & `.cortex-lock.json` manager across 12 agent targets |
+| `scripts/install_skills.py` | `cortex install` | Multi-agent skill installer & `.cortex-lock.json` manager across 13 agent targets |
 | `scripts/bump_version.py` | `python scripts/bump_version.py <ver>` | Atomic release bumper for all 36 skills, 9 manifests, ZIPs, `checksums.json`, and `index.html` |

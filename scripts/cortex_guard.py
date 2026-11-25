@@ -103,18 +103,24 @@ CHECKS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
 )
 
 
-def run_check(name: str, script: str, extra: tuple[str, ...], project_dir: Path) -> dict:
+def run_check(name: str, script: str, extra: tuple[str, ...], project_dir: Path, *, skip_archives: bool = False) -> dict:
     started = time.monotonic()
-    if name == "package" and not (
-        (ROOT / "zips").is_dir() and (ROOT / "premium-zips").is_dir()
-    ):
+    archives_present = (ROOT / "zips").is_dir() and (ROOT / "premium-zips").is_dir()
+    if name == "package" and (skip_archives or not archives_present):
         return {
             "name": name,
             "ok": True,
             "skipped": True,
-            "detail": "Not a source checkout with ZIP archives; SHA-256 files were verified by cortex verify.",
+            "detail": (
+                "Skipped archive check (--skip-archives)."
+                if skip_archives
+                else "Not a source checkout with ZIP archives; SHA-256 files were verified by cortex verify."
+            ),
             "duration_ms": 0,
         }
+
+    if name == "skills" and (skip_archives or not archives_present):
+        extra = (*extra, "--skip-archives")
 
     cmd = [sys.executable, str(SCRIPTS / script), *extra]
     if name == "scan":
@@ -162,7 +168,7 @@ def run_check(name: str, script: str, extra: tuple[str, ...], project_dir: Path)
     }
 
 
-def guard_check(project_dir: Path, *, only: list[str] | None, fail_fast: bool) -> dict:
+def guard_check(project_dir: Path, *, only: list[str] | None, fail_fast: bool, skip_archives: bool = False) -> dict:
     selected = set(only) if only else {spec[0] for spec in CHECKS}
     unknown = sorted(selected - {spec[0] for spec in CHECKS})
     if unknown:
@@ -173,7 +179,7 @@ def guard_check(project_dir: Path, *, only: list[str] | None, fail_fast: bool) -
     for name, script, extra in CHECKS:
         if name not in selected:
             continue
-        result = run_check(name, script, extra, project_dir)
+        result = run_check(name, script, extra, project_dir, skip_archives=skip_archives)
         results.append(result)
         if not result["ok"]:
             all_ok = False
@@ -235,6 +241,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--project-dir", type=Path, default=Path.cwd(), help="Workspace to scan and install hooks into.")
     parser.add_argument("--only", action="append", default=[], help="Run only specific checks (package, skills, manifests, audit, graph, scan).")
     parser.add_argument("--fail-fast", action="store_true", help="Stop at the first failing check.")
+    parser.add_argument("--skip-archives", action="store_true", help="Skip ZIP archive checks (useful when running outside a full checkout).")
     parser.add_argument("--json", action="store_true", dest="as_json")
     parser.add_argument("--print-workflow", action="store_true", help="Print a SHA-pinned Cortex Guard GitHub Actions workflow and exit.")
     parser.add_argument("--write-workflow", action="store_true", help="Write .github/workflows/cortex-guard.yml in the project directory.")
@@ -260,7 +267,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if payload["ok"] else 1
 
     try:
-        report = guard_check(args.project_dir.resolve(), only=args.only, fail_fast=args.fail_fast)
+        report = guard_check(
+            args.project_dir.resolve(),
+            only=args.only,
+            fail_fast=args.fail_fast,
+            skip_archives=args.skip_archives,
+        )
     except ValueError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2

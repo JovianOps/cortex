@@ -127,6 +127,13 @@ AGENT_TARGETS: dict[str, AgentTarget] = {
         project_rel=".cline/skills",
         note="Open Cline's Skills panel in VS Code or invoke skills with /<skill-name>.",
     ),
+    "windsurf": AgentTarget(
+        key="windsurf",
+        label="Windsurf",
+        global_rel=".codeium/windsurf/skills",
+        project_rel=".windsurf/skills",
+        note="Windsurf discovers SKILL.md files from .windsurf/skills/ and ~/.codeium/windsurf/skills/.",
+    ),
     "aider": AgentTarget(
         key="aider",
         label="Aider",
@@ -478,16 +485,18 @@ def install_single_skill(
     return written_hashes
 
 
-def cmd_status(agents: list[AgentTarget], scope: str, project_root: Path) -> int:
+def cmd_status(agents: list[AgentTarget], scope: str, project_root: Path, *, as_json: bool = False) -> int:
     any_issues = False
+    targets_out: list[dict] = []
     for target in agents:
         dest_base = destination_dir(target, scope, project_root)
         lock = read_lockfile(dest_base)
         installed = lock.get("skills", {})
-        print(f"\n==> {target.label} ({scope}: {dest_base})")
-        if not installed:
-            print("  (no Cortex skills recorded in lockfile)")
-            continue
+        skill_rows: list[dict] = []
+        if not as_json:
+            print(f"\n==> {target.label} ({scope}: {dest_base})")
+            if not installed:
+                print("  (no Cortex skills recorded in lockfile)")
         for slug, entry in sorted(installed.items()):
             ver = entry.get("version", "?")
             files = entry.get("files", {})
@@ -502,7 +511,17 @@ def cmd_status(agents: list[AgentTarget], scope: str, project_root: Path) -> int
                     state = f"MODIFIED ({rel_file})"
                     any_issues = True
                     break
-            print(f"  {slug:<26} v{ver:<8} [{state}]")
+            skill_rows.append({"slug": slug, "version": ver, "status": state})
+            if not as_json:
+                print(f"  {slug:<26} v{ver:<8} [{state}]")
+        targets_out.append({
+            "agent": target.key,
+            "label": target.label,
+            "destination": dest_base.as_posix(),
+            "skills": skill_rows,
+        })
+    if as_json:
+        print(json.dumps({"ok": not any_issues, "scope": scope, "targets": targets_out}, indent=2))
     return 1 if any_issues else 0
 
 
@@ -605,14 +624,14 @@ def cmd_uninstall(
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Install, verify, upgrade, and uninstall Cortex v3.0.0 SKILL.md playbooks across 12 AI agent & IDE targets."
+        description="Install, verify, upgrade, and uninstall Cortex v3.0.0 SKILL.md playbooks across 13 AI agent & IDE targets."
     )
     parser.add_argument(
         "--agent",
         "-a",
         action="append",
         default=[],
-        help="Target agent(s): claude-code, codex, gemini-cli, cursor, copilot, vscode, opencode, openclaw, goose, cline, aider, agents, or all.",
+        help="Target agent(s): claude-code, codex, gemini-cli, cursor, copilot, vscode, opencode, openclaw, goose, cline, windsurf, aider, agents, or all.",
     )
     parser.add_argument(
         "--collection",
@@ -679,14 +698,35 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     )
     parser.add_argument("--dry-run", action="store_true", help="Preview changes without writing or deleting files.")
     parser.add_argument("--list", action="store_true", help="List all supported agents and available Cortex skills.")
+    parser.add_argument("--json", action="store_true", dest="as_json", help="Output structured JSON.")
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
+    import contextlib
+    import io
+
     args = parse_args(argv if argv is not None else sys.argv[1:])
 
     if args.list:
         catalog = load_remote_catalog(args.repo, args.ref) if args.remote else load_local_catalog()
+        if args.as_json:
+            print(json.dumps({
+                "release_version": catalog.get("release_version", "3.0.0"),
+                "agents": [
+                    {"key": t.key, "label": t.label, "global_rel": t.global_rel, "project_rel": t.project_rel}
+                    for t in AGENT_TARGETS.values()
+                ],
+                "skills": [
+                    {
+                        "slug": slug,
+                        "collection": meta.get("collection", "core"),
+                        "files": sorted(meta.get("files", {}).keys()),
+                    }
+                    for slug, meta in catalog["skills"].items()
+                ],
+            }, indent=2))
+            return 0
         print("Supported Agents:")
         for target in AGENT_TARGETS.values():
             print(
@@ -707,13 +747,35 @@ def main(argv: list[str] | None = None) -> int:
     project_root = args.project_dir.resolve()
 
     if args.status:
-        return cmd_status(agents, args.scope, project_root)
+        return cmd_status(agents, args.scope, project_root, as_json=args.as_json)
     if args.uninstall:
+        if args.as_json:
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                rc = cmd_uninstall(agents, args.scope, project_root, args.skill, args.all_flag, args.dry_run)
+            print(json.dumps({"ok": rc == 0, "scope": args.scope, "agents": [a.key for a in agents], "dry_run": args.dry_run, "log": buf.getvalue().strip()}, indent=2))
+            return rc
         return cmd_uninstall(agents, args.scope, project_root, args.skill, args.all_flag, args.dry_run)
 
     catalog = load_remote_catalog(args.repo, args.ref) if args.remote else load_local_catalog()
 
     if args.check_updates or args.upgrade:
+        if args.as_json:
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                rc = cmd_check_updates(
+                    agents,
+                    args.scope,
+                    project_root,
+                    catalog,
+                    do_upgrade=args.upgrade,
+                    remote=args.remote,
+                    repo=args.repo,
+                    ref=args.ref,
+                    dry_run=args.dry_run,
+                )
+            print(json.dumps({"ok": rc == 0, "upgrade": args.upgrade, "dry_run": args.dry_run, "log": buf.getvalue().strip()}, indent=2))
+            return rc
         return cmd_check_updates(
             agents,
             args.scope,
@@ -730,38 +792,63 @@ def main(argv: list[str] | None = None) -> int:
     skills = select_skills(catalog, args.collection, args.skill, args.pack, packs)
     release_ver = catalog.get("release_version", "3.0.0")
 
-    for target in agents:
-        dest_base = destination_dir(target, args.scope, project_root)
-        lock = read_lockfile(dest_base)
-        installed_md: list[Path] = []
-        print(f"\n==> {target.label} ({args.scope}: {dest_base})")
-        for slug, meta in skills:
-            hashes = install_single_skill(
-                slug, meta, dest_base, remote=args.remote, repo=args.repo, ref=args.ref, dry_run=args.dry_run
-            )
-            installed_md.append(dest_base / slug / "SKILL.md")
+    def _run_install() -> dict:
+        installed_targets: list[dict] = []
+        for target in agents:
+            dest_base = destination_dir(target, args.scope, project_root)
+            lock = read_lockfile(dest_base)
+            installed_md: list[Path] = []
+            print(f"\n==> {target.label} ({args.scope}: {dest_base})")
+            for slug, meta in skills:
+                hashes = install_single_skill(
+                    slug, meta, dest_base, remote=args.remote, repo=args.repo, ref=args.ref, dry_run=args.dry_run
+                )
+                installed_md.append(dest_base / slug / "SKILL.md")
+                if not args.dry_run:
+                    lock["skills"][slug] = {
+                        "version": release_ver,
+                        "dir": meta["dir"],
+                        "installed_at": datetime.now(timezone.utc).isoformat(),
+                        "files": hashes,
+                    }
             if not args.dry_run:
-                lock["skills"][slug] = {
-                    "version": release_ver,
-                    "dir": meta["dir"],
-                    "installed_at": datetime.now(timezone.utc).isoformat(),
-                    "files": hashes,
-                }
-        if not args.dry_run:
-            lock["release_version"] = release_ver
-            write_lockfile(dest_base, lock)
+                lock["release_version"] = release_ver
+                write_lockfile(dest_base, lock)
 
-        if target.key == "aider":
-            sample_flags = " ".join(f'--read "{p}"' for p in installed_md[:3])
-            suffix = " ..." if len(installed_md) > 3 else ""
-            print(f"  Aider usage: aider {sample_flags}{suffix}")
-            if args.write_aider_conf:
-                update_aider_conf(project_root, installed_md, args.dry_run)
-        if target.key == "vscode" and args.write_vscode_settings:
-            update_vscode_settings(project_root, args.dry_run)
-        if target.note:
-            print(f"  Note: {target.note}")
+            if target.key == "aider":
+                sample_flags = " ".join(f'--read "{p}"' for p in installed_md[:3])
+                suffix = " ..." if len(installed_md) > 3 else ""
+                print(f"  Aider usage: aider {sample_flags}{suffix}")
+                if args.write_aider_conf:
+                    update_aider_conf(project_root, installed_md, args.dry_run)
+            if target.key == "vscode" and args.write_vscode_settings:
+                update_vscode_settings(project_root, args.dry_run)
+            if target.note:
+                print(f"  Note: {target.note}")
+            installed_targets.append({
+                "agent": target.key,
+                "label": target.label,
+                "destination": dest_base.as_posix(),
+                "skill_count": len(skills),
+            })
+        return {
+            "ok": True,
+            "version": release_ver,
+            "scope": args.scope,
+            "source": f"remote:{args.repo}@{args.ref}" if args.remote else "local",
+            "dry_run": args.dry_run,
+            "skills": [slug for slug, _ in skills],
+            "targets": installed_targets,
+        }
 
+    if args.as_json:
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            summary = _run_install()
+        print(json.dumps(summary, indent=2))
+        return 0
+
+    _run_install()
     source_desc = f"remote ({args.repo}@{args.ref}, SHA-256 verified)" if args.remote else "local checkout"
     print(f"\nDone! Installed {len(skills)} skill(s) from {source_desc} across {len(agents)} agent target(s).")
     return 0

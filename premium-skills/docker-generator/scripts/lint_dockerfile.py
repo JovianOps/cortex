@@ -16,7 +16,7 @@ PIPE_SHELL_RE = re.compile(r"(?:curl|wget)[^|\n]+\|\s*(?:sh|bash)\b", re.IGNOREC
 
 
 def lint_dockerfile(path: Path) -> list[dict]:
-    lines = path.read_text(encoding="utf-8").splitlines()
+    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
     findings: list[dict] = []
     from_lines: list[tuple[int, str]] = []
     has_non_root_user = False
@@ -29,8 +29,9 @@ def lint_dockerfile(path: Path) -> list[dict]:
         upper = line.upper()
         if upper.startswith("FROM "):
             from_lines.append((lineno, line))
-            image = line.split()[1]
-            if image.lower() != "scratch":
+            parts = [tok for tok in line.split()[1:] if not tok.startswith("--")]
+            image = parts[0] if parts else ""
+            if image and image.lower() != "scratch":
                 if ":latest" in image or (":" not in image and "@sha256:" not in image):
                     findings.append({
                         "severity": "HIGH",

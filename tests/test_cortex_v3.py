@@ -293,6 +293,10 @@ class TestV3McpAndStudio(unittest.TestCase):
                     mermaid = json.loads(resp.read().decode("utf-8"))
                 self.assertTrue(mermaid["graph"].startswith("graph LR"))
 
+                with urllib.request.urlopen(f"{base}/api/graph?format=dot", timeout=15) as resp:
+                    dot = json.loads(resp.read().decode("utf-8"))
+                self.assertTrue(dot["graph"].startswith("digraph cortex"))
+
                 req = urllib.request.Request(
                     f"{base}/api/guard",
                     data=json.dumps({"only": ["graph"], "fail_fast": False}).encode("utf-8"),
@@ -312,6 +316,218 @@ class TestV3McpAndStudio(unittest.TestCase):
         self.assertEqual(res.returncode, 0)
         self.assertEqual(res.stdout.strip(), f"cortex {PKG_VERSION}")
         self.assertTrue(PKG_VERSION.startswith("3."))
+
+
+class TestHardeningAndCliFixes(unittest.TestCase):
+    def test_windsurf_install_detect_and_clean_verify_doctor_json(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = Path(tmp)
+            inst = subprocess.run(
+                [
+                    sys.executable, str(SCRIPTS / "cortex.py"), "install",
+                    "--agent", "windsurf", "--skill", "security-auditor",
+                    "--scope", "project", "--project-dir", str(proj), "--json",
+                ],
+                cwd=ROOT, capture_output=True, text=True,
+            )
+            self.assertEqual(inst.returncode, 0, msg=inst.stdout + inst.stderr)
+            inst_data = json.loads(inst.stdout)
+            self.assertTrue(inst_data["ok"])
+            self.assertEqual(inst_data["targets"][0]["agent"], "windsurf")
+            self.assertTrue((proj / ".windsurf/skills/security-auditor/SKILL.md").is_file())
+
+            detect = subprocess.run(
+                [sys.executable, str(SCRIPTS / "cortex.py"), "detect", "--project-dir", str(proj), "--json"],
+                cwd=ROOT, capture_output=True, text=True,
+            )
+            self.assertEqual(detect.returncode, 0, msg=detect.stderr)
+            agents = {a["agent"]: a for a in json.loads(detect.stdout)["agents"]}
+            self.assertTrue(agents["windsurf"]["detected"])
+            self.assertGreaterEqual(agents["windsurf"]["installed_cortex_skills"], 1)
+
+            ver = subprocess.run(
+                [sys.executable, str(SCRIPTS / "cortex.py"), "verify", "--project-dir", str(proj), "--json"],
+                cwd=ROOT, capture_output=True, text=True,
+            )
+            self.assertEqual(ver.returncode, 0, msg=ver.stdout + ver.stderr)
+            ver_json = json.loads(ver.stdout)
+            self.assertTrue(ver_json["ok"])
+
+            doc = subprocess.run(
+                [sys.executable, str(SCRIPTS / "cortex.py"), "doctor", "--project-dir", str(proj), "--json"],
+                cwd=ROOT, capture_output=True, text=True,
+            )
+            self.assertEqual(doc.returncode, 0, msg=doc.stdout + doc.stderr)
+            doc_json = json.loads(doc.stdout)
+            self.assertTrue(doc_json["ok"])
+            self.assertGreaterEqual(doc_json["checked_lockfiles"], 1)
+
+    def test_compile_all_dedupes_agents_md(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            res = subprocess.run(
+                [
+                    sys.executable, str(SCRIPTS / "cortex_compile.py"),
+                    "--skill", "security-auditor", "--target", "all",
+                    "--project-dir", tmp, "--dry-run", "--json",
+                ],
+                cwd=ROOT, capture_output=True, text=True,
+            )
+            self.assertEqual(res.returncode, 0, msg=res.stderr)
+            files = [entry["file"] for entry in json.loads(res.stdout)["files"]]
+            self.assertEqual(files.count("AGENTS.md"), 1)
+
+    def test_bundle_manifest_tamper_and_verified_install(self) -> None:
+        bundle_mod = load_mod("cortex_bundle_hardening", SCRIPTS / "cortex_bundle.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            out = root / "bundle.zip"
+            bundle_mod.build_bundle(ROOT, out, skills=["security-auditor"])
+
+            dest = root / ".claude/skills"
+            install_res = bundle_mod.install_bundle(out, dest)
+            self.assertTrue(install_res["ok"])
+            self.assertTrue((dest / "security-auditor/SKILL.md").is_file())
+            self.assertTrue((dest / ".cortex-lock.json").is_file())
+
+            tampered_manifest = root / "tampered_manifest.zip"
+            with zipfile.ZipFile(out) as src, zipfile.ZipFile(tampered_manifest, "w") as dst:
+                for info in src.infolist():
+                    data = src.read(info.filename)
+                    if info.filename == "bundle.json":
+                        obj = json.loads(data.decode("utf-8"))
+                        obj["manifest_sha256"] = "0" * 64
+                        data = json.dumps(obj, indent=2, sort_keys=True).encode("utf-8")
+                    dst.writestr(info, data)
+            rep = bundle_mod.verify_bundle(tampered_manifest)
+            self.assertFalse(rep["ok"])
+            self.assertTrue(any("manifest_sha256" in p for p in rep["problems"]))
+            with self.assertRaises(ValueError):
+                bundle_mod.install_bundle(tampered_manifest, root / "should_not_exist")
+
+    def test_graph_pack_filter_and_studio_a11y_and_mcp_frame_cap(self) -> None:
+        graph_mod = load_mod("cortex_graph_pack_test", SCRIPTS / "cortex_graph.py")
+        sub = graph_mod.build_graph(ROOT, packs_filter=["cloud-native"])
+        self.assertEqual(sub["pack_count"], 1)
+        self.assertEqual(sub["skill_count"], 6)
+        self.assertGreaterEqual(sub["components"], 1)
+
+        studio_mod = load_mod("cortex_studio_a11y_test", SCRIPTS / "cortex_studio.py")
+        a11y_mod = load_mod("a11y_scan_studio", ROOT / "premium-skills/accessibility-auditor/scripts/a11y_scan.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            studio_html = Path(tmp) / "studio.html"
+            studio_html.write_text(studio_mod.STUDIO_HTML, encoding="utf-8")
+            findings = a11y_mod.scan_html(studio_html)
+            serious = [f for f in findings if f["severity"] in {"BLOCKER", "SERIOUS"}]
+            self.assertEqual(serious, [], msg=serious)
+
+        mcp_mod = load_mod("cortex_mcp_frame_test", SCRIPTS / "cortex_mcp.py")
+        oversized = io.BytesIO(b"Content-Length: 999999999\r\n\r\n{}")
+        with self.assertRaises(ValueError):
+            mcp_mod.read_stdio_message(oversized)
+
+    def test_json_flags_and_skip_archives_guard(self) -> None:
+        checks: list[list[object]] = [
+            [SCRIPTS / "validate_manifests.py", "--json"],
+            [SCRIPTS / "validate_skills.py", "--skip-archives", "--json"],
+            [SCRIPTS / "package_skills.py", "--check", "--json"],
+            [SCRIPTS / "verify_site.py", "--json"],
+            [SCRIPTS / "install_skills.py", "--list", "--json"],
+            [SCRIPTS / "cortex_guard.py", "check", "--skip-archives", "--only", "package", "--only", "skills", "--json"],
+        ]
+        if importlib.util.find_spec("yaml") is not None:
+            checks.append([SCRIPTS / "validate_yaml.py", "--json"])
+        for script_args in checks:
+            res = subprocess.run(
+                [sys.executable, *(str(a) for a in script_args)],
+                cwd=ROOT, capture_output=True, text=True,
+            )
+            self.assertEqual(res.returncode, 0, msg=f"{script_args}: {res.stdout}\n{res.stderr}")
+            data = json.loads(res.stdout)
+            if "ok" in data:
+                self.assertTrue(data["ok"], msg=data)
+
+    def test_upgraded_verifiers_and_agent_dir_pruning(self) -> None:
+        secret_mod = load_mod("secret_scan_v3", ROOT / "premium-skills/security-auditor/scripts/secret_scan.py")
+        resil_mod = load_mod("audit_resil_v3", ROOT / "premium-skills/chaos-resilience-engineer/scripts/audit_resilience.py")
+        rust_mod = load_mod("lint_rust_v3", ROOT / "premium-skills/rust-systems-engineer/scripts/lint_rust.py")
+        go_mod = load_mod("lint_go_v3", ROOT / "premium-skills/go-backend-engineer/scripts/lint_go.py")
+        ts_mod = load_mod("lint_ts_v3", ROOT / "premium-skills/typescript-architect/scripts/lint_ts.py")
+        sbom_mod = load_mod("audit_sbom_v3", ROOT / "premium-skills/supply-chain-sbom/scripts/audit_sbom.py")
+        act_mod = load_mod("lint_act_v3", ROOT / "premium-skills/devops-pipeline/scripts/lint_actions.py")
+        dock_mod = load_mod("lint_dock_v3", ROOT / "premium-skills/docker-generator/scripts/lint_dockerfile.py")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            # Installed agent skill copies inside .claude/skills & .github/skills must be skipped
+            agent_copy = root / ".claude/skills/bad/evil.py"
+            agent_copy.parent.mkdir(parents=True)
+            agent_copy.write_text("subprocess.run('id', shell=True)\n", encoding="utf-8")
+            self.assertEqual(secret_mod.scan_path(root), [])
+
+            # Multiline shell=True flagged; comments ignored; secrets redacted
+            (root / "app.py").write_text(
+                "# subprocess.run('ok', shell=True)\n"
+                "import subprocess\n"
+                "subprocess.run(\n"
+                "    'ls -la',\n"
+                "    shell=True,\n"
+                ")\n",
+                encoding="utf-8",
+            )
+            sec_findings = secret_mod.scan_path(root / "app.py")
+            self.assertEqual(len(sec_findings), 1)
+            self.assertEqual(sec_findings[0]["cwe"], "CWE-78")
+
+            # Tight retry loop + multi-doc YAML K8s HA
+            (root / "worker.py").write_text("while True:\n    try:\n        call()\n    except Exception:\n        pass\n", encoding="utf-8")
+            self.assertTrue(any(f["rule"] == "resilience-tight-retry-loop" for f in resil_mod.audit_code_file(root / "worker.py")))
+            k8s_multi = root / "deploy.yaml"
+            k8s_multi.write_text("kind: Service\n---\nkind: Deployment\nspec:\n  replicas: 1\n", encoding="utf-8")
+            self.assertTrue(any(f["rule"] == "resilience-single-replica" for f in resil_mod.audit_k8s_ha(k8s_multi)))
+
+            # Rust same-line SAFETY accepted & cfg(test) unwrap ignored while post-test unwrap flagged
+            rs = root / "lib.rs"
+            rs.write_text(
+                "pub fn ok() {\n"
+                "    unsafe { std::ptr::null::<u8>().read(); } // SAFETY: test\n"
+                "}\n"
+                "#[cfg(test)]\nmod tests {\n    fn t() { Some(1).unwrap(); }\n}\n"
+                "pub fn bad() -> i32 { Some(2).unwrap() }\n",
+                encoding="utf-8",
+            )
+            rs_findings = rust_mod.audit_rust_file(rs)
+            self.assertEqual([f["rule"] for f in rs_findings], ["rust-unwrap-in-prod"])
+
+            # Go http.Client without Timeout flagged
+            go_f = root / "client.go"
+            go_f.write_text("package main\nimport \"net/http\"\nvar c = &http.Client{\n}\n", encoding="utf-8")
+            self.assertTrue(any(f["rule"] == "go-http-client-no-timeout" for f in go_mod.audit_go_file(go_f)))
+
+            # TS ignores // comment lines containing ': any'
+            ts_f = root / "clean.ts"
+            ts_f.write_text("// avoid : any in types\nexport const x: number = 1;\n", encoding="utf-8")
+            self.assertEqual(ts_mod.audit_ts_file(ts_f), [])
+
+            # SBOM detects missing go.sum & builds CycloneDX
+            gm = root / "go.mod"
+            gm.write_text("module ex\nrequire github.com/pkg/errors v0.9.1\n", encoding="utf-8")
+            self.assertTrue(any(f["rule"] == "sbom-missing-go-sum" for f in sbom_mod.audit_go_mod(gm)))
+            self.assertEqual(sbom_mod.generate_cyclonedx_summary([gm])["componentCount"], 1)
+
+            # lint_actions flags write-all + github.head_ref
+            wf = root / "ci.yml"
+            wf.write_text(
+                "permissions: write-all\n"
+                "jobs:\n  j:\n    steps:\n      - run: echo ${{ github.head_ref }}\n",
+                encoding="utf-8",
+            )
+            wf_rules = {f["rule"] for f in act_mod.lint_workflow(wf)}
+            self.assertTrue({"overbroad-permissions", "no-script-injection"}.issubset(wf_rules))
+
+            # lint_dockerfile allows FROM --platform=... with pinned tag
+            df = root / "Dockerfile"
+            df.write_text("FROM --platform=$BUILDPLATFORM alpine:3.20\nUSER app\nHEALTHCHECK CMD true\n", encoding="utf-8")
+            self.assertEqual(dock_mod.lint_dockerfile(df), [])
 
 
 if __name__ == "__main__":

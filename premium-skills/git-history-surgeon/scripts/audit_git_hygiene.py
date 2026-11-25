@@ -9,9 +9,24 @@ import subprocess
 import sys
 from pathlib import Path
 
-SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "dist", "build", "zips", "premium-zips"}
+SKIP_DIRS = {
+    ".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build",
+    "coverage", ".next", "target", "vendor", ".pytest_cache",
+    ".opencode", ".claude", ".cursor", ".windsurf", ".cline", ".agents",
+    ".codex", ".gemini", ".openclaw", ".goose", ".aider", "zips", "premium-zips",
+}
 CONVENTIONAL_RE = re.compile(r"^(?:feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|release)(?:\([a-z0-9._/-]+\))?!?: .+")
 CONFLICT_RE = re.compile(r"^(?:<{7}\s|={7}$|>{7}\s)")
+
+
+def should_skip(fp: Path, root: Path) -> bool:
+    rel = fp.relative_to(root).parts if fp != root else fp.parts
+    if any(part in SKIP_DIRS for part in rel):
+        return True
+    for i in range(len(rel) - 1):
+        if rel[i] == ".github" and rel[i + 1] == "skills":
+            return True
+    return False
 
 
 def audit_repo(repo: Path, max_file_kb: int = 1024, commits_to_check: int = 10) -> dict:
@@ -19,7 +34,7 @@ def audit_repo(repo: Path, max_file_kb: int = 1024, commits_to_check: int = 10) 
     scanned_files = 0
 
     for p in sorted(repo.rglob("*")):
-        if not p.is_file() or any(part in SKIP_DIRS for part in p.parts):
+        if not p.is_file() or should_skip(p, repo):
             continue
         scanned_files += 1
         size_kb = p.stat().st_size / 1024

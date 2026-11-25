@@ -42,6 +42,7 @@ AGENT_PROBES: tuple[tuple[str, str, str, str, tuple[str, ...]], ...] = (
     ("openclaw", "OpenClaw", ".openclaw", ".openclaw", ("openclaw",)),
     ("goose", "Goose", ".config/goose", ".goose", ("goose",)),
     ("cline", "Cline", ".cline", ".cline", ()),
+    ("windsurf", "Windsurf", ".codeium/windsurf", ".windsurf", ("windsurf",)),
     ("aider", "Aider", ".aider", ".aider", ("aider",)),
     ("hermes", "Hermes Agent", ".hermes", ".hermes", ("hermes",)),
 )
@@ -199,22 +200,24 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     # 3. Verify any installed .cortex-lock.json files in detected agent directories
     installer = load_script("install_skills")
     checked_locks = 0
+    seen_lock_dests: set[Path] = set()
     for target in installer.AGENT_TARGETS.values():
         for scope in ("project", "global"):
             dest = installer.destination_dir(target, scope, project_dir)
+            if dest in seen_lock_dests:
+                continue
+            seen_lock_dests.add(dest)
             if (dest / installer.LOCKFILE_NAME).is_file():
                 checked_locks += 1
-                if as_json:
-                    res = subprocess.run(
-                        [sys.executable, str(SCRIPTS / "install_skills.py"), "--status", "--agent", target, "--scope", scope, "--project-dir", str(project_dir)],
+                rc = installer.cmd_status([target], scope, project_dir, as_json=as_json) if not as_json else (
+                    0 if subprocess.run(
+                        [sys.executable, str(SCRIPTS / "install_skills.py"), "--status", "--agent", target.key, "--scope", scope, "--project-dir", str(project_dir)],
                         cwd=ROOT,
                         capture_output=True,
                         text=True,
                         check=False,
-                    )
-                    rc = res.returncode
-                else:
-                    rc = installer.cmd_status([target], scope, project_dir)
+                    ).returncode == 0 else 1
+                )
                 if rc != 0:
                     issues += 1
 
@@ -633,6 +636,9 @@ def cmd_verify(args: argparse.Namespace) -> int:
     all_ok &= run_check("evals_and_audit", "eval_skills", [])
 
     # Check installed lockfiles under project_dir
+    import contextlib
+    import io
+
     installer = load_script("install_skills")
     lock_issues = 0
     locks_checked = 0
@@ -644,7 +650,12 @@ def cmd_verify(args: argparse.Namespace) -> int:
         seen_dests.add(dest)
         if (dest / installer.LOCKFILE_NAME).is_file():
             locks_checked += 1
-            if installer.cmd_status([target], "project", project_dir) != 0:
+            if args.as_json:
+                with contextlib.redirect_stdout(io.StringIO()):
+                    status_rc = installer.cmd_status([target], "project", project_dir)
+            else:
+                status_rc = installer.cmd_status([target], "project", project_dir)
+            if status_rc != 0:
                 lock_issues += 1
     if locks_checked:
         ok = lock_issues == 0

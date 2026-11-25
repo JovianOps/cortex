@@ -12,7 +12,13 @@ import re
 import sys
 from pathlib import Path
 
-SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build", ".private"}
+SKIP_DIRS = {
+    ".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build",
+    "coverage", ".next", "target", "vendor", ".terraform", ".pytest_cache",
+    ".mypy_cache", ".ruff_cache", ".tox", ".private", ".opencode", ".claude",
+    ".cursor", ".windsurf", ".cline", ".agents", ".codex", ".gemini",
+    ".openclaw", ".goose", ".aider", ".githooks", "zips", "premium-zips",
+}
 TEXT_SUFFIXES = {
     ".py", ".js", ".ts", ".tsx", ".jsx", ".mjs", ".cjs", ".go", ".rs", ".java",
     ".rb", ".php", ".sh", ".ps1", ".yml", ".yaml", ".json", ".toml", ".env", ".ini", ".cfg",
@@ -21,8 +27,12 @@ TEXT_SUFFIXES = {
 SECRET_RULES: tuple[tuple[str, str, str, re.Pattern[str]], ...] = (
     ("CRITICAL", "CWE-798", "AWS Access Key ID", re.compile(r"\b(AKIA[0-9A-Z]{16})\b")),
     ("CRITICAL", "CWE-798", "GitHub Personal Access Token", re.compile(r"\b(gh[pousr]_[A-Za-z0-9_]{36,})\b")),
-    ("CRITICAL", "CWE-798", "OpenAI / Stripe Secret Key", re.compile(r"\b(sk-(?:live-|proj-)?[A-Za-z0-9_-]{20,})\b")),
-    ("CRITICAL", "CWE-798", "Private Key Material", re.compile(r"(-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----)")),
+    ("CRITICAL", "CWE-798", "OpenAI / Stripe Secret Key", re.compile(r"\b(sk-(?:live-|proj-|ant-)?[A-Za-z0-9_-]{20,})\b")),
+    ("CRITICAL", "CWE-798", "Slack Token", re.compile(r"\b(xox[baprs]-[0-9A-Za-z-]{10,})\b")),
+    ("CRITICAL", "CWE-798", "Google Cloud / Firebase API Key", re.compile(r"\b(AIza[0-9A-Za-z_-]{35})\b")),
+    ("CRITICAL", "CWE-798", "HuggingFace / npm / PyPI Access Token", re.compile(r"\b((?:hf_[A-Za-z0-9]{20,}|npm_[A-Za-z0-9]{30,}|pypi-AgEI[A-Za-z0-9_-]{20,}))\b")),
+    ("CRITICAL", "CWE-798", "Database Connection URL With Embedded Password", re.compile(r"\b((?:postgres|postgresql|mysql|mongodb(?:\+srv)?|redis)://[^:\s/]+:[^@\s$<{'\"]+@(?!localhost\b|127\.0\.0\.1\b|example\.com\b|your[-_]|placeholder)[A-Za-z0-9.-]+)")),
+    ("CRITICAL", "CWE-798", "Private Key Material", re.compile(r"(-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED )?PRIVATE KEY-----)")),
 )
 
 SINK_RULES: tuple[tuple[str, str, str, re.Pattern[str]], ...] = (
@@ -33,6 +43,18 @@ SINK_RULES: tuple[tuple[str, str, str, re.Pattern[str]], ...] = (
     ("MEDIUM", "CWE-327", "Weak cryptographic hash (MD5/SHA1)", re.compile(r"hashlib\.(?:md5|sha1)\s*\(")),
     ("MEDIUM", "CWE-79", "Raw HTML injection sink", re.compile(r"dangerouslySetInnerHTML|\.innerHTML\s*=")),
 )
+
+MULTILINE_SHELL_RE = re.compile(r"subprocess\.\w+\([^)]*?shell\s*=\s*True", re.DOTALL)
+
+
+def should_skip(fp: Path, root: Path) -> bool:
+    rel = fp.relative_to(root).parts if fp != root else fp.parts
+    if any(part in SKIP_DIRS for part in rel):
+        return True
+    for i in range(len(rel) - 1):
+        if rel[i] == ".github" and rel[i + 1] == "skills":
+            return True
+    return False
 
 
 def redact(secret: str) -> str:
@@ -46,9 +68,9 @@ def iter_files(target: Path) -> list[Path]:
         return [target]
     files: list[Path] = []
     for path in sorted(target.rglob("*")):
-        if any(part in SKIP_DIRS for part in path.parts):
+        if not path.is_file() or should_skip(path, target):
             continue
-        if path.is_file() and (path.suffix.lower() in TEXT_SUFFIXES or path.name.startswith(".env")):
+        if path.suffix.lower() in TEXT_SUFFIXES or path.name.startswith(".env"):
             files.append(path)
     return files
 
@@ -57,10 +79,14 @@ def scan_path(target: Path) -> list[dict]:
     findings: list[dict] = []
     for file_path in iter_files(target):
         try:
-            lines = file_path.read_text(encoding="utf-8", errors="ignore").splitlines()
+            text = file_path.read_text(encoding="utf-8", errors="ignore")
         except OSError:
             continue
+        lines = text.splitlines()
+        line_hits: set[tuple[str, int]] = set()
         for lineno, line in enumerate(lines, start=1):
+            stripped = line.lstrip()
+            is_comment = stripped.startswith(("#", "//", "/*", "*"))
             for severity, cwe, title, pattern in SECRET_RULES:
                 match = pattern.search(line)
                 if match:
@@ -72,10 +98,11 @@ def scan_path(target: Path) -> list[dict]:
                         "line": lineno,
                         "evidence": redact(match.group(1)),
                     })
+            if is_comment or "re.compile(" in line:
+                continue
             for severity, cwe, title, pattern in SINK_RULES:
-                if "re.compile(" in line:
-                    continue
                 if pattern.search(line):
+                    line_hits.add((cwe, lineno))
                     findings.append({
                         "severity": severity,
                         "cwe": cwe,
@@ -83,6 +110,21 @@ def scan_path(target: Path) -> list[dict]:
                         "file": file_path.as_posix(),
                         "line": lineno,
                         "evidence": line.strip()[:120],
+                    })
+        if file_path.suffix.lower() == ".py" and "subprocess." in text:
+            for m in MULTILINE_SHELL_RE.finditer(text):
+                ln = text[: m.start()].count("\n") + 1
+                stmt_line = lines[ln - 1] if ln - 1 < len(lines) else ""
+                if stmt_line.lstrip().startswith("#") or "re.compile(" in stmt_line:
+                    continue
+                if ("CWE-78", ln) not in line_hits and not any(("CWE-78", k) in line_hits for k in range(ln, ln + m.group(0).count("\n") + 1)):
+                    findings.append({
+                        "severity": "HIGH",
+                        "cwe": "CWE-78",
+                        "title": "Shell injection risk (shell=True)",
+                        "file": file_path.as_posix(),
+                        "line": ln,
+                        "evidence": stmt_line.strip()[:120],
                     })
     return findings
 

@@ -8,7 +8,12 @@ import re
 import sys
 from pathlib import Path
 
-SKIP_DIRS = {"node_modules", "dist", "build", ".next", "coverage", ".git"}
+SKIP_DIRS = {
+    "node_modules", "dist", "build", ".next", ".nuxt", ".output", "coverage",
+    ".git", ".venv", "__pycache__", ".opencode", ".claude", ".cursor",
+    ".windsurf", ".cline", ".agents", ".codex", ".gemini", ".openclaw",
+    ".goose", ".aider", "zips", "premium-zips",
+}
 
 TS_RULES: list[tuple[str, str, re.Pattern[str], str]] = [
     ("CRITICAL", "ts-eval-or-new-function", re.compile(r"\b(?:eval\s*\(|new\s+Function\s*\()"), "Avoid eval() / new Function() due to code-injection risk."),
@@ -18,6 +23,16 @@ TS_RULES: list[tuple[str, str, re.Pattern[str], str]] = [
     ("MEDIUM", "ts-non-null-assertion-chain", re.compile(r"\w+!\.\w+!\."), "Chained non-null assertions (!.) hide null/undefined runtime crashes."),
     ("LOW", "ts-console-debug", re.compile(r"\bconsole\.(?:log|debug)\s*\("), "Replace console.log/debug with structured application logging."),
 ]
+
+
+def should_skip(fp: Path, root: Path) -> bool:
+    rel = fp.relative_to(root).parts if fp != root else fp.parts
+    if any(part in SKIP_DIRS for part in rel):
+        return True
+    for i in range(len(rel) - 1):
+        if rel[i] == ".github" and rel[i + 1] == "skills":
+            return True
+    return False
 
 
 def strip_json_comments(raw: str) -> str:
@@ -33,6 +48,9 @@ def audit_tsconfig(path: Path) -> list[dict]:
         data = json.loads(strip_json_comments(path.read_text(encoding="utf-8", errors="replace")))
     except json.JSONDecodeError as exc:
         return [{"file": path.as_posix(), "line": 1, "severity": "HIGH", "rule": "tsconfig-invalid-json", "message": f"Invalid tsconfig JSON: {exc}"}]
+
+    if isinstance(data, dict) and "extends" in data and not data.get("compilerOptions"):
+        return findings
 
     opts = data.get("compilerOptions", {}) if isinstance(data, dict) else {}
     if opts.get("strict") is not True:
@@ -51,7 +69,10 @@ def audit_ts_file(path: Path) -> list[dict]:
         stripped = line.strip()
         if stripped.startswith("*") or stripped.startswith("/*"):
             continue
+        is_line_comment = stripped.startswith("//")
         for sev, rule, pat, msg in TS_RULES:
+            if is_line_comment and rule != "ts-ignore-directive":
+                continue
             if rule == "ts-console-debug" and is_test:
                 continue
             if pat.search(line):
@@ -61,15 +82,15 @@ def audit_ts_file(path: Path) -> list[dict]:
 
 def collect_targets(target: Path) -> tuple[list[Path], list[Path]]:
     if target.is_file():
-        if target.name == "tsconfig.json" or target.name.startswith("tsconfig.") and target.suffix == ".json":
+        if target.name == "tsconfig.json" or (target.name.startswith("tsconfig.") and target.suffix == ".json"):
             return [target], []
         return [], [target]
     tsconfigs: list[Path] = []
     ts_files: list[Path] = []
     for p in sorted(target.rglob("*")):
-        if any(part in SKIP_DIRS for part in p.parts) or not p.is_file():
+        if not p.is_file() or should_skip(p, target):
             continue
-        if p.name == "tsconfig.json":
+        if p.name == "tsconfig.json" or (p.name.startswith("tsconfig.") and p.suffix == ".json"):
             tsconfigs.append(p)
         elif p.suffix in {".ts", ".tsx", ".mts", ".cts"} and not p.name.endswith(".d.ts"):
             ts_files.append(p)

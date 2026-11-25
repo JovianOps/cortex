@@ -31,7 +31,7 @@ Validate against [`schemas/policy.schema.json`](../schemas/policy.schema.json):
 
 ```json
 {
-  "schema_version": "2.0.0",
+  "schema_version": "3.0.0",
   "fail_on": "high",
   "disabled_scanners": ["finops"],
   "ignore_rules": ["git-non-conventional-commit"],

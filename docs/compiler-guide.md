@@ -21,7 +21,7 @@ Different AI coding IDEs and harnesses expect different instruction file formats
 # Compile the cloud-native pack for Cursor and VS Code
 npx @jovianops/cortex compile --pack cloud-native --target cursor --target vscode
 
-# Compile specific skills across ALL 7 formats (dry-run preview first)
+# Compile specific skills across ALL 8 targets (dry-run preview first)
 npx @jovianops/cortex compile --skill kubernetes-architect --skill security-auditor --target all --dry-run
 
 # CI Drift Gate: exit 1 if compiled files on disk do not match current Cortex skills

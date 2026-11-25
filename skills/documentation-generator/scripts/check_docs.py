@@ -12,8 +12,24 @@ import re
 import sys
 from pathlib import Path
 
+SKIP_DIRS = {
+    ".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build",
+    "coverage", ".next", "target", "vendor",
+    ".opencode", ".claude", ".cursor", ".windsurf", ".cline", ".agents",
+    ".codex", ".gemini", ".openclaw", ".goose", ".aider", "zips", "premium-zips",
+}
 LINK_RE = re.compile(r"!?\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
 HEADING_RE = re.compile(r"^#{1,6}\s+(.+)$", re.MULTILINE)
+
+
+def should_skip(fp: Path, root: Path) -> bool:
+    rel = fp.relative_to(root).parts if fp != root else fp.parts
+    if any(part in SKIP_DIRS for part in rel):
+        return True
+    for i in range(len(rel) - 1):
+        if rel[i] == ".github" and rel[i + 1] == "skills":
+            return True
+    return False
 
 
 def slugify_heading(text: str) -> str:
@@ -49,7 +65,7 @@ def strip_fenced_code(markdown: str) -> list[tuple[int, str]]:
 
 
 def check_file(md_path: Path) -> list[dict]:
-    content = md_path.read_text(encoding="utf-8")
+    content = md_path.read_text(encoding="utf-8", errors="replace")
     anchors = extract_anchors(content)
     broken: list[dict] = []
 
@@ -78,7 +94,7 @@ def check_file(md_path: Path) -> list[dict]:
                     "reason": f"Relative target does not exist: {path_part}",
                 })
             elif frag and resolved.is_file() and resolved.suffix.lower() == ".md":
-                other_anchors = extract_anchors(resolved.read_text(encoding="utf-8"))
+                other_anchors = extract_anchors(resolved.read_text(encoding="utf-8", errors="replace"))
                 if frag.lower() not in other_anchors:
                     broken.append({
                         "file": md_path.as_posix(),
@@ -100,7 +116,7 @@ def main(argv: list[str] | None = None) -> int:
         if p.is_file():
             md_files.append(p)
         elif p.is_dir():
-            md_files.extend(sorted(p.rglob("*.md")))
+            md_files.extend(sorted(fp for fp in p.rglob("*.md") if fp.is_file() and not should_skip(fp, p)))
         else:
             print(f"ERROR: Path not found: {p}", file=sys.stderr)
             return 2

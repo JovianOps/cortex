@@ -60,6 +60,10 @@ ZIP entries are written in sorted order with a fixed timestamp (`2026-01-01T00:0
 ## Install a bundle
 
 ```bash
+# Verified one-command install (re-verifies manifest_sha256 + per-file SHA-256 + updates .cortex-lock.json)
+python scripts/cortex_bundle.py --install dist/cortex-cloud-native.zip --dest ~/.claude/skills
+
+# Or manual extraction
 unzip cortex-cloud-native.zip -d /tmp/cortex-bundle
 cp -r /tmp/cortex-bundle/skills/* ~/.claude/skills/
 ```

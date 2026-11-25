@@ -9,14 +9,22 @@ import sys
 from pathlib import Path
 
 IGNORE_DIRS = {
-    ".git", "node_modules", ".venv", "__pycache__", ".terraform", "dist", "build",
+    ".git", "node_modules", ".venv", "venv", "__pycache__", ".terraform", "dist", "build",
+    "coverage", ".next", "target", "vendor",
     ".opencode", ".claude", ".cursor", ".windsurf", ".cline", ".agents",
+    ".codex", ".gemini", ".openclaw", ".goose", ".aider", ".githooks",
+    "zips", "premium-zips",
 }
 
 
 def should_skip(fp: Path, root: Path) -> bool:
     rel = fp.relative_to(root).parts if fp != root else fp.parts
-    return any(p in IGNORE_DIRS for p in rel) or (len(rel) >= 2 and rel[0] == ".github" and rel[1] == "skills")
+    if any(p in IGNORE_DIRS for p in rel):
+        return True
+    for i in range(len(rel) - 1):
+        if rel[i] == ".github" and rel[i + 1] == "skills":
+            return True
+    return False
 
 
 def audit_graphql(path: Path) -> list[dict]:

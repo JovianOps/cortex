@@ -8,11 +8,28 @@ import json
 import sys
 from pathlib import Path
 
+SKIP_DIRS = {
+    ".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build",
+    ".pytest_cache", ".mypy_cache", ".ruff_cache", ".tox",
+    ".opencode", ".claude", ".cursor", ".windsurf", ".cline", ".agents",
+    ".codex", ".gemini", ".openclaw", ".goose", ".aider", "zips", "premium-zips",
+}
+
+
+def should_skip(fp: Path, root: Path) -> bool:
+    rel = fp.relative_to(root).parts if fp != root else fp.parts
+    if any(part in SKIP_DIRS for part in rel):
+        return True
+    for i in range(len(rel) - 1):
+        if rel[i] == ".github" and rel[i + 1] == "skills":
+            return True
+    return False
+
 
 def audit_python_file(path: Path) -> list[dict]:
     findings: list[dict] = []
     try:
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=path.as_posix())
+        tree = ast.parse(path.read_text(encoding="utf-8", errors="replace"), filename=path.as_posix())
     except SyntaxError as exc:
         return [{"severity": "CRITICAL", "rule": "syntax-error", "file": path.as_posix(), "line": exc.lineno or 1, "message": str(exc)}]
 
@@ -57,7 +74,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: Path not found: {args.target}", file=sys.stderr)
         return 2
 
-    files = [args.target] if args.target.is_file() else sorted(args.target.rglob("*.py"))
+    files = [args.target] if args.target.is_file() else sorted(
+        p for p in args.target.rglob("*.py") if p.is_file() and not should_skip(p, args.target)
+    )
     findings: list[dict] = []
     for fp in files:
         findings.extend(audit_python_file(fp))

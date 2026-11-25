@@ -8,11 +8,30 @@ import re
 import sys
 from pathlib import Path
 
-SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "dist", "build", "zips", "premium-zips"}
+SKIP_DIRS = {
+    ".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build",
+    "coverage", ".next", "target", "vendor", ".terraform", ".pytest_cache",
+    ".opencode", ".claude", ".cursor", ".windsurf", ".cline", ".agents",
+    ".codex", ".gemini", ".openclaw", ".goose", ".aider", ".githooks",
+    "zips", "premium-zips",
+}
 SSN_RE = re.compile(r"\b(?!000|666|9\d{2})\d{3}-(?!00)\d{2}-(?!0000)\d{4}\b")
 CC_RE = re.compile(r"\b(?:\d[ -]*?){13,16}\b")
-LOG_PII_RE = re.compile(r"(?i)\b(?:logger\.\w+|logging\.\w+|console\.log|print)\s*\([^)]*\b(?:ssn|social_security|credit_card|card_number|password|passport_no|dob)\b")
+LOG_PII_RE = re.compile(
+    r"(?i)\b(?:logger\.\w+|logging\.\w+|console\.(?:log|info|warn|error|debug)|print)\s*\([^)]*\b"
+    r"(?:ssn|social_security|credit_card|card_number|password|passport_no|dob|tax_id|national_id|drivers_license|bank_account|iban|api_key|access_token|refresh_token)\b"
+)
 EMAIL_RE = re.compile(r"\b[A-Za-z0-9._%+-]+@(?!example\.com\b|example\.org\b|users\.noreply\.github\.com\b|test\.local\b)[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
+
+
+def should_skip(fp: Path, root: Path) -> bool:
+    rel = fp.relative_to(root).parts if fp != root else fp.parts
+    if any(part in SKIP_DIRS for part in rel):
+        return True
+    for i in range(len(rel) - 1):
+        if rel[i] == ".github" and rel[i + 1] == "skills":
+            return True
+    return False
 
 
 def luhn_valid(digits: str) -> bool:
@@ -39,6 +58,9 @@ def redact(val: str) -> str:
 def scan_file(path: Path, check_emails: bool = False) -> list[dict]:
     findings: list[dict] = []
     for idx, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+        stripped = line.lstrip()
+        if stripped.startswith(("#", "//", "/*", "*")):
+            continue
         for m in SSN_RE.finditer(line):
             findings.append({
                 "file": path.as_posix(),
@@ -57,13 +79,13 @@ def scan_file(path: Path, check_emails: bool = False) -> list[dict]:
                     "rule": "pii-luhn-payment-card",
                     "message": f"Possible Luhn-valid payment card number detected ({redact(digits)}).",
                 })
-        if LOG_PII_RE.search(line):
+        if "re.compile(" not in line and LOG_PII_RE.search(line):
             findings.append({
                 "file": path.as_posix(),
                 "line": idx,
                 "severity": "HIGH",
                 "rule": "pii-logged-sensitive-field",
-                "message": "Sensitive PII field appears inside a log/print statement; redact before emitting logs.",
+                "message": "Sensitive PII/credential field appears inside a log/print statement; redact before emitting logs.",
             })
         if check_emails:
             for m in EMAIL_RE.finditer(line):
@@ -91,7 +113,7 @@ def main(argv: list[str] | None = None) -> int:
     exts = {".py", ".ts", ".tsx", ".js", ".jsx", ".go", ".rs", ".java", ".json", ".yaml", ".yml", ".csv", ".log", ".sql", ".txt"}
     files = [args.target] if args.target.is_file() else sorted(
         p for p in args.target.rglob("*")
-        if p.is_file() and p.suffix.lower() in exts and not any(part in SKIP_DIRS for part in p.parts)
+        if p.is_file() and p.suffix.lower() in exts and not should_skip(p, args.target)
     )
     findings: list[dict] = []
     for fp in files:

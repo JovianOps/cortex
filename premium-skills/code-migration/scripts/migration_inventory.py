@@ -8,8 +8,23 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-IGNORED = {".git", "node_modules", ".venv", "__pycache__", "dist", "build"}
+IGNORED = {
+    ".git", "node_modules", ".venv", "venv", "__pycache__", "dist", "build",
+    "coverage", ".next", "target", "vendor", ".pytest_cache", ".mypy_cache",
+    ".opencode", ".claude", ".cursor", ".windsurf", ".cline", ".agents",
+    ".codex", ".gemini", ".openclaw", ".goose", ".aider", "zips", "premium-zips",
+}
 MANIFEST_NAMES = {"package.json", "pyproject.toml", "requirements.txt", "go.mod", "Cargo.toml", "pom.xml", "Gemfile"}
+
+
+def should_skip(fp: Path, root: Path) -> bool:
+    rel = fp.relative_to(root).parts
+    if any(part in IGNORED for part in rel):
+        return True
+    for i in range(len(rel) - 1):
+        if rel[i] == ".github" and rel[i + 1] == "skills":
+            return True
+    return False
 
 
 def build_inventory(root: Path) -> dict:
@@ -18,7 +33,7 @@ def build_inventory(root: Path) -> dict:
     manifests: list[str] = []
 
     for fp in sorted(root.rglob("*")):
-        if not fp.is_file() or any(part in IGNORED for part in fp.relative_to(root).parts):
+        if not fp.is_file() or should_skip(fp, root):
             continue
         if fp.name in MANIFEST_NAMES:
             manifests.append(fp.relative_to(root).as_posix())

@@ -268,7 +268,7 @@ class TestUnifiedPolicyAndSarifScanner(unittest.TestCase):
 
             # Policy ignoring graphql rule causes pass
             (proj / ".cortex-policy.json").write_text(json.dumps({
-                "schema_version": "2.0.0",
+                "schema_version": "3.0.0",
                 "fail_on": "high",
                 "ignore_rules": ["gql-unbounded-list-query"],
             }), encoding="utf-8")

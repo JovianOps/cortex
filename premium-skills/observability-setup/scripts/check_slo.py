@@ -9,10 +9,26 @@ import sys
 from decimal import Decimal
 from pathlib import Path
 
+SKIP_DIRS = {
+    ".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build",
+    "coverage", ".next", "target", "vendor", ".pytest_cache",
+    ".opencode", ".claude", ".cursor", ".windsurf", ".cline", ".agents",
+    ".codex", ".gemini", ".openclaw", ".goose", ".aider", "zips", "premium-zips",
+}
 HIGH_CARDINALITY_LABELS = {
     "user_id", "userid", "request_id", "requestid", "trace_id", "span_id",
     "email", "ip", "client_ip", "session_id", "uuid", "order_id", "timestamp",
 }
+
+
+def should_skip(fp: Path, root: Path) -> bool:
+    rel = fp.relative_to(root).parts if fp != root else fp.parts
+    if any(part in SKIP_DIRS for part in rel):
+        return True
+    for i in range(len(rel) - 1):
+        if rel[i] == ".github" and rel[i + 1] == "skills":
+            return True
+    return False
 
 
 def compute_error_budget(slo_percent: Decimal, window_days: int) -> dict:
@@ -36,9 +52,13 @@ def compute_error_budget(slo_percent: Decimal, window_days: int) -> dict:
 
 def scan_labels(path: Path) -> list[dict]:
     findings: list[dict] = []
-    files = [path] if path.is_file() else sorted(p for p in path.rglob("*") if p.is_file() and p.suffix in {".py", ".ts", ".js", ".go", ".yml", ".yaml", ".json"})
+    files = [path] if path.is_file() else sorted(
+        p for p in path.rglob("*")
+        if p.is_file() and p.suffix in {".py", ".ts", ".js", ".go", ".yml", ".yaml", ".json"}
+        and not should_skip(p, path)
+    )
     for fp in files:
-        for idx, line in enumerate(fp.read_text(encoding="utf-8", errors="ignore").splitlines(), 1):
+        for idx, line in enumerate(fp.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
             for label in HIGH_CARDINALITY_LABELS:
                 if re.search(rf'["\']{re.escape(label)}["\']', line) and re.search(r'(?i)(label|tag|metric|counter|histogram|gauge|prom)', line):
                     findings.append({

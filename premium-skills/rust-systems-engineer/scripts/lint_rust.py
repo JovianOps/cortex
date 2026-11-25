@@ -8,24 +8,52 @@ import re
 import sys
 from pathlib import Path
 
-SKIP_DIRS = {"target", ".git", "node_modules"}
+SKIP_DIRS = {
+    "target", ".git", "node_modules", ".venv", "__pycache__", "dist", "build",
+    ".opencode", ".claude", ".cursor", ".windsurf", ".cline", ".agents",
+    ".codex", ".gemini", ".openclaw", ".goose", ".aider", "zips", "premium-zips",
+}
+
+
+def should_skip(fp: Path, root: Path) -> bool:
+    rel = fp.relative_to(root).parts if fp != root else fp.parts
+    if any(part in SKIP_DIRS for part in rel):
+        return True
+    for i in range(len(rel) - 1):
+        if rel[i] == ".github" and rel[i + 1] == "skills":
+            return True
+    return False
 
 
 def audit_rust_file(path: Path) -> list[dict]:
     findings: list[dict] = []
     lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
-    in_cfg_test = False
+    pending_cfg_test = False
+    cfg_test_depth = 0
     for idx, line in enumerate(lines, 1):
         stripped = line.strip()
         if "#[cfg(test)]" in stripped:
-            in_cfg_test = True
+            pending_cfg_test = True
+        if pending_cfg_test and "{" in stripped:
+            cfg_test_depth += stripped.count("{") - stripped.count("}")
+            if cfg_test_depth <= 0:
+                pending_cfg_test = False
+                cfg_test_depth = 0
+            continue
+        in_cfg_test = cfg_test_depth > 0 or pending_cfg_test
+        if cfg_test_depth > 0:
+            cfg_test_depth += stripped.count("{") - stripped.count("}")
+            if cfg_test_depth <= 0:
+                cfg_test_depth = 0
+                pending_cfg_test = False
         if stripped.startswith("//"):
             continue
 
         if re.search(r"\bunsafe\s*\{", line):
             prev = lines[idx - 2].strip() if idx >= 2 else ""
             prev2 = lines[idx - 3].strip() if idx >= 3 else ""
-            if "SAFETY:" not in prev and "SAFETY:" not in prev2:
+            nxt = lines[idx].strip() if idx < len(lines) else ""
+            if "SAFETY:" not in line and "SAFETY:" not in prev and "SAFETY:" not in prev2 and "SAFETY:" not in nxt:
                 findings.append({
                     "file": path.as_posix(),
                     "line": idx,
@@ -34,7 +62,7 @@ def audit_rust_file(path: Path) -> list[dict]:
                     "message": "unsafe block lacks an adjacent '// SAFETY:' invariant comment.",
                 })
 
-        if not in_cfg_test:
+        if not in_cfg_test and not path.name.endswith("_test.rs"):
             if ".unwrap()" in line:
                 findings.append({
                     "file": path.as_posix(),
@@ -100,7 +128,7 @@ def main(argv: list[str] | None = None) -> int:
             rs_files.append(args.target)
     else:
         for p in sorted(args.target.rglob("*")):
-            if any(part in SKIP_DIRS for part in p.parts) or not p.is_file():
+            if not p.is_file() or should_skip(p, args.target):
                 continue
             if p.suffix == ".rs":
                 rs_files.append(p)

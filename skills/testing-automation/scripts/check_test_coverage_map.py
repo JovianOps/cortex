@@ -8,6 +8,23 @@ import json
 import sys
 from pathlib import Path
 
+SKIP_DIRS = {
+    ".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build",
+    ".pytest_cache", ".mypy_cache", ".ruff_cache", ".tox",
+    ".opencode", ".claude", ".cursor", ".windsurf", ".cline", ".agents",
+    ".codex", ".gemini", ".openclaw", ".goose", ".aider", "zips", "premium-zips",
+}
+
+
+def should_skip(fp: Path, root: Path) -> bool:
+    rel = fp.relative_to(root).parts if fp != root else fp.parts
+    if any(part in SKIP_DIRS for part in rel):
+        return True
+    for i in range(len(rel) - 1):
+        if rel[i] == ".github" and rel[i + 1] == "skills":
+            return True
+    return False
+
 
 def has_assertion(func: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
     for node in ast.walk(func):
@@ -25,8 +42,19 @@ def has_assertion(func: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
 
 def scan_tests(test_dir: Path) -> list[dict]:
     findings: list[dict] = []
-    for fp in sorted(test_dir.rglob("test_*.py")):
-        tree = ast.parse(fp.read_text(encoding="utf-8"), filename=fp.as_posix())
+    for fp in sorted(p for p in test_dir.rglob("test_*.py") if p.is_file() and not should_skip(p, test_dir)):
+        try:
+            tree = ast.parse(fp.read_text(encoding="utf-8", errors="replace"), filename=fp.as_posix())
+        except SyntaxError as exc:
+            findings.append({
+                "severity": "CRITICAL",
+                "rule": "syntax-error",
+                "file": fp.as_posix(),
+                "line": exc.lineno or 1,
+                "test": "<module>",
+                "message": f"SyntaxError parsing test file: {exc.msg}",
+            })
+            continue
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith("test_"):
                 if not has_assertion(node):

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jovianops.github.io/cortex/schemas/policy.schema.json",
-  "title": "Cortex Unified Scanner Policy (.cortex-policy.json v2.0.0)",
+  "title": "Cortex Unified Scanner Policy (.cortex-policy.json v3.0.0)",
   "type": "object",
   "additionalProperties": false,
   "properties": {

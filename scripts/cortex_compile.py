@@ -228,9 +228,19 @@ def compile_rules(
         else:
             raise ValueError(f"Unsupported compile target: {tgt!r}")
 
+    deduped: list[tuple[Path, str]] = []
+    seen_paths: dict[Path, int] = {}
+    for path, content in planned:
+        resolved_out = path.resolve()
+        if resolved_out in seen_paths:
+            deduped[seen_paths[resolved_out]] = (path, content)
+        else:
+            seen_paths[resolved_out] = len(deduped)
+            deduped.append((path, content))
+
     results: list[dict] = []
     drift_count = 0
-    for path, content in planned:
+    for path, content in deduped:
         rel = path.relative_to(project_dir).as_posix()
         existing = path.read_text(encoding="utf-8") if path.is_file() else None
         changed = existing != content

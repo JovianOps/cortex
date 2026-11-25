@@ -83,7 +83,7 @@ class TestSkillAuditGates(unittest.TestCase):
             "---\n"
             f"name: {name}\n"
             "description: Stub skill used by the audit tests.\n"
-            "version: 2.0.0\n"
+            "version: 3.0.0\n"
             "author: test\n"
             "license: MIT\n"
             "platforms: [linux]\n"

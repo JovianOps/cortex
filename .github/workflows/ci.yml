@@ -59,8 +59,10 @@ jobs:
       - name: Run automated test suite
         run: python -m unittest discover -s tests -v
 
-      - name: Run Cortex CLI doctor smoke check
-        run: python scripts/cortex.py doctor
+      - name: Run Cortex CLI doctor & guard smoke checks
+        run: |
+          python scripts/cortex.py doctor --json
+          python scripts/cortex.py guard check --json
 
   cross-platform-cli:
     name: Cross-Platform CLI (${{ matrix.os }})
@@ -111,8 +113,8 @@ jobs:
       - name: Verify index.html JS, checksums/packs parity, and WCAG 2.2 AA
         run: python scripts/verify_site.py
 
-      - name: Check README.md local links and heading anchors
-        run: python skills/documentation-generator/scripts/check_docs.py README.md
+      - name: Check README.md and docs/ local links and heading anchors
+        run: python skills/documentation-generator/scripts/check_docs.py README.md docs
 
   package-smoke-test:
     name: npm Package Smoke Test
@@ -143,11 +145,16 @@ jobs:
             cd "$TMPDIR"
             ./node_modules/.bin/cortex detect
             ./node_modules/.bin/cortex doctor --json
+            ./node_modules/.bin/cortex verify --json
+            ./node_modules/.bin/cortex graph --check --json
+            ./node_modules/.bin/cortex guard check --json
             ./node_modules/.bin/cortex packs
             ./node_modules/.bin/cortex search --has-script
             ./node_modules/.bin/cortex audit --json
             ./node_modules/.bin/cortex scan . --json --only secrets
+            ./node_modules/.bin/cortex install --agent windsurf --skill security-auditor --scope project
             ./node_modules/.bin/cortex install --agent claude-code --pack fullstack --scope project
+            test -f "$TMPDIR/.windsurf/skills/security-auditor/scripts/secret_scan.py"
             test -f "$TMPDIR/.claude/skills/security-auditor/scripts/secret_scan.py"
           )
 

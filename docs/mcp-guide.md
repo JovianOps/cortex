@@ -1,6 +1,6 @@
 # Cortex MCP Server Guide (`cortex mcp`)
 
-Cortex `v2.0.0` includes a zero-dependency **Model Context Protocol (MCP 2025-03-26)** JSON-RPC 2.0 server over stdio, supporting both `Content-Length` framed (LSP-style) and newline-delimited JSON-RPC transport.
+Cortex `v3.0.0` includes a zero-dependency **Model Context Protocol (MCP 2025-03-26)** JSON-RPC 2.0 server over stdio, supporting both `Content-Length` framed (LSP-style) and newline-delimited JSON-RPC transport.
 
 ## Quick Start
 
@@ -38,7 +38,7 @@ npx @jovianops/cortex mcp --print-config opencode
 
 ## Exposed MCP Capabilities
 
-### 1. Tools (8)
+### 1. Tools (11)
 
 | Tool Name | Purpose |
 | :--- | :--- |
@@ -50,12 +50,16 @@ npx @jovianops/cortex mcp --print-config opencode
 | `cortex_run_verifier` | Safely execute any skill's bundled Python verifier inside `--project-dir` |
 | `cortex_compile_rules` | Compile skills/packs into native Cursor, VS Code, Windsurf, Cline, Claude, AGENTS, or Gemini rules |
 | `cortex_scan_repo` | Execute the unified multi-tool security/quality scanner across the workspace |
+| `cortex_skill_graph` | Build the skill/pack capability graph with hubs, orphans, and dangling references |
+| `cortex_build_bundle` | Package a verified deterministic offline skill bundle ZIP inside the workspace |
+| `cortex_release_gate` | Run Cortex's full 6-gate release verification (`package`, `skills`, `manifests`, `audit`, `graph`, `scan`) |
 
-### 2. Resources (38)
+### 2. Resources (39)
 
 - `cortex://skills/<slug>` — Live `SKILL.md` Markdown for all 36 skills
 - `cortex://packs` — Canonical `packs.json`
 - `cortex://checksums` — Canonical `checksums.json`
+- `cortex://graph` — Live capability graph JSON (`cortex graph`)
 
 ### 3. Prompts (36)
 
@@ -63,5 +67,5 @@ Every skill is registered as an invocable MCP Prompt (`cortex/<slug>`) accepting
 
 ## Security Model
 
-- **Workspace Confinement**: All file/directory arguments passed to `cortex_run_verifier` are canonicalized via `Path.resolve()` and verified with `relative_to(workspace_dir)`. Any path escaping the workspace root is rejected before execution.
+- **Workspace Confinement**: All file/directory arguments passed to `cortex_run_verifier` and `cortex_build_bundle` are canonicalized via `Path.resolve()` and verified with `relative_to(workspace_dir)`. Any path escaping the workspace root is rejected before execution.
 - **No Shell Interpolation**: All verifier invocations use `subprocess.run([...])` with explicit argument lists and a 60-second execution timeout.

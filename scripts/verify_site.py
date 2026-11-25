@@ -2,6 +2,7 @@
 """Verify index.html integrity: inline JS syntax, checksums.json/packs.json parity, and WCAG 2.2 AA."""
 from __future__ import annotations
 
+import argparse
 import json
 import subprocess
 import sys
@@ -91,11 +92,32 @@ def check_accessibility() -> None:
         raise RuntimeError(f"Accessibility scan failed:\n{res.stdout}\n{res.stderr}")
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--json", action="store_true", dest="as_json", help="Emit JSON verification summary.")
+    args = parser.parse_args(argv)
+
     html = INDEX_HTML.read_text(encoding="utf-8")
-    check_inline_js(html)
-    skill_count, pack_count = check_data_parity(html)
-    check_accessibility()
+    try:
+        check_inline_js(html)
+        skill_count, pack_count = check_data_parity(html)
+        check_accessibility()
+    except RuntimeError as exc:
+        if args.as_json:
+            print(json.dumps({"ok": False, "error": str(exc)}, indent=2))
+            return 1
+        raise
+
+    if args.as_json:
+        print(json.dumps({
+            "ok": True,
+            "skills": skill_count,
+            "packs": pack_count,
+            "inline_js_ok": True,
+            "wcag_22_aa_ok": True,
+        }, indent=2))
+        return 0
+
     print(f"Verified index.html: inline JS syntax OK, {skill_count} skills & {pack_count} packs in sync with checksums.json, WCAG 2.2 AA OK.")
     return 0
 

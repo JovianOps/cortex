@@ -127,7 +127,7 @@ STUDIO_HTML = """<!DOCTYPE html>
       <div class="split">
         <div class="box">
           <h2>Skill Catalog</h2>
-          <input type="search" id="skillFilter" placeholder="Filter by slug, tier, or script..." />
+          <input type="search" id="skillFilter" aria-label="Filter skills by slug, tier, or script" placeholder="Filter by slug, tier, or script..." />
           <div class="list" id="skillList"></div>
         </div>
         <div class="box">
@@ -146,8 +146,8 @@ STUDIO_HTML = """<!DOCTYPE html>
       <div class="box">
         <h2>Execute Any Bundled Python Verifier Live</h2>
         <div class="toolbar">
-          <select id="runnerSkill" style="max-width:300px;margin:0;"></select>
-          <input type="text" id="runnerTarget" value="." placeholder="Relative path inside workspace" style="max-width:340px;margin:0;" />
+          <select id="runnerSkill" aria-label="Select bundled verifier skill" style="max-width:300px;margin:0;"></select>
+          <input type="text" id="runnerTarget" aria-label="Relative path inside workspace" value="." placeholder="Relative path inside workspace" style="max-width:340px;margin:0;" />
           <button type="button" class="accent-btn" id="btnExecTool">Run Verifier</button>
         </div>
         <pre id="runnerOut">Select a skill verifier and click Run Verifier.</pre>
@@ -158,7 +158,7 @@ STUDIO_HTML = """<!DOCTYPE html>
       <div class="box">
         <h2>Universal Agent Rule Compiler (cortex compile)</h2>
         <div class="toolbar">
-          <select id="compilePack" style="max-width:260px;margin:0;"></select>
+          <select id="compilePack" aria-label="Select role pack to compile" style="max-width:260px;margin:0;"></select>
           <button type="button" id="btnCompileDry">Preview (Dry Run)</button>
           <button type="button" class="accent-btn" id="btnCompileWrite">Compile &amp; Write Files</button>
         </div>
@@ -180,7 +180,7 @@ STUDIO_HTML = """<!DOCTYPE html>
       <div class="box">
         <h2>Unified Policy &amp; SARIF 2.1.0 Repository Scanner</h2>
         <div class="toolbar">
-          <select id="scanFailOn" style="max-width:180px;margin:0;">
+          <select id="scanFailOn" aria-label="Minimum failure severity threshold" style="max-width:180px;margin:0;">
             <option value="high" selected>fail-on: high</option>
             <option value="critical">fail-on: critical</option>
             <option value="medium">fail-on: medium</option>
@@ -198,7 +198,7 @@ STUDIO_HTML = """<!DOCTYPE html>
       <div class="box">
         <h2>Model Context Protocol (MCP) Client Configuration</h2>
         <div class="toolbar">
-          <select id="mcpClient" style="max-width:220px;margin:0;">
+          <select id="mcpClient" aria-label="Select MCP client target" style="max-width:220px;margin:0;">
             <option value="vscode">Visual Studio Code (.vscode/mcp.json)</option>
             <option value="claude-code">Claude Code (.mcp.json)</option>
             <option value="cursor">Cursor (.cursor/mcp.json)</option>
@@ -218,6 +218,7 @@ STUDIO_HTML = """<!DOCTYPE html>
         <div class="toolbar">
           <button type="button" class="accent-btn" id="btnLoadGraph">Build Graph (JSON)</button>
           <button type="button" id="btnLoadMermaid">Mermaid Diagram</button>
+          <button type="button" id="btnLoadDot">DOT Diagram</button>
           <button type="button" id="btnRunGuard">Run Release Gate</button>
         </div>
         <pre id="graphOut">Build the graph to inspect hubs, orphans, pack coverage, and dangling related-skill edges.</pre>
@@ -356,6 +357,7 @@ STUDIO_HTML = """<!DOCTYPE html>
     }
     $("btnLoadGraph").onclick = () => loadGraph("json");
     $("btnLoadMermaid").onclick = () => loadGraph("mermaid");
+    $("btnLoadDot").onclick = () => loadGraph("dot");
     $("btnRunGuard").onclick = async () => {
       $("graphOut").textContent = "Running Cortex release gate...";
       const data = await api("/api/guard", {

@@ -17,7 +17,7 @@ premium-skills/<kebab-slug>/
 ---
 name: my-skill-slug
 description: Concise <=60-char action sentence ending in a period.
-version: 2.0.0
+version: 3.0.0
 author: Athalla Jovian Maharsa (athallajovian9-cyber), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -31,7 +31,7 @@ metadata:
 ## Required Sections in `SKILL.md`
 
 1. `## When to Use` + `### When Not to Use` (clear trigger boundary)
-2. `## How to Run` (including a `> **Bundled Helper Script (\`v2.0.0\`):**` callout)
+2. `## How to Run` (including a `> **Bundled Helper Script (\`v3.0.0\`):**` callout)
 3. Numbered `## Mandatory ... Protocol` steps with explicit stop gates
 4. `## Output Contract` defining concrete deliverables
 

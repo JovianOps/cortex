@@ -20,8 +20,8 @@ python scripts/cortex_graph.py
 # Human-reviewable Mermaid diagram for docs or PRs
 python scripts/cortex_graph.py --format mermaid --out docs/capability-graph.mmd
 
-# Graphviz DOT for rendering
-python scripts/cortex_graph.py --format dot --out capability-graph.dot
+# Graphviz DOT for rendering (optionally scoped to one or more packs)
+python scripts/cortex_graph.py --format dot --pack cloud-native --out capability-graph.dot
 
 # CI gate: fail on dangling pack/related references
 python scripts/cortex_graph.py --check

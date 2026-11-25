@@ -8,10 +8,26 @@ import re
 import sys
 from pathlib import Path
 
+SKIP_DIRS = {
+    ".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build",
+    "coverage", ".next", "target", "vendor", ".pytest_cache",
+    ".opencode", ".claude", ".cursor", ".windsurf", ".cline", ".agents",
+    ".codex", ".gemini", ".openclaw", ".goose", ".aider", "zips", "premium-zips",
+}
+
+
+def should_skip(fp: Path, root: Path) -> bool:
+    rel = fp.relative_to(root).parts if fp != root else fp.parts
+    if any(part in SKIP_DIRS for part in rel):
+        return True
+    for i in range(len(rel) - 1):
+        if rel[i] == ".github" and rel[i + 1] == "skills":
+            return True
+    return False
+
 
 def lint_sql_text(text: str, filename: str) -> list[dict]:
     findings: list[dict] = []
-    # Strip -- line comments while keeping line numbers intact
     lines = text.splitlines()
     for idx, raw in enumerate(lines, 1):
         code = raw.split("--", 1)[0].strip()
@@ -54,19 +70,21 @@ def lint_sql_text(text: str, filename: str) -> list[dict]:
                 "message": "ORDER BY RANDOM() forces a full-table sort.",
             })
 
-    # Statement-level check for DELETE/UPDATE without WHERE
+    # Statement-level check for DELETE/UPDATE without WHERE (with accurate start line)
+    offset = 0
     for stmt in re.split(r";", text):
         cleaned = re.sub(r"--[^\n]*", "", stmt).strip()
-        if not cleaned:
-            continue
-        if re.match(r"(?i)^(DELETE\s+FROM|UPDATE)\b", cleaned) and not re.search(r"(?i)\bWHERE\b", cleaned):
-            findings.append({
-                "severity": "CRITICAL",
-                "rule": "dml-without-where",
-                "file": filename,
-                "line": 1,
-                "message": "DELETE/UPDATE statement has no WHERE clause and will mutate every row.",
-            })
+        if cleaned:
+            stmt_ln = text[:offset].count("\n") + 1
+            if re.match(r"(?i)^(DELETE\s+FROM|UPDATE)\b", cleaned) and not re.search(r"(?i)\bWHERE\b", cleaned):
+                findings.append({
+                    "severity": "CRITICAL",
+                    "rule": "dml-without-where",
+                    "file": filename,
+                    "line": stmt_ln,
+                    "message": "DELETE/UPDATE statement has no WHERE clause and will mutate every row.",
+                })
+        offset += len(stmt) + 1
 
     return findings
 
@@ -80,10 +98,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: Path not found: {args.target}", file=sys.stderr)
         return 2
 
-    files = [args.target] if args.target.is_file() else sorted(args.target.rglob("*.sql"))
+    files = [args.target] if args.target.is_file() else sorted(
+        p for p in args.target.rglob("*.sql") if p.is_file() and not should_skip(p, args.target)
+    )
     findings: list[dict] = []
     for fp in files:
-        findings.extend(lint_sql_text(fp.read_text(encoding="utf-8", errors="ignore"), fp.as_posix()))
+        findings.extend(lint_sql_text(fp.read_text(encoding="utf-8", errors="replace"), fp.as_posix()))
 
     if args.as_json:
         print(json.dumps({"files_checked": len(files), "count": len(findings), "findings": findings}, indent=2))

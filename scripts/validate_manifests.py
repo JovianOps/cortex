@@ -2,6 +2,7 @@
 """Validate all multi-agent plugin, marketplace, and extension manifests."""
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -68,7 +69,11 @@ def validate_skill_list(rel: str, skills: object, expected_all: set[str], requir
         errors.append(f"{rel}: skill list mismatch (missing={missing}, extra={extra})")
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--json", action="store_true", dest="as_json", help="Emit JSON validation summary.")
+    args = parser.parse_args(argv)
+
     errors: list[str] = []
     expected_all = set(all_skill_paths())
     versions: dict[str, str] = {}
@@ -150,6 +155,17 @@ def main() -> int:
         schema_data = load_json(schema_rel, errors)
         if schema_data is not None and "$schema" not in schema_data:
             errors.append(f"{schema_rel}: missing '$schema' key")
+
+    if args.as_json:
+        ver = next(iter(versions.values()), "") if not errors else ""
+        print(json.dumps({
+            "ok": not errors,
+            "version": ver,
+            "manifests_checked": len(PLUGIN_MANIFESTS) + len(MARKETPLACE_MANIFESTS) + 1,
+            "skills_count": len(expected_all),
+            "errors": errors,
+        }, indent=2))
+        return 1 if errors else 0
 
     if errors:
         for err in errors:

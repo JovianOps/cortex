@@ -114,8 +114,9 @@ def build_checksums_manifest() -> dict:
     }
 
 
-def package(check: bool) -> int:
+def package(check: bool, *, as_json: bool = False) -> int:
     problems: list[str] = []
+    created: list[str] = []
     for source_dir, archive_dir in COLLECTIONS:
         sources = skill_sources(ROOT / source_dir)
         output = ROOT / archive_dir
@@ -142,7 +143,9 @@ def package(check: bool) -> int:
                         info.compress_type = zipfile.ZIP_DEFLATED
                         info.external_attr = 0o644 << 16
                         archive.writestr(info, normalized_bytes(src_path))
-                print(f"Created {destination.relative_to(ROOT)} ({len(members)} file(s))")
+                created.append(destination.relative_to(ROOT).as_posix())
+                if not as_json:
+                    print(f"Created {destination.relative_to(ROOT)} ({len(members)} file(s))")
 
     expected_manifest = build_checksums_manifest()
     if check:
@@ -157,7 +160,19 @@ def package(check: bool) -> int:
                 problems.append(f"checksums.json: invalid JSON ({exc})")
     else:
         CHECKSUMS_FILE.write_text(json.dumps(expected_manifest, indent=2) + "\n", encoding="utf-8")
-        print(f"Wrote {CHECKSUMS_FILE.relative_to(ROOT)} ({expected_manifest['skill_count']} skills)")
+        if not as_json:
+            print(f"Wrote {CHECKSUMS_FILE.relative_to(ROOT)} ({expected_manifest['skill_count']} skills)")
+
+    if as_json:
+        print(json.dumps({
+            "ok": not problems,
+            "mode": "check" if check else "build",
+            "version": expected_manifest["release_version"],
+            "skill_count": expected_manifest["skill_count"],
+            "archives_written": len(created),
+            "problems": problems,
+        }, indent=2))
+        return 1 if problems else 0
 
     if problems:
         for problem in problems:
@@ -168,10 +183,12 @@ def package(check: bool) -> int:
     return 0
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="verify archives and checksums without writing")
-    return package(parser.parse_args().check)
+    parser.add_argument("--json", action="store_true", dest="as_json", help="Emit JSON result.")
+    args = parser.parse_args(argv)
+    return package(args.check, as_json=args.as_json)
 
 
 if __name__ == "__main__":
