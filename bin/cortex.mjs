@@ -11,6 +11,9 @@ const candidates = process.platform === 'win32' ? ['python', 'py', 'python3'] : 
 for (const bin of candidates) {
   const res = spawnSync(bin, args, { stdio: 'inherit' });
   if (!res.error) {
+    if (res.signal) {
+      process.kill(process.pid, res.signal);
+    }
     process.exit(res.status ?? 0);
   }
 }

@@ -529,6 +529,65 @@ class TestHardeningAndCliFixes(unittest.TestCase):
             df.write_text("FROM --platform=$BUILDPLATFORM alpine:3.20\nUSER app\nHEALTHCHECK CMD true\n", encoding="utf-8")
             self.assertEqual(dock_mod.lint_dockerfile(df), [])
 
+    def test_parallel_scan_strict_validation_mcp_pack_studio_headers_and_diff_semver_defaults(self) -> None:
+        # Unknown --only scanner ID fails with exit 2 instead of false-pass
+        bad_only = subprocess.run(
+            [sys.executable, str(SCRIPTS / "cortex_scan.py"), str(ROOT), "--only", "nonexistent-scanner"],
+            cwd=ROOT, capture_output=True, text=True,
+        )
+        self.assertEqual(bad_only.returncode, 2)
+        self.assertIn("Unknown scanner", bad_only.stderr)
+
+        # Missing explicit --policy file fails with exit 2
+        bad_pol = subprocess.run(
+            [sys.executable, str(SCRIPTS / "cortex_scan.py"), str(ROOT), "--policy", "does-not-exist.json"],
+            cwd=ROOT, capture_output=True, text=True,
+        )
+        self.assertEqual(bad_pol.returncode, 2)
+
+        # MCP cortex_skill_graph accepts packs filter
+        mcp_mod = load_mod("cortex_mcp_pack_graph", SCRIPTS / "cortex_mcp.py")
+        server = mcp_mod.CortexMCPServer(ROOT)
+        resp = server.handle_request({
+            "jsonrpc": "2.0", "id": 11, "method": "tools/call",
+            "params": {"name": "cortex_skill_graph", "arguments": {"format": "json", "packs": ["cloud-native"]}},
+        })
+        assert resp is not None
+        g = json.loads(resp["result"]["content"][0]["text"])
+        self.assertEqual(g["pack_count"], 1)
+        self.assertEqual(g["skill_count"], 6)
+
+        # Studio security headers & /api/graph?pack=cloud-native&format=dot
+        studio_mod = load_mod("cortex_studio_headers", SCRIPTS / "cortex_studio.py")
+        http_srv = studio_mod.create_server("127.0.0.1", 0, ROOT)
+        port = http_srv.server_address[1]
+        thr = threading.Thread(target=http_srv.serve_forever, daemon=True)
+        thr.start()
+        try:
+            with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/graph?pack=cloud-native&format=dot", timeout=15) as r:
+                self.assertEqual(r.headers.get("X-Content-Type-Options"), "nosniff")
+                self.assertEqual(r.headers.get("Cache-Control"), "no-store")
+                payload = json.loads(r.read().decode("utf-8"))
+                self.assertIn('"pack:cloud-native"', payload["graph"])
+        finally:
+            http_srv.shutdown()
+            http_srv.server_close()
+
+        # diff_review accepts directory & semver_bump auto-detects version from package.json
+        diff_res = subprocess.run(
+            [sys.executable, str(ROOT / "skills/code-review-assistant/scripts/diff_review.py"), str(ROOT), "--json"],
+            cwd=ROOT, capture_output=True, text=True,
+        )
+        self.assertIn(diff_res.returncode, (0, 1), msg=diff_res.stderr)
+        self.assertIn("files_changed", json.loads(diff_res.stdout))
+
+        semver_res = subprocess.run(
+            [sys.executable, str(ROOT / "premium-skills/release-engineering/scripts/semver_bump.py"), str(ROOT), "--json"],
+            cwd=ROOT, capture_output=True, text=True,
+        )
+        self.assertEqual(semver_res.returncode, 0, msg=semver_res.stderr)
+        self.assertEqual(json.loads(semver_res.stdout)["current"], PKG_VERSION)
+
 
 if __name__ == "__main__":
     unittest.main()

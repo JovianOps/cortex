@@ -41,7 +41,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: Document not found: {args.document}", file=sys.stderr)
         return 2
 
-    verified, missing = verify_claims(args.document.read_text(encoding="utf-8"), args.repo)
+    verified, missing = verify_claims(args.document.read_text(encoding="utf-8", errors="replace"), args.repo)
     if args.as_json:
         print(json.dumps({"verified": verified, "missing": missing, "ok": not missing}, indent=2))
     elif not missing:

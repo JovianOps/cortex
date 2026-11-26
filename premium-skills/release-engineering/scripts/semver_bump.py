@@ -9,6 +9,7 @@ import argparse
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 SEMVER_RE = re.compile(r"^v?(\d+)\.(\d+)\.(\d+)$")
@@ -20,6 +21,27 @@ def parse_version(raw: str) -> tuple[int, int, int]:
     if not m:
         raise ValueError(f"Invalid SemVer version: {raw!r}")
     return int(m.group(1)), int(m.group(2)), int(m.group(3))
+
+
+def detect_current_version(target_dir: Path) -> str:
+    pkg = target_dir / "package.json"
+    if pkg.is_file():
+        try:
+            ver = json.loads(pkg.read_text(encoding="utf-8")).get("version", "")
+            if SEMVER_RE.match(str(ver)):
+                return str(ver)
+        except (OSError, json.JSONDecodeError):
+            pass
+    res = subprocess.run(
+        ["git", "describe", "--tags", "--abbrev=0"],
+        cwd=target_dir,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if res.returncode == 0 and SEMVER_RE.match(res.stdout.strip()):
+        return res.stdout.strip()
+    return "0.1.0"
 
 
 def compute_bump(current: str, commits: list[str]) -> dict:
@@ -63,31 +85,46 @@ def compute_bump(current: str, commits: list[str]) -> dict:
     return {"current": f"{major}.{minor}.{patch}", "bump": level, "next": next_ver, "sections": grouped}
 
 
-def read_git_commits(since_ref: str | None) -> list[str]:
+def read_git_commits(since_ref: str | None, cwd: Path | None = None) -> list[str]:
     rev = f"{since_ref}..HEAD" if since_ref else "HEAD"
     res = subprocess.run(
         ["git", "log", rev, "--format=%s%n%b%x1e"],
+        cwd=cwd,
         capture_output=True,
         text=True,
-        check=True,
+        check=False,
     )
+    if res.returncode != 0:
+        return []
     return [chunk.strip() for chunk in res.stdout.split("\x1e") if chunk.strip()]
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Compute next SemVer release & changelog from Conventional Commits.")
-    parser.add_argument("--current", required=True, help="Current SemVer version (e.g., 0.2.0).")
+    parser.add_argument("target", nargs="?", type=Path, default=Path("."), help="Optional git repository directory (used when --current is omitted).")
+    parser.add_argument("--current", default=None, help="Current SemVer version (auto-detected from package.json/git tag if omitted).")
     parser.add_argument("--since", default=None, help="Git ref/tag to read commits from (default: all commits).")
     parser.add_argument("--commits-file", type=Path, default=None, help="Optional file of commit messages (one per line).")
     parser.add_argument("--json", action="store_true", dest="as_json", help="Emit JSON output.")
     args = parser.parse_args(argv)
 
-    if args.commits_file:
-        commits = [ln for ln in args.commits_file.read_text(encoding="utf-8").splitlines() if ln.strip()]
-    else:
-        commits = read_git_commits(args.since)
+    repo_dir = args.target if args.target.is_dir() else Path.cwd()
+    current = args.current or detect_current_version(repo_dir)
 
-    result = compute_bump(args.current, commits)
+    if args.commits_file:
+        if not args.commits_file.is_file():
+            print(f"ERROR: Commits file not found: {args.commits_file}", file=sys.stderr)
+            return 2
+        commits = [ln for ln in args.commits_file.read_text(encoding="utf-8", errors="replace").splitlines() if ln.strip()]
+    else:
+        commits = read_git_commits(args.since, cwd=repo_dir)
+
+    try:
+        result = compute_bump(current, commits)
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
     if args.as_json:
         print(json.dumps(result, indent=2))
     else:

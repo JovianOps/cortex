@@ -7,20 +7,20 @@
       "collection": "core",
       "dir": "skills",
       "zip": "zips/academic-assistant.zip",
-      "zip_sha256": "91f8151591996c1fd4d62d8ed7d5d655a1a568fbde7c7315878b0881ae69044f",
+      "zip_sha256": "d2f882a2abd7c31a3ea6ef58401218b4979567386c75b962f0b297587d87ecc7",
       "files": {
         "SKILL.md": "b40b06c4fcf5f5cb026e69c1cdc9c9f98f00b68a0b7146e442f728d1443e8430",
-        "scripts/citation_check.py": "13b7b848ae2b6e0875a29a519ef2dc28d03d2caaeadf9787b33a68f7ed1bc2e1"
+        "scripts/citation_check.py": "422aa863019703be8fcb628184740a213e4558ab396bdd23b95fd369cac9c26d"
       }
     },
     "anti-hallucination": {
       "collection": "core",
       "dir": "skills",
       "zip": "zips/anti-hallucination.zip",
-      "zip_sha256": "ed5888529cccf38a2647a19860c19b942c01b87fdb086b7ef502c726077b0af6",
+      "zip_sha256": "c033ef89f0328d5f212bd193cc501bfca99731492d749a66fc8ee65022e7c3f5",
       "files": {
         "SKILL.md": "27b686ec51c85d6cdc2dceb12c600b1ef83e8e292bcd23982f36659b274d07c5",
-        "scripts/verify_claims.py": "56bc5bcbf6f305870531cc52e68df4690fc25fc032c1e2096acdc8b07b47751b"
+        "scripts/verify_claims.py": "fe93689becc0bdc8c33c667cde23925a4a482d5075c998fff8a1b4f6884820d8"
       }
     },
     "blender-3d-modeling": {
@@ -37,10 +37,10 @@
       "collection": "core",
       "dir": "skills",
       "zip": "zips/code-review-assistant.zip",
-      "zip_sha256": "24a5da47a671286e82435ddcdaf88c35ff9d047a374a3855a86ae0985d8fbae9",
+      "zip_sha256": "a2452c0fc86ecf0e6ab4836f512201651d97944bca1e1042c8244c4ac094967b",
       "files": {
         "SKILL.md": "3673277f9eda89e936c48c39f916c022ed743c1ca3d36e51549fff1c79257c6c",
-        "scripts/diff_review.py": "9806ce17bb251930e554f2d51391d69d69ff05837c86de13741ba841a4e99c1a"
+        "scripts/diff_review.py": "f399ec57e1175c60722cb282af5cf1ae603536f091e575850291f2b46c2d3ae0"
       }
     },
     "college-report-card": {
@@ -297,10 +297,10 @@
       "collection": "extended",
       "dir": "premium-skills",
       "zip": "premium-zips/release-engineering.zip",
-      "zip_sha256": "e114404d3bf84fa7969dc358bf21c22fcad3632261115e3a1cec5bebbaac3720",
+      "zip_sha256": "de6e5f2654ea445a9bebb8bc53c06554cdca53610c1050d148fc5431d6c79a1b",
       "files": {
         "SKILL.md": "3d71916d79c38699ed205f56de5721b5fe519aca741fd4debed5ae4f92737e78",
-        "scripts/semver_bump.py": "565c275376b83084839b21bc703c7ef2ad244f19bcc87ff8d90e49389bde6ff5"
+        "scripts/semver_bump.py": "2b95902e52b3d36dbd9b7a227e2d8c848695e43e28154d30f172ea0e45b31247"
       }
     },
     "rust-systems-engineer": {

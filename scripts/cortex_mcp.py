@@ -163,6 +163,7 @@ class CortexMCPServer:
                     "type": "object",
                     "properties": {
                         "format": {"type": "string", "enum": ["json", "mermaid", "dot"], "default": "json"},
+                        "packs": {"type": "array", "items": {"type": "string"}, "description": "Optional role pack IDs to scope the subgraph."},
                     },
                 },
             },
@@ -275,12 +276,15 @@ class CortexMCPServer:
 
         if name == "cortex_skill_graph":
             graph_mod = load_local_module("cortex_graph")
-            graph = graph_mod.build_graph(ROOT)
+            packs = [str(p) for p in args["packs"]] if isinstance(args.get("packs"), list) and args["packs"] else None
+            graph = graph_mod.build_graph(ROOT, packs_filter=packs)
             fmt = str(args.get("format") or "json")
             if fmt == "mermaid":
                 return {"format": fmt, "graph": graph_mod.to_mermaid(graph), "ok": graph["ok"]}
             if fmt == "dot":
                 return {"format": fmt, "graph": graph_mod.to_dot(graph), "ok": graph["ok"]}
+            if fmt != "json":
+                raise ValueError(f"Unsupported graph format: {fmt!r}")
             return graph
 
         if name == "cortex_build_bundle":

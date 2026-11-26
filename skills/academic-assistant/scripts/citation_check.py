@@ -37,7 +37,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: File not found: {args.draft}", file=sys.stderr)
         return 2
 
-    res = audit_citations(args.draft.read_text(encoding="utf-8"))
+    res = audit_citations(args.draft.read_text(encoding="utf-8", errors="replace"))
     if args.as_json:
         print(json.dumps(res, indent=2))
     elif res["ok"]:

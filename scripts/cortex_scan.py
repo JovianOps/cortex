@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import fnmatch
 import json
 import subprocess
@@ -33,11 +34,16 @@ SCANNER_SPECS: list[tuple[str, str, str, str | None]] = [
     ("llm", "llm-security-auditor", "premium-skills/llm-security-auditor/scripts/audit_prompts.py", None),
     ("git", "git-history-surgeon", "premium-skills/git-history-surgeon/scripts/audit_git_hygiene.py", None),
 ]
+VALID_SCANNER_IDS = frozenset(spec[0] for spec in SCANNER_SPECS)
 
 
 def load_policy(policy_path: Path | None, target_dir: Path) -> dict:
-    candidate = policy_path or (target_dir / ".cortex-policy.json")
-    if candidate and candidate.is_file():
+    if policy_path is not None:
+        if not policy_path.is_file():
+            raise FileNotFoundError(f"Policy file not found: {policy_path}")
+        return json.loads(policy_path.read_text(encoding="utf-8"))
+    candidate = target_dir / ".cortex-policy.json"
+    if candidate.is_file():
         return json.loads(candidate.read_text(encoding="utf-8"))
     return {"fail_on": "high", "disabled_scanners": [], "ignore_rules": [], "ignore_paths": []}
 
@@ -48,8 +54,10 @@ def normalize_finding(scanner_id: str, skill: str, raw: dict, target_dir: Path) 
         fp = Path(file_val)
         if fp.is_absolute():
             file_val = fp.resolve().relative_to(target_dir.resolve()).as_posix()
+        else:
+            file_val = file_val.replace("\\", "/")
     except ValueError:
-        pass
+        file_val = file_val.replace("\\", "/")
     sev = str(raw.get("severity", "MEDIUM")).upper()
     if sev not in SEVERITY_RANK:
         sev = "MEDIUM"
@@ -64,46 +72,90 @@ def normalize_finding(scanner_id: str, skill: str, raw: dict, target_dir: Path) 
     }
 
 
+def _matches_ignored_path(rel_path: str, patterns: list[str]) -> bool:
+    norm = rel_path.replace("\\", "/").lstrip("./")
+    for raw_pat in patterns:
+        pat = raw_pat.replace("\\", "/").lstrip("./")
+        if fnmatch.fnmatch(norm, pat):
+            return True
+        if pat.endswith("/**") and (norm == pat[:-3] or norm.startswith(pat[:-2])):
+            return True
+        if pat.endswith("/*") and norm.startswith(pat[:-1]):
+            return True
+    return False
+
+
+def _run_single_scanner(
+    spec: tuple[str, str, str, str | None],
+    target_dir: Path,
+    timeout: int,
+) -> tuple[str, str, list[dict], int] | None:
+    scanner_id, skill, script_rel, sub = spec
+    script_path = ROOT / script_rel
+    if not script_path.is_file():
+        return None
+    scan_target = (target_dir / sub) if sub else target_dir
+    if not scan_target.exists():
+        return None
+
+    cmd = [sys.executable, str(script_path), str(scan_target), "--json"]
+    res = subprocess.run(cmd, cwd=target_dir, check=False, capture_output=True, text=True, timeout=timeout)
+    raw_findings: list[dict] = []
+    if res.stdout.strip():
+        try:
+            parsed = json.loads(res.stdout)
+            if isinstance(parsed, dict) and isinstance(parsed.get("findings"), list):
+                raw_findings = parsed["findings"]
+            elif isinstance(parsed, list):
+                raw_findings = parsed
+        except json.JSONDecodeError:
+            pass
+    return scanner_id, skill, raw_findings, res.returncode
+
+
 def run_scan(
     target_dir: Path,
     *,
     only: list[str] | None = None,
     policy: dict | None = None,
     fail_on_override: str | None = None,
+    timeout: int = 60,
 ) -> dict:
+    if only:
+        unknown = sorted(set(only) - VALID_SCANNER_IDS)
+        if unknown:
+            raise ValueError(
+                f"Unknown scanner(s): {', '.join(unknown)}. Valid scanners: {', '.join(sorted(VALID_SCANNER_IDS))}"
+            )
     pol = policy or {}
-    enabled = set(only) if only else (set(pol["enabled_scanners"]) if pol.get("enabled_scanners") else {s[0] for s in SCANNER_SPECS})
+    enabled = set(only) if only else (set(pol["enabled_scanners"]) if pol.get("enabled_scanners") else set(VALID_SCANNER_IDS))
     disabled = set(pol.get("disabled_scanners", []))
     ignore_rules = set(pol.get("ignore_rules", []))
     ignore_paths = list(pol.get("ignore_paths", []))
     fail_on = (fail_on_override or pol.get("fail_on") or "high").lower()
 
+    active_specs = [
+        spec for spec in SCANNER_SPECS
+        if spec[0] in enabled and spec[0] not in disabled
+    ]
+    raw_results: dict[str, tuple[str, str, list[dict], int] | None] = {}
+    if len(active_specs) <= 1:
+        for spec in active_specs:
+            raw_results[spec[0]] = _run_single_scanner(spec, target_dir, timeout)
+    else:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(8, len(active_specs))) as pool:
+            futures = {pool.submit(_run_single_scanner, spec, target_dir, timeout): spec[0] for spec in active_specs}
+            for fut in concurrent.futures.as_completed(futures):
+                sid = futures[fut]
+                raw_results[sid] = fut.result()
+
     findings: list[dict] = []
     scanners_run: list[dict] = []
-
-    for scanner_id, skill, script_rel, sub in SCANNER_SPECS:
-        if scanner_id not in enabled or scanner_id in disabled:
+    for spec in active_specs:
+        entry = raw_results.get(spec[0])
+        if entry is None:
             continue
-        script_path = ROOT / script_rel
-        if not script_path.is_file():
-            continue
-        scan_target = (target_dir / sub) if sub else target_dir
-        if not scan_target.exists():
-            continue
-
-        cmd = [sys.executable, str(script_path), str(scan_target), "--json"]
-        res = subprocess.run(cmd, cwd=target_dir, check=False, capture_output=True, text=True, timeout=60)
-        raw_findings: list[dict] = []
-        if res.stdout.strip():
-            try:
-                parsed = json.loads(res.stdout)
-                if isinstance(parsed, dict) and isinstance(parsed.get("findings"), list):
-                    raw_findings = parsed["findings"]
-                elif isinstance(parsed, list):
-                    raw_findings = parsed
-            except json.JSONDecodeError:
-                pass
-
+        scanner_id, skill, raw_findings, rc = entry
         kept = 0
         for rf in raw_findings:
             if not isinstance(rf, dict):
@@ -111,16 +163,15 @@ def run_scan(
             nf = normalize_finding(scanner_id, skill, rf, target_dir)
             if nf["rule"] in ignore_rules:
                 continue
-            if any(fnmatch.fnmatch(nf["file"], pat) for pat in ignore_paths):
+            if _matches_ignored_path(nf["file"], ignore_paths):
                 continue
             findings.append(nf)
             kept += 1
-
         scanners_run.append({
             "scanner": scanner_id,
             "skill": skill,
             "findings": kept,
-            "exit_code": res.returncode,
+            "exit_code": rc,
         })
 
     counts = {k: 0 for k in ("CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO")}
@@ -209,6 +260,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--format", "-f", choices=("table", "json", "sarif", "junit"), default="table")
     parser.add_argument("--json", action="store_true", dest="as_json", help="Emit JSON output (alias for --format json).")
     parser.add_argument("--init-policy", action="store_true", help="Write a starter .cortex-policy.json in the target directory.")
+    parser.add_argument("--timeout", type=int, default=60, help="Per-scanner timeout in seconds (default: 60).")
     parser.add_argument("--output", "-o", type=Path, default=None, help="Optional file path to write report.")
     args = parser.parse_args(argv)
 
@@ -233,8 +285,13 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Policy already exists at {policy_dest}")
         return 0
 
-    pol = load_policy(args.policy, target)
-    report = run_scan(target, only=args.only or None, policy=pol, fail_on_override=args.fail_on)
+    try:
+        pol = load_policy(args.policy, target)
+        report = run_scan(target, only=args.only or None, policy=pol, fail_on_override=args.fail_on, timeout=args.timeout)
+    except (FileNotFoundError, ValueError, json.JSONDecodeError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
     fmt = "json" if args.as_json else args.format
 
     if fmt == "json":

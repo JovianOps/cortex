@@ -216,6 +216,9 @@ STUDIO_HTML = """<!DOCTYPE html>
       <div class="box">
         <h2>Skill &amp; Role-Pack Capability Graph (cortex graph)</h2>
         <div class="toolbar">
+          <select id="graphPack" aria-label="Filter capability graph by role pack" style="max-width:240px;margin:0;">
+            <option value="">All role packs (10)</option>
+          </select>
           <button type="button" class="accent-btn" id="btnLoadGraph">Build Graph (JSON)</button>
           <button type="button" id="btnLoadMermaid">Mermaid Diagram</button>
           <button type="button" id="btnLoadDot">DOT Diagram</button>
@@ -251,7 +254,11 @@ STUDIO_HTML = """<!DOCTYPE html>
 
     async function api(path, opts) {
       const res = await fetch(path, opts);
-      return res.json();
+      const data = await res.json();
+      if (!res.ok && data && !data.error) {
+        data.error = "HTTP " + res.status;
+      }
+      return data;
     }
 
     function renderSkillList() {
@@ -336,10 +343,12 @@ STUDIO_HTML = """<!DOCTYPE html>
     $("btnDownloadSarif").onclick = () => {
       if (!state.lastSarif) { $("scanOut").textContent = "Run Unified Scan first to generate SARIF 2.1.0 output."; return; }
       const blob = new Blob([JSON.stringify(state.lastSarif, null, 2)], { type: "application/sarif+json" });
+      const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
+      a.href = url;
       a.download = "cortex-scan.sarif";
       a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
 
     async function loadMcp() {
@@ -352,12 +361,16 @@ STUDIO_HTML = """<!DOCTYPE html>
 
     async function loadGraph(fmt) {
       $("graphOut").textContent = "Building capability graph...";
-      const data = await api("/api/graph?format=" + encodeURIComponent(fmt));
+      const pack = $("graphPack").value;
+      const qs = new URLSearchParams({ format: fmt });
+      if (pack) qs.set("pack", pack);
+      const data = await api("/api/graph?" + qs.toString());
       $("graphOut").textContent = typeof data.graph === "string" ? data.graph : JSON.stringify(data, null, 2);
     }
     $("btnLoadGraph").onclick = () => loadGraph("json");
     $("btnLoadMermaid").onclick = () => loadGraph("mermaid");
     $("btnLoadDot").onclick = () => loadGraph("dot");
+    $("graphPack").onchange = () => loadGraph("json");
     $("btnRunGuard").onclick = async () => {
       $("graphOut").textContent = "Running Cortex release gate...";
       const data = await api("/api/guard", {
@@ -402,12 +415,19 @@ STUDIO_HTML = """<!DOCTYPE html>
 
       state.packs = pk.packs || {};
       const pSel = $("compilePack");
+      const gSel = $("graphPack");
       pSel.textContent = "";
+      gSel.textContent = "";
+      const allOpt = document.createElement("option");
+      allOpt.value = "";
+      allOpt.textContent = "All role packs (" + Object.keys(state.packs).length + ")";
+      gSel.appendChild(allOpt);
       Object.entries(state.packs).forEach(([id, meta]) => {
         const opt = document.createElement("option");
         opt.value = id;
         opt.textContent = id + " — " + meta.label;
         pSel.appendChild(opt);
+        gSel.appendChild(opt.cloneNode(true));
       });
       loadMcp();
     }
@@ -435,6 +455,9 @@ def make_handler(workspace_dir: Path):
             self.send_response(status)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(raw)))
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("Referrer-Policy", "no-referrer")
+            self.send_header("Cache-Control", "no-store")
             self.end_headers()
             self.wfile.write(raw)
 
@@ -443,6 +466,8 @@ def make_handler(workspace_dir: Path):
             self.send_response(HTTPStatus.OK)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(raw)))
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("Referrer-Policy", "no-referrer")
             self.end_headers()
             self.wfile.write(raw)
 
@@ -532,7 +557,12 @@ def make_handler(workspace_dir: Path):
                 return
 
             if path == "/api/graph":
-                graph = graph_mod.build_graph(ROOT)
+                packs_param = [p for p in (qs.get("pack") or []) if p]
+                try:
+                    graph = graph_mod.build_graph(ROOT, packs_filter=packs_param or None)
+                except ValueError as exc:
+                    self._send_json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+                    return
                 fmt = (qs.get("format") or ["json"])[0]
                 if fmt == "mermaid":
                     self._send_json({"format": fmt, "graph": graph_mod.to_mermaid(graph), "ok": graph["ok"]})
