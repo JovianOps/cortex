@@ -3745,6 +3745,16 @@
         .replace(/'/g, '&#39;');
     }
 
+    function captureEvent(event, properties) {
+      if (window.posthog) window.posthog.capture(event, properties);
+    }
+
+    function logCatalogAction(level, message, attributes) {
+      if (window.posthog && window.posthog.logger && typeof window.posthog.logger[level] === 'function') {
+        window.posthog.logger[level](message, attributes);
+      }
+    }
+
     function copyText(text, btn, label) {
       const done = () => {
         if (btn) {
@@ -3874,6 +3884,8 @@
       });
       renderCommands();
       if (state.inspectSlug) openDrawer(state.inspectSlug);
+      captureEvent('platform_selected', { platform_id: targetId, platform_label: t ? t.label : targetId });
+      logCatalogAction('info', 'catalog platform selected', { platform_id: targetId });
       if (announce && t) showToast(`Target switched to ${t.label}`);
     }
 
@@ -4281,7 +4293,10 @@
         </div>
       `;
 
-      $('drawerCopyCmd').addEventListener('click', (e) => copyText(installCmd, e.currentTarget));
+      $('drawerCopyCmd').addEventListener('click', (e) => {
+        copyText(installCmd, e.currentTarget);
+        captureEvent('install_command_copied', { source: 'skill_drawer', platform_id: state.target, shell: state.shell, skill_slug: s.slug });
+      });
       $('drawerCopySha').addEventListener('click', (e) => copyText(s.sha256, e.currentTarget));
       $('drawerToggleSel').addEventListener('click', () => {
         if (state.selected.has(s.slug)) state.selected.delete(s.slug);
@@ -4384,6 +4399,7 @@
             renderCatalog();
             renderCommands();
             $('builder').scrollIntoView({ behavior: 'smooth' });
+            captureEvent('skill_pack_loaded', { pack_id: p.id, skill_count: p.skills.length, source: 'command_palette' });
             showToast(`Loaded pack: ${p.id}`);
           }
         });
@@ -4577,6 +4593,11 @@
       $('scanFixToggle').addEventListener('click', () => {
         state.scanFixed = !state.scanFixed;
         renderScannerSim();
+        captureEvent('scanner_fix_toggled', { fixture_id: state.scanFixture, hardened: state.scanFixed });
+        logCatalogAction('info', 'scanner fixture state changed', {
+          fixture_id: state.scanFixture,
+          hardened: state.scanFixed
+        });
         showToast(state.scanFixed ? 'Applied hardened fix — 0 findings' : 'Restored vulnerable fixture');
       });
       document.querySelectorAll('[data-scan-fmt]').forEach((btn) => {
@@ -4590,11 +4611,21 @@
       // Compiler controls
       $('compileSkillSel').addEventListener('change', renderCompileSim);
       $('compileTargetSel').addEventListener('change', renderCompileSim);
-      $('compileCopyBtn').addEventListener('click', (e) => copyText($('compilePreview').textContent, e.currentTarget, 'Copied compiled rule'));
+      $('compileCopyBtn').addEventListener('click', (e) => {
+        copyText($('compilePreview').textContent, e.currentTarget, 'Copied compiled rule');
+        captureEvent('compiled_rule_copied', { skill_slug: $('compileSkillSel').value, target_format: $('compileTargetSel').value });
+        logCatalogAction('info', 'compiled rule copied', {
+          skill_slug: $('compileSkillSel').value,
+          target_format: $('compileTargetSel').value
+        });
+      });
 
       // MCP controls
       $('mcpClientSel').addEventListener('change', renderMcpSim);
-      $('mcpCopyBtn').addEventListener('click', (e) => copyText($('mcpConfigPreview').textContent, e.currentTarget, 'Copied MCP client config'));
+      $('mcpCopyBtn').addEventListener('click', (e) => {
+        copyText($('mcpConfigPreview').textContent, e.currentTarget, 'Copied MCP client config');
+        captureEvent('mcp_config_copied', { client: $('mcpClientSel').value });
+      });
       document.querySelectorAll('[data-mcp-tab]').forEach((btn) => {
         btn.addEventListener('click', () => {
           state.mcpTab = btn.dataset.mcpTab;
@@ -4730,6 +4761,7 @@
             renderCatalog();
             renderCommands();
             $('builder').scrollIntoView({ behavior: 'smooth' });
+            captureEvent('skill_pack_loaded', { pack_id: p.id, skill_count: p.skills.length, source: 'pack_card' });
             showToast(`Loaded pack: ${p.id} (${p.skills.length} skills)`);
           }
           return;
@@ -4738,6 +4770,7 @@
         if (copyBtn) {
           const cmd = `npx @jovianops/cortex install --agent claude-code --pack ${copyBtn.dataset.copyPack}`;
           copyText(cmd, copyBtn, `Copied CLI for ${copyBtn.dataset.copyPack}`);
+          captureEvent('install_command_copied', { source: 'pack_card', platform_id: 'cortex-cli', pack_id: copyBtn.dataset.copyPack });
         }
       });
 
@@ -4749,6 +4782,7 @@
           state.selected = new Set(p.skills);
           renderCatalog();
           renderCommands();
+          captureEvent('skill_pack_loaded', { pack_id: p.id, skill_count: p.skills.length, source: 'builder_pack_pill' });
           showToast(`Selected pack: ${p.id}`);
         }
       });
@@ -4761,8 +4795,14 @@
       });
 
       // Copy buttons
-      $('heroCopy').addEventListener('click', (e) => copyText($('heroCmd').textContent, e.currentTarget));
-      $('builderCopy').addEventListener('click', (e) => copyText($('builderCmd').textContent, e.currentTarget));
+      $('heroCopy').addEventListener('click', (e) => {
+        copyText($('heroCmd').textContent, e.currentTarget);
+        captureEvent('install_command_copied', { source: 'hero', platform_id: state.target, shell: state.shell });
+      });
+      $('builderCopy').addEventListener('click', (e) => {
+        copyText($('builderCmd').textContent, e.currentTarget);
+        captureEvent('install_command_copied', { source: 'builder', platform_id: state.target, shell: state.shell, selected_skill_count: state.selected.size });
+      });
       $('verifyCopy').addEventListener('click', (e) => copyText($('verifyCmd').textContent, e.currentTarget));
       document.querySelectorAll('[data-copy]').forEach((btn) => {
         btn.addEventListener('click', () => copyText(btn.dataset.copy, btn));
@@ -4772,7 +4812,38 @@
       $('drawerClose').addEventListener('click', closeDrawer);
     }
 
+    function initializePostHog() {
+      const token = window.POSTHOG_PROJECT_TOKEN;
+      const host = window.POSTHOG_HOST;
+      if (!token || !host) {
+        if (['localhost', '127.0.0.1'].includes(window.location.hostname)) {
+          const missing = token ? 'POSTHOG_HOST' : 'POSTHOG_PROJECT_TOKEN';
+          throw new Error(`${missing} variable required by PostHog is missing or un-configured, this causes events to be silently missed. This error stops appearing once ${missing} is configured`);
+        }
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = `${host.replace(/\/$/, '')}/static/array.js`;
+      script.onload = () => window.posthog && window.posthog.init(token, {
+        api_host: host,
+        capture_exceptions: {
+          capture_unhandled_errors: true,
+          capture_unhandled_rejections: true,
+          capture_console_errors: false
+        },
+        logs: {
+          serviceName: 'cortex-catalog',
+          environment: ['localhost', '127.0.0.1'].includes(window.location.hostname) ? 'development' : 'production',
+          serviceVersion: '3.0.0'
+        }
+      });
+      document.head.appendChild(script);
+    }
+
     init();
+    initializePostHog();
   </script>
 </body>
 </html>
