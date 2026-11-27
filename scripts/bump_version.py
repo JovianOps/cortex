@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -86,8 +87,10 @@ def bump_all(new_version: str, *, quiet: bool = False) -> dict:
         pkg_cmd.append("--json")
     subprocess.run(pkg_cmd, cwd=ROOT, check=True, stdout=subprocess.DEVNULL if quiet else None)
 
-    # 6. Sync index.html chrome version, full SKILLS array (from disk + checksums.json), and PACKS array (from packs.json)
-    checksums = json.loads((ROOT / "checksums.json").read_text(encoding="utf-8"))
+    # 6. Sync index.html chrome version, checksums.json SHA-256, SKILLS array, and PACKS array
+    checksums_bytes = (ROOT / "checksums.json").read_bytes()
+    checksums_sha = hashlib.sha256(checksums_bytes).hexdigest()
+    checksums = json.loads(checksums_bytes.decode("utf-8"))
     packs_data = json.loads((ROOT / "packs.json").read_text(encoding="utf-8"))
     html_path = ROOT / "index.html"
     html = html_path.read_text(encoding="utf-8")
@@ -99,6 +102,13 @@ def bump_all(new_version: str, *, quiet: bool = False) -> dict:
             f'<span class="kv-v">{old_version}</span>',
         ):
             html = html.replace(pattern, pattern.replace(old_version, new_version))
+
+    html = re.sub(
+        r'(<code[^>]*id="checksumsManifestSha"[^>]*>)[0-9a-f]{64}(</code>\s*<button[^>]*data-copy=")[0-9a-f]{64}(")',
+        rf"\g<1>{checksums_sha}\g<2>{checksums_sha}\g<3>",
+        html,
+        count=1,
+    )
 
     skills_js: list[dict] = []
     for folder, tier, zip_dir in (("skills", "core", "zips"), ("premium-skills", "extended", "premium-zips")):

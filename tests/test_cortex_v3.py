@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import importlib.util
 import io
 import json
@@ -587,6 +588,22 @@ class TestHardeningAndCliFixes(unittest.TestCase):
         )
         self.assertEqual(semver_res.returncode, 0, msg=semver_res.stderr)
         self.assertEqual(json.loads(semver_res.stdout)["current"], PKG_VERSION)
+
+    def test_catalog_site_integrity_graph_tab_and_checksums_sha(self) -> None:
+        verify_res = subprocess.run(
+            [sys.executable, str(SCRIPTS / "verify_site.py"), "--json"],
+            cwd=ROOT, capture_output=True, text=True,
+        )
+        self.assertEqual(verify_res.returncode, 0, msg=verify_res.stdout + verify_res.stderr)
+        vdata = json.loads(verify_res.stdout)
+        self.assertTrue(vdata["ok"])
+        self.assertTrue(vdata["wcag_22_aa_ok"])
+
+        html = (ROOT / "index.html").read_text(encoding="utf-8")
+        expected_sha = hashlib.sha256((ROOT / "checksums.json").read_bytes()).hexdigest()
+        self.assertIn(f'id="checksumsManifestSha" class="ledger-val">{expected_sha}</code>', html)
+        for token in ('id="rt-graph"', 'data-term="guard"', '<option value="opencode">', "id: 'windsurf'", "id: 'bundle-zip'"):
+            self.assertIn(token, html)
 
 
 if __name__ == "__main__":

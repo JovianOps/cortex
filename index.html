@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>cortex — deterministic agent skills &amp; runtime (v3.0.0)</title>
-  <meta name="description" content="36 versioned SKILL.md playbooks, 36 zero-dependency Python helper scripts, native MCP 2025-03-26 server, Local Studio UI, Universal Rule Compiler, SARIF 2.1.0 scanner, 10 role packs, and SHA-256 verification." />
+  <meta name="description" content="36 versioned SKILL.md playbooks, 36 zero-dependency Python helper scripts, native MCP 2025-03-26 server, Local Studio UI, 8-target Universal Rule Compiler, 14-verifier SARIF 2.1.0 scanner, capability graph, portable bundles, 10 role packs, and SHA-256 verification." />
   <link rel="canonical" href="https://jovianops.github.io/cortex/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Cortex" />
   <meta property="og:url" content="https://jovianops.github.io/cortex/" />
   <meta property="og:title" content="Cortex — deterministic agent skills &amp; runtime" />
-  <meta property="og:description" content="36 SKILL.md playbooks with bundled Python verifiers, native MCP server, rule compiler, SARIF scanner and SHA-256 integrity — for every major AI coding agent." />
+  <meta property="og:description" content="36 SKILL.md playbooks with bundled Python verifiers, native MCP server, 8-target rule compiler, SARIF scanner, capability graph, offline bundles, and SHA-256 integrity — across 13 agent targets." />
   <meta property="og:image" content="https://jovianops.github.io/cortex/assets/og-cover.png" />
   <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1200" />
@@ -869,7 +869,7 @@
 
     .runtime-nav {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       border-bottom: 1px solid var(--border);
       background: var(--surface-alt);
     }
@@ -1121,10 +1121,89 @@
       background: var(--bg);
     }
 
+    /* ---------- Graph explorer & Studio cards ---------- */
+    .graph-stage {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      overflow: hidden;
+    }
+
+    .graph-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      min-height: 280px;
+    }
+
+    .graph-node { cursor: pointer; }
+    .graph-node:hover rect { stroke: var(--accent); }
+    .graph-edge { transition: opacity 0.14s var(--ease), stroke 0.14s var(--ease); }
+
+    .graph-inspector {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 12px;
+      border-top: 1px solid var(--border);
+      background: var(--surface-alt);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    .engine-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .engine-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-soft);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .engine-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .engine-card p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .engine-card code {
+      display: block;
+      font-size: 11px;
+      padding: 7px 9px;
+      border-radius: 4px;
+      background: var(--code-bg);
+      color: var(--code-fg);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
     /* ---------- Platform matrix ---------- */
     .platforms-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       border-top: 1px solid var(--border-strong);
       border-left: 1px solid var(--border-strong);
       background: var(--surface);
@@ -1319,6 +1398,45 @@
       border-bottom: 1px solid var(--border-strong);
       background: var(--surface-alt);
       white-space: nowrap;
+    }
+
+    .sort-btn {
+      border: 0;
+      background: transparent;
+      padding: 0;
+      font: inherit;
+      letter-spacing: inherit;
+      text-transform: inherit;
+      color: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sort-btn:hover { color: var(--ink); }
+    .sort-btn.active { color: var(--accent); }
+
+    .sel-bar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding: 9px 14px;
+      border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+      border-radius: var(--radius-sm);
+      background: var(--accent-soft);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .sel-bar.show { display: flex; }
+
+    .drawer-box.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-soft);
     }
 
     table.idx td {
@@ -2032,9 +2150,9 @@
         border-bottom: 1px solid var(--border);
       }
       .ctl-field { flex: 1; max-width: 330px; }
-      .runtime-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .runtime-nav button:nth-child(2) { border-right: 0; }
-      .runtime-nav button:nth-child(1), .runtime-nav button:nth-child(2) { border-bottom: 1px solid var(--border); }
+      .runtime-nav { grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); }
+      .runtime-nav button { border-bottom: 1px solid var(--border); }
+      .engine-cards { grid-template-columns: 1fr; }
       .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .specs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .spec:nth-child(2) { border-right: 0; }
@@ -2189,7 +2307,7 @@
             </p>
             <h1>Deterministic skills for <span class="h1-accent">AI coding agents.</span></h1>
             <p class="lead">
-              36 versioned <code>SKILL.md</code> playbooks, 36 Python stdlib verifiers, native MCP 2025-03-26 server (<code>cortex mcp</code>), Local Studio Web Workbench (<code>cortex studio</code>), Universal Rule Compiler (<code>cortex compile</code>), SARIF 2.1.0 scanner (<code>cortex scan</code>), 10 role packs, and cryptographic SHA-256 verification.
+              36 versioned <code>SKILL.md</code> playbooks, 36 Python stdlib verifiers, native MCP 2025-03-26 server (<code>cortex mcp</code>), Local Studio UI (<code>cortex studio</code>), 8-target Rule Compiler (<code>cortex compile</code>), SARIF 2.1.0 scanner (<code>cortex scan</code>), capability graph (<code>cortex graph</code>), offline bundles, 10 role packs, and SHA-256 verification.
             </p>
           </div>
 
@@ -2202,6 +2320,7 @@
                 <button type="button" role="tab" data-term="compile" aria-selected="false">compile</button>
                 <button type="button" role="tab" data-term="mcp" aria-selected="false">mcp</button>
                 <button type="button" role="tab" data-term="detect" aria-selected="false">detect</button>
+                <button type="button" role="tab" data-term="guard" aria-selected="false">guard</button>
               </div>
               <button type="button" id="termReplay" class="term-replay" title="Replay terminal output">&#9654; replay</button>
             </div>
@@ -2264,7 +2383,7 @@
           <div>
             <span class="sec-num">01 / RUNTIME ENGINE</span>
             <h2>Live v3.0.0 Workbench</h2>
-            <p class="sec-desc">Test Cortex's four zero-dependency runtime pillars right here: simulate deterministic <code>cortex scan</code> findings &amp; fixes, transpile rules with <code>cortex compile</code>, inspect <code>cortex mcp</code>, or explore the <code>cortex studio</code> topology.</p>
+            <p class="sec-desc">Explore Cortex's zero-dependency runtime pillars right here: simulate deterministic <code>cortex scan</code> findings &amp; fixes, transpile rules across 8 formats with <code>cortex compile</code>, inspect <code>cortex mcp</code>, explore the live <code>cortex graph</code>, or launch <code>cortex studio</code> &amp; release guard.</p>
           </div>
         </div>
 
@@ -2272,19 +2391,23 @@
           <div class="runtime-nav" role="tablist" aria-label="Runtime engine tools">
             <button type="button" role="tab" data-rt="scan" aria-selected="true">
               <span class="rt-cmd">cortex scan</span>
-              <span class="rt-sub">Policy &amp; SARIF 2.1.0 simulator</span>
+              <span class="rt-sub">14-verifier SARIF 2.1.0 simulator</span>
             </button>
             <button type="button" role="tab" data-rt="compile" aria-selected="false">
               <span class="rt-cmd">cortex compile</span>
-              <span class="rt-sub">7-target rule transpiler</span>
+              <span class="rt-sub">8-target rule transpiler</span>
             </button>
             <button type="button" role="tab" data-rt="mcp" aria-selected="false">
               <span class="rt-cmd">cortex mcp</span>
               <span class="rt-sub">MCP 2025-03-26 JSON-RPC server</span>
             </button>
+            <button type="button" role="tab" data-rt="graph" aria-selected="false">
+              <span class="rt-cmd">cortex graph</span>
+              <span class="rt-sub">Live capability topology &amp; DOT</span>
+            </button>
             <button type="button" role="tab" data-rt="studio" aria-selected="false">
               <span class="rt-cmd">cortex studio</span>
-              <span class="rt-sub">Local Swiss UI &amp; topology</span>
+              <span class="rt-sub">Local UI, bundles &amp; guard</span>
             </button>
           </div>
 
@@ -2310,10 +2433,13 @@
               <div class="rt-pane">
                 <div class="rt-pane-bar">
                   <span id="scanMetaLabel">scanner output</span>
-                  <div class="seg" role="group" aria-label="Scanner output format">
-                    <button type="button" data-scan-fmt="table" aria-pressed="true">findings</button>
-                    <button type="button" data-scan-fmt="sarif" aria-pressed="false">SARIF 2.1.0</button>
-                    <button type="button" data-scan-fmt="junit" aria-pressed="false">JUnit XML</button>
+                  <div class="quick-controls">
+                    <div class="seg" role="group" aria-label="Scanner output format">
+                      <button type="button" data-scan-fmt="table" aria-pressed="true">findings</button>
+                      <button type="button" data-scan-fmt="sarif" aria-pressed="false">SARIF 2.1.0</button>
+                      <button type="button" data-scan-fmt="junit" aria-pressed="false">JUnit XML</button>
+                    </div>
+                    <button type="button" id="scanDownloadBtn" class="btn-sm" title="Download active SARIF or JUnit output">download</button>
                   </div>
                 </div>
                 <div class="scan-summary-bar" id="scanSummaryBar"></div>
@@ -2336,7 +2462,8 @@
                     <option value="windsurf">Windsurf (.windsurf/rules/*.md)</option>
                     <option value="cline">Cline (.clinerules/*.md)</option>
                     <option value="claude">Claude Code (CLAUDE.md managed block)</option>
-                    <option value="agents">Codex / OpenCode (AGENTS.md managed block)</option>
+                    <option value="agents">Codex (AGENTS.md managed block)</option>
+                    <option value="opencode">OpenCode (AGENTS.md managed block)</option>
                     <option value="gemini">Gemini CLI (GEMINI.md managed block)</option>
                   </select>
                 </div>
@@ -2362,6 +2489,7 @@
                     <option value="codex">OpenAI Codex CLI (~/.codex/config.toml)</option>
                     <option value="windsurf">Windsurf (~/.codeium/windsurf/mcp_config.json)</option>
                     <option value="opencode">OpenCode (opencode.json)</option>
+                    <option value="gemini">Gemini CLI (~/.gemini/settings.json)</option>
                   </select>
                 </div>
                 <button type="button" id="mcpCopyBtn" class="btn-sm">copy config</button>
@@ -2380,61 +2508,129 @@
             <div id="mcpSurfaceGrid" class="mcp-grid"></div>
           </div>
 
-          <!-- Panel 4: Studio & Architecture Topology -->
+          <!-- Panel 4: Live Capability Graph Explorer -->
+          <div id="rt-graph" class="runtime-panel">
+            <div class="rt-pane">
+              <div class="rt-pane-bar">
+                <div class="quick-controls">
+                  <label for="graphPackSel" class="mono">pack</label>
+                  <select id="graphPackSel" class="ctrl" aria-label="Filter capability graph by role pack"></select>
+                  <div class="seg" role="group" aria-label="Capability graph format">
+                    <button type="button" data-graph-fmt="visual" aria-pressed="true">visual map</button>
+                    <button type="button" data-graph-fmt="mermaid" aria-pressed="false">Mermaid</button>
+                    <button type="button" data-graph-fmt="dot" aria-pressed="false">DOT</button>
+                    <button type="button" data-graph-fmt="json" aria-pressed="false">JSON</button>
+                  </div>
+                </div>
+                <div class="quick-controls">
+                  <span id="graphStatsBadge" class="mono" style="color:var(--ok);"></span>
+                  <button type="button" id="graphCopyBtn" class="btn-sm">copy graph</button>
+                </div>
+              </div>
+              <div id="graphVisualWrap" class="graph-stage"></div>
+              <pre id="graphRawOut" class="raw-out" style="display:none;max-height:360px;"></pre>
+              <div id="graphInspector" class="graph-inspector">
+                <span>Hover a node to trace pack memberships; click any pack or skill to inspect.</span>
+                <span class="mono">core = emerald &middot; extended = slate</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel 5: Studio, Portable Bundles & Release Guard -->
           <div id="rt-studio" class="runtime-panel">
-            <div style="margin-bottom:14px;" class="cmd-row" >
+            <div style="margin-bottom:14px;" class="cmd-row">
               <pre><span class="prompt">$</span>npx @jovianops/cortex studio --port 4173</pre>
               <button type="button" class="copy-btn" data-copy="npx @jovianops/cortex studio --port 4173">copy</button>
             </div>
-            <svg class="topo-svg" viewBox="0 0 920 290" role="img" aria-label="Cortex v3.0.0 System Topology Diagram">
+            <svg class="topo-svg" viewBox="0 0 920 310" role="img" aria-label="Cortex v3.0.0 System Topology Diagram">
               <defs>
                 <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                   <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--border-strong)" />
                 </marker>
               </defs>
               <!-- Canonical Catalog Box -->
-              <rect x="210" y="18" width="500" height="78" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.8" />
-              <rect x="210" y="18" width="500" height="5" fill="var(--accent)" />
-              <text x="460" y="45" text-anchor="middle" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600">CORTEX CANONICAL CATALOG (v3.0.0)</text>
-              <text x="460" y="66" text-anchor="middle" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="11">36 SKILL.md + 36 Python Verifiers &middot; 10 Packs &middot; 72 SHA-256 Digests</text>
-              <text x="460" y="83" text-anchor="middle" fill="var(--ok)" font-family="IBM Plex Mono, monospace" font-size="10.5">4 JSON Schemas &middot; 36 Paired 100-pt Eval Rubrics &middot; Zero External Deps</text>
+              <rect x="190" y="16" width="540" height="74" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.8" />
+              <rect x="190" y="16" width="540" height="5" fill="var(--accent)" />
+              <text x="460" y="42" text-anchor="middle" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600">CORTEX CANONICAL CATALOG (v3.0.0)</text>
+              <text x="460" y="61" text-anchor="middle" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="11">36 SKILL.md + 36 Python Verifiers &middot; 10 Packs &middot; 72 SHA-256 Digests</text>
+              <text x="460" y="78" text-anchor="middle" fill="var(--ok)" font-family="IBM Plex Mono, monospace" font-size="10.5">13 Agent Targets &middot; 4 JSON Schemas &middot; 36 Eval Rubrics &middot; Zero External Deps</text>
 
-              <!-- Routing lines -->
-              <path d="M 300 96 L 300 132 L 118 132 L 118 164" fill="none" stroke="var(--border-strong)" stroke-width="1.5" marker-end="url(#arr)" />
-              <path d="M 405 96 L 405 132 L 346 132 L 346 164" fill="none" stroke="var(--border-strong)" stroke-width="1.5" marker-end="url(#arr)" />
-              <path d="M 515 96 L 515 132 L 574 132 L 574 164" fill="none" stroke="var(--border-strong)" stroke-width="1.5" marker-end="url(#arr)" />
-              <path d="M 620 96 L 620 132 L 802 132 L 802 164" fill="none" stroke="var(--border-strong)" stroke-width="1.5" marker-end="url(#arr)" />
+              <!-- Routing lines to top row -->
+              <path d="M 280 90 L 280 118 L 118 118 L 118 142" fill="none" stroke="var(--border-strong)" stroke-width="1.4" marker-end="url(#arr)" />
+              <path d="M 390 90 L 390 118 L 346 118 L 346 142" fill="none" stroke="var(--border-strong)" stroke-width="1.4" marker-end="url(#arr)" />
+              <path d="M 530 90 L 530 118 L 574 118 L 574 142" fill="none" stroke="var(--border-strong)" stroke-width="1.4" marker-end="url(#arr)" />
+              <path d="M 640 90 L 640 118 L 802 118 L 802 142" fill="none" stroke="var(--border-strong)" stroke-width="1.4" marker-end="url(#arr)" />
 
-              <!-- 4 Runtime Modules -->
+              <!-- Top row: 4 core runtime modules -->
               <g>
-                <rect x="20" y="168" width="196" height="98" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.5" />
-                <text x="34" y="192" fill="var(--accent)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">cortex mcp</text>
-                <text x="34" y="212" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="11">JSON-RPC 2.0 stdio</text>
-                <text x="34" y="230" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">11 tools &middot; 39 resources</text>
-                <text x="34" y="247" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">36 invocable prompts</text>
+                <rect x="20" y="146" width="196" height="72" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.5" />
+                <text x="34" y="169" fill="var(--accent)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">cortex mcp</text>
+                <text x="34" y="187" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="10.5">MCP 2025-03-26 stdio</text>
+                <text x="34" y="204" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10">11 tools &middot; 39 resources &middot; 36 prompts</text>
               </g>
               <g>
-                <rect x="248" y="168" width="196" height="98" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.5" />
-                <text x="262" y="192" fill="var(--accent)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">cortex studio</text>
-                <text x="262" y="212" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="11">Local Swiss Workbench</text>
-                <text x="262" y="230" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">7 UI panels &middot; 12 REST APIs</text>
-                <text x="262" y="247" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">Live workspace runner</text>
+                <rect x="248" y="146" width="196" height="72" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.5" />
+                <text x="262" y="169" fill="var(--accent)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">cortex studio</text>
+                <text x="262" y="187" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="10.5">Local Swiss Workbench</text>
+                <text x="262" y="204" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10">7 panels &middot; pack graph &middot; SARIF export</text>
               </g>
               <g>
-                <rect x="476" y="168" width="196" height="98" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.5" />
-                <text x="490" y="192" fill="var(--accent)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">cortex compile</text>
-                <text x="490" y="212" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="11">Universal Transpiler</text>
-                <text x="490" y="230" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">8 native IDE/agent formats</text>
-                <text x="490" y="247" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">--check CI drift gate</text>
+                <rect x="476" y="146" width="196" height="72" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.5" />
+                <text x="490" y="169" fill="var(--accent)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">cortex compile</text>
+                <text x="490" y="187" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="10.5">Universal Transpiler</text>
+                <text x="490" y="204" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10">8 IDE formats &middot; --check drift gate</text>
               </g>
               <g>
-                <rect x="704" y="168" width="196" height="98" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.5" />
-                <text x="718" y="192" fill="var(--accent)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">cortex scan</text>
-                <text x="718" y="212" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="11">Policy &amp; SARIF 2.1.0</text>
-                <text x="718" y="230" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">14 repo verifiers in 1 pass</text>
-                <text x="718" y="247" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10.5">Table, JSON, SARIF, JUnit</text>
+                <rect x="704" y="146" width="196" height="72" fill="var(--surface)" stroke="var(--rule)" stroke-width="1.5" />
+                <text x="718" y="169" fill="var(--accent)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">cortex scan</text>
+                <text x="718" y="187" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="10.5">Parallel Policy Scanner</text>
+                <text x="718" y="204" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10">14 verifiers &middot; Table/JSON/SARIF/JUnit</text>
+              </g>
+
+              <!-- Bottom row: v3 Graph, Bundle, Guard -->
+              <g>
+                <rect x="20" y="232" width="280" height="62" fill="var(--surface)" stroke="var(--border-strong)" stroke-width="1.3" />
+                <text x="34" y="254" fill="var(--ok)" font-family="IBM Plex Mono, monospace" font-size="11.5" font-weight="600">cortex graph</text>
+                <text x="34" y="274" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10">179 edges &middot; JSON / Mermaid / DOT &middot; --pack filter</text>
+              </g>
+              <g>
+                <rect x="320" y="232" width="280" height="62" fill="var(--surface)" stroke="var(--border-strong)" stroke-width="1.3" />
+                <text x="334" y="254" fill="var(--ok)" font-family="IBM Plex Mono, monospace" font-size="11.5" font-weight="600">cortex bundle</text>
+                <text x="334" y="274" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10">Deterministic air-gapped ZIP + manifest_sha256</text>
+              </g>
+              <g>
+                <rect x="620" y="232" width="280" height="62" fill="var(--surface)" stroke="var(--border-strong)" stroke-width="1.3" />
+                <text x="634" y="254" fill="var(--ok)" font-family="IBM Plex Mono, monospace" font-size="11.5" font-weight="600">cortex guard</text>
+                <text x="634" y="274" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="10">6-gate release &amp; pre-commit audit (--skip-archives)</text>
               </g>
             </svg>
+
+            <div class="engine-cards">
+              <div class="engine-card">
+                <div class="engine-card-head">
+                  <span>Portable Air-Gapped Bundle</span>
+                  <button type="button" class="btn-sm" data-copy="npx @jovianops/cortex bundle --pack cloud-native --out dist/cloud-native.zip">copy</button>
+                </div>
+                <p>Package any pack or collection into a reproducible ZIP with per-file SHA-256 verification and safe <code>--install</code>.</p>
+                <code>cortex bundle --pack cloud-native --out dist/cloud-native.zip</code>
+              </div>
+              <div class="engine-card">
+                <div class="engine-card-head">
+                  <span>Cortex Guard Release Gate</span>
+                  <button type="button" class="btn-sm" data-copy="npx @jovianops/cortex guard check --json">copy</button>
+                </div>
+                <p>Runs packaging, manifests, structural audits, capability graph, and high-severity policy scan in one pass.</p>
+                <code>cortex guard check --json</code>
+              </div>
+              <div class="engine-card">
+                <div class="engine-card-head">
+                  <span>Capability Graph Check</span>
+                  <button type="button" class="btn-sm" data-copy="npx @jovianops/cortex graph --pack cloud-native --format mermaid">copy</button>
+                </div>
+                <p>Export dependency topologies in JSON, Mermaid, or Graphviz DOT with orphan &amp; dangling-reference gates.</p>
+                <code>cortex graph --pack cloud-native --format mermaid</code>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2445,8 +2641,8 @@
         <div class="sec-head">
           <div>
             <span class="sec-num">02 / COMPATIBILITY MATRIX</span>
-            <h2>16 Agents, One Standard</h2>
-            <p class="sec-desc">Click any platform below to switch the active install target across the Hero, Builder, and Skill Inspector.</p>
+            <h2>18 Targets, One Standard</h2>
+            <p class="sec-desc">Click any target below to switch the active install command across the Hero, Builder, and Skill Inspector.</p>
           </div>
           <div class="mono" style="font-size:12px;color:var(--muted);">
             active: <strong id="activePlatformLabel" style="color:var(--accent);">npx @jovianops/cortex (CLI)</strong>
@@ -2490,14 +2686,23 @@
 
         <div id="tagStrip" class="tag-strip" aria-label="Quick topic filters"></div>
 
+        <div id="selBar" class="sel-bar" aria-live="polite">
+          <span id="selBarText"></span>
+          <div class="quick-controls">
+            <button type="button" id="selBarJump" class="btn-sm primary">open in builder &darr;</button>
+            <button type="button" id="selBarCopy" class="btn-sm">copy cli</button>
+            <button type="button" id="selBarClear" class="btn-sm">clear</button>
+          </div>
+        </div>
+
         <div id="tableViewWrap" class="table-wrap">
           <table class="idx">
             <thead>
               <tr>
                 <th class="col-chk"><input id="selectAllChk" class="chk" type="checkbox" aria-label="Select all visible skills" /></th>
-                <th>Skill</th>
-                <th>Tier</th>
-                <th>Script</th>
+                <th><button type="button" class="sort-btn active" data-sort="slug">Skill <span id="sortIndSlug">&#8593;</span></button></th>
+                <th><button type="button" class="sort-btn" data-sort="tier">Tier <span id="sortIndTier"></span></button></th>
+                <th><button type="button" class="sort-btn" data-sort="script">Script <span id="sortIndScript"></span></button></th>
                 <th>Description</th>
               </tr>
             </thead>
@@ -2567,8 +2772,8 @@
         <div class="ledger">
           <div class="ledger-row">
             <span class="ledger-key">checksums.json SHA-256 (v3.0.0)</span>
-            <code class="ledger-val">a1ad6311314d84cd378c426a13273aa8eaec4c3c890c4072d47835685bea5076</code>
-            <button type="button" class="btn-sm" data-copy="a1ad6311314d84cd378c426a13273aa8eaec4c3c890c4072d47835685bea5076">copy</button>
+            <code id="checksumsManifestSha" class="ledger-val">d2d5550532a90c04b07640ee6b13aa500da496666af7b34ea5ea1de642eccf51</code>
+            <button type="button" class="btn-sm" data-copy="d2d5550532a90c04b07640ee6b13aa500da496666af7b34ea5ea1de642eccf51">copy</button>
           </div>
           <div class="ledger-row">
             <span class="ledger-key">npm release integrity (SRI SHA-512)</span>
@@ -2620,7 +2825,7 @@
 
   <footer>
     <div class="wrap foot">
-      <div>JovianOps / cortex &middot; v3.0.0 &middot; MIT License</div>
+      <div>JovianOps / cortex &middot; v3.0.0 &middot; MIT License &middot; <span style="color:var(--muted);">Shortcuts: <kbd class="kbd-pill">Ctrl+K</kbd> palette &middot; <kbd class="kbd-pill">/</kbd> filter &middot; <kbd class="kbd-pill">T</kbd> theme</span></div>
       <div class="foot-links">
         <a href="https://github.com/JovianOps/cortex" target="_blank" rel="noreferrer">repository</a>
         <a href="https://www.npmjs.com/package/@jovianops/cortex" target="_blank" rel="noreferrer">npm</a>
@@ -2653,7 +2858,7 @@
       <div id="paletteList" class="palette-list"></div>
       <div class="palette-foot">
         <span>&#8593;&#8595; navigate &middot; Enter select &middot; Esc close</span>
-        <span>36 skills &middot; 10 packs &middot; 14 platforms</span>
+        <span id="paletteMeta">36 skills &middot; 10 packs &middot; 18 targets</span>
       </div>
     </div>
   </div>
@@ -3456,13 +3661,14 @@
 
     const TARGETS = [
       { id: 'cortex-cli', label: 'npx @jovianops/cortex (CLI)', badge: 'CLI', path: './.claude/skills/', hint: 'Runs Cortex CLI directly from npm — verifies bundled SHA-256 checksums' },
-      { id: 'npx-skills', label: 'npx skills add (universal)', badge: 'Universal', path: '40+ agents', hint: 'Universal skills.sh CLI — Claude Code, Codex, Gemini CLI, Cursor, Copilot, OpenCode, Goose, Cline' },
+      { id: 'npx-skills', label: 'npx skills add (universal)', badge: 'Universal', path: '40+ agents', hint: 'Universal skills.sh CLI — Claude Code, Codex, Gemini CLI, Cursor, Copilot, Windsurf, OpenCode, Goose, Cline' },
       { id: 'claude-code', label: 'Claude Code', badge: 'Plugin', path: '.claude/skills/', hint: 'Installs into .claude/skills/ or ~/.claude/skills/ (-a claude-code)' },
       { id: 'codex', label: 'OpenAI Codex CLI', badge: 'Plugin', path: '.agents/skills/', hint: 'Installs into .agents/skills/ or ~/.codex/skills/ (-a codex)' },
       { id: 'gemini-cli', label: 'Gemini CLI', badge: 'Ext', path: '.gemini/skills/', hint: 'Installs into .gemini/skills/ or ~/.gemini/skills/ (-a gemini-cli)' },
       { id: 'cursor', label: 'Cursor', badge: 'Rules', path: '.cursor/skills/', hint: 'Installs into .cursor/skills/ or ~/.cursor/skills/ (-a cursor)' },
       { id: 'vscode', label: 'Visual Studio Code', badge: 'Native', path: '.github/skills/', hint: 'Installs into .github/skills/ + enables chat.useAgentSkills in .vscode/settings.json' },
       { id: 'copilot', label: 'GitHub Copilot', badge: 'Plugin', path: '.github/skills/', hint: 'Installs into .github/skills/ or ~/.copilot/skills/ (-a github-copilot)' },
+      { id: 'windsurf', label: 'Windsurf', badge: 'Rules', path: '.windsurf/skills/', hint: 'Installs into .windsurf/skills/ or ~/.codeium/windsurf/skills/' },
       { id: 'opencode', label: 'OpenCode', badge: 'SKILL.md', path: '.opencode/skills/', hint: 'Installs into .opencode/skills/ (-a opencode)' },
       { id: 'openclaw', label: 'OpenClaw', badge: 'SKILL.md', path: '.openclaw/skills/', hint: 'Installs into .openclaw/skills/ (-a openclaw)' },
       { id: 'goose', label: 'Goose', badge: 'SKILL.md', path: '.goose/skills/', hint: 'Installs into .goose/skills/ (-a goose)' },
@@ -3470,6 +3676,7 @@
       { id: 'aider', label: 'Aider', badge: 'Conf', path: '.aider.conf.yml', hint: 'Installs SKILL.md files and updates .aider.conf.yml' },
       { id: 'remote-py', label: 'Python --remote (no Node)', badge: 'Stdlib', path: 'SHA-256 verified', hint: 'Zero-clone Python 3 stdlib — verifies checksums.json SHA-256 before writing' },
       { id: 'hermes', label: 'Hermes Agent', badge: 'Tap', path: 'hermes tap', hint: 'Uses hermes skills tap add JovianOps/cortex' },
+      { id: 'bundle-zip', label: 'Offline Bundle (air-gapped)', badge: 'Bundle', path: 'dist/cortex-bundle.zip', hint: 'Deterministic ZIP bundle with manifest_sha256 verification and --install' },
       { id: 'zip-upload', label: 'Claude Apps / ChatGPT (ZIP)', badge: 'ZIP', path: 'zips/*.zip', hint: 'Download verified <slug>.zip from zips/ or premium-zips/ and upload in Settings' }
     ];
 
@@ -3540,6 +3747,19 @@
         ``,
         `Suggested install command:`,
         `  <span class="t-accent">npx @jovianops/cortex install --agent claude-code --pack cloud-native</span>`
+      ],
+      guard: [
+        `<span class="t-dim">$ npx @jovianops/cortex guard check --json</span>`,
+        `<span class="t-hi">Cortex v3.0.0 — Release Gate &amp; Drift Audit</span>`,
+        ``,
+        `<span class="t-ok">[PASS]</span> packaging      36/36 SHA-256 deterministic ZIPs verified`,
+        `<span class="t-ok">[PASS]</span> manifests      9 multi-agent manifests match v3.0.0`,
+        `<span class="t-ok">[PASS]</span> validate       36/36 SKILL.md frontmatter + YAML valid`,
+        `<span class="t-ok">[PASS]</span> audit          36/36 evals &amp; structural rubrics 100.0/100`,
+        `<span class="t-ok">[PASS]</span> graph          36 skills, 10 packs, 179 edges (0 dangling)`,
+        `<span class="t-ok">[PASS]</span> scan           14 concurrent scanners &mdash; 0 high/crit findings`,
+        ``,
+        `Release gate: <span class="t-ok">PASSED (6 / 6 checks green)</span>.`
       ]
     };
 
@@ -3713,13 +3933,18 @@
       tagFilter: '',
       view: 'table',
       query: '',
+      sortBy: 'slug',
+      sortDir: 'asc',
       selected: new Set(PACKS[0].skills),
       inspectSlug: null,
+      drawerCompileFmt: 'cursor',
       rtTab: 'scan',
       scanFixture: 'k8s',
       scanFixed: false,
       scanFmt: 'table',
       mcpTab: 'tools',
+      graphPack: '',
+      graphFmt: 'visual',
       paletteOpen: false,
       paletteIndex: 0
     };
@@ -3826,6 +4051,18 @@
         if (pack) return `npx @jovianops/cortex install --agent vscode --pack ${pack.id} --scope project --write-vscode-settings`;
         if (allSelected) return `npx @jovianops/cortex install --agent vscode --collection all --scope project --write-vscode-settings`;
         return `npx @jovianops/cortex install --agent vscode ${list.map((s) => `--skill ${s}`).join(' ')} --scope project --write-vscode-settings`;
+      }
+
+      if (target === 'windsurf') {
+        if (pack) return `npx @jovianops/cortex install --agent windsurf --pack ${pack.id} --scope project`;
+        if (allSelected) return `npx @jovianops/cortex install --agent windsurf --collection all --scope project`;
+        return `npx @jovianops/cortex install --agent windsurf ${list.map((s) => `--skill ${s}`).join(' ')} --scope project`;
+      }
+
+      if (target === 'bundle-zip') {
+        if (pack) return `npx @jovianops/cortex bundle --pack ${pack.id} --out dist/${pack.id}.zip`;
+        if (allSelected) return `npx @jovianops/cortex bundle --collection all --out dist/cortex-all.zip`;
+        return `npx @jovianops/cortex bundle ${list.map((s) => `--skill ${s}`).join(' ')} --out dist/cortex-bundle.zip`;
       }
 
       if (target === 'aider') {
@@ -4056,8 +4293,8 @@
           text: `${prov}\n\n${body}`
         };
       }
-      const targetFiles = { claude: 'CLAUDE.md', agents: 'AGENTS.md', gemini: 'GEMINI.md' };
-      const targetLabels = { claude: 'Claude Code', agents: 'AGENTS.md', gemini: 'Gemini CLI' };
+      const targetFiles = { claude: 'CLAUDE.md', agents: 'AGENTS.md', opencode: 'AGENTS.md', gemini: 'GEMINI.md' };
+      const targetLabels = { claude: 'Claude Code', agents: 'AGENTS.md', opencode: 'OpenCode', gemini: 'Gemini CLI' };
       return {
         path: targetFiles[format] || 'AGENTS.md',
         text: `<!-- BEGIN CORTEX MANAGED -->\n<!-- Compiled for ${targetLabels[format] || format} | skill=${s.slug}@3.0.0 | sha256=${s.sha256} -->\n\n${body}\n<!-- END CORTEX MANAGED -->`
@@ -4087,12 +4324,9 @@
         cfg = JSON.stringify({
           $schema: 'https://opencode.ai/config.json',
           mcp: {
-            servers: {
-              cortex: {
-                type: 'local',
-                command: ['npx', '-y', '@jovianops/cortex', 'mcp', '--project-dir', '.'],
-                enabled: true
-              }
+            cortex: {
+              type: 'local',
+              command: ['npx', '-y', '@jovianops/cortex', 'mcp', '--project-dir', '.']
             }
           }
         }, null, 2);
@@ -4114,10 +4348,175 @@
       `).join('');
     }
 
+    /* Capability Graph Explorer */
+    function buildGraphModel(packFilter) {
+      const activePacks = packFilter ? PACKS.filter((p) => p.id === packFilter) : PACKS;
+      const skillMap = new Map();
+      const edges = [];
+      for (const p of activePacks) {
+        for (const slug of p.skills) {
+          const sk = SKILLS.find((x) => x.slug === slug);
+          if (sk) {
+            skillMap.set(slug, sk);
+            edges.push({ from: `pack:${p.id}`, to: slug, pack: p.id, type: 'pack-member' });
+          }
+        }
+      }
+      const skills = Array.from(skillMap.values()).sort((a, b) => a.slug.localeCompare(b.slug));
+      return { packs: activePacks, skills, edges };
+    }
+
+    function renderGraphRawText(model, fmt) {
+      if (fmt === 'json') {
+        return JSON.stringify({
+          version: '3.0.0',
+          ok: true,
+          pack_count: model.packs.length,
+          skill_count: model.skills.length,
+          edge_count: model.edges.length,
+          packs: model.packs.map((p) => ({ id: p.id, label: p.label, skills: p.skills })),
+          edges: model.edges
+        }, null, 2);
+      }
+      if (fmt === 'mermaid') {
+        const lines = ['graph LR'];
+        for (const p of model.packs) {
+          lines.push(`  pack_${p.id.replace(/[^a-zA-Z0-9_]/g, '_')}["${p.id} (${p.skills.length})"]`);
+        }
+        for (const s of model.skills) {
+          lines.push(`  skill_${s.slug.replace(/[^a-zA-Z0-9_]/g, '_')}(["${s.slug}"])`);
+        }
+        for (const e of model.edges) {
+          lines.push(`  pack_${e.pack.replace(/[^a-zA-Z0-9_]/g, '_')} --> skill_${e.to.replace(/[^a-zA-Z0-9_]/g, '_')}`);
+        }
+        return lines.join('\n');
+      }
+      const lines = ['digraph cortex_skills {', '  rankdir=LR;', '  node [fontname="IBM Plex Mono", fontsize=11];'];
+      for (const p of model.packs) {
+        lines.push(`  "pack:${p.id}" [shape=box, style=filled, fillcolor="#c8321c", fontcolor="#ffffff"];`);
+      }
+      for (const e of model.edges) {
+        lines.push(`  "pack:${e.pack}" -> "${e.to}";`);
+      }
+      lines.push('}');
+      return lines.join('\n');
+    }
+
+    function renderGraphSim() {
+      const model = buildGraphModel(state.graphPack);
+      $('graphStatsBadge').textContent = `${model.packs.length} pack${model.packs.length === 1 ? '' : 's'} · ${model.skills.length} skills · ${model.edges.length} edges`;
+      const visualWrap = $('graphVisualWrap');
+      const rawOut = $('graphRawOut');
+
+      if (state.graphFmt !== 'visual') {
+        visualWrap.style.display = 'none';
+        rawOut.style.display = '';
+        rawOut.textContent = renderGraphRawText(model, state.graphFmt);
+        return;
+      }
+      visualWrap.style.display = '';
+      rawOut.style.display = 'none';
+
+      const w = 920;
+      const skillCount = model.skills.length;
+      const packCount = model.packs.length;
+      const colH = Math.max(packCount * 42 + 40, Math.ceil(skillCount / 2) * 32 + 44, 300);
+      const packX = 36;
+      const packW = 205;
+      const midColX = 340;
+      const rightColX = 630;
+      const skillW = 250;
+
+      const packPos = new Map();
+      const packStep = (colH - 40) / Math.max(1, packCount);
+      model.packs.forEach((p, i) => {
+        const y = Math.round(20 + i * packStep + packStep / 2);
+        packPos.set(p.id, { x: packX, y });
+      });
+
+      const skillPos = new Map();
+      const half = Math.ceil(skillCount / 2);
+      const leftSkills = model.skills.slice(0, half);
+      const rightSkills = model.skills.slice(half);
+      const stepL = (colH - 36) / Math.max(1, leftSkills.length);
+      const stepR = (colH - 36) / Math.max(1, rightSkills.length || 1);
+      leftSkills.forEach((s, i) => skillPos.set(s.slug, { x: midColX, y: Math.round(18 + i * stepL + stepL / 2) }));
+      rightSkills.forEach((s, i) => skillPos.set(s.slug, { x: rightColX, y: Math.round(18 + i * stepR + stepR / 2) }));
+
+      const pathsSvg = model.edges.map((e) => {
+        const a = packPos.get(e.pack);
+        const b = skillPos.get(e.to);
+        if (!a || !b) return '';
+        const x1 = a.x + packW;
+        const y1 = a.y;
+        const x2 = b.x;
+        const y2 = b.y;
+        const cx = Math.round((x1 + x2) / 2);
+        return `<path class="graph-edge" data-epack="${escapeHtml(e.pack)}" data-eskill="${escapeHtml(e.to)}" d="M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}" fill="none" stroke="var(--border-strong)" stroke-width="1.2" opacity="0.55" />`;
+      }).join('');
+
+      const packsSvg = model.packs.map((p) => {
+        const pos = packPos.get(p.id);
+        return `<g class="graph-node" data-gpack="${escapeHtml(p.id)}">
+          <rect x="${pos.x}" y="${pos.y - 14}" width="${packW}" height="28" rx="4" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.4" />
+          <text x="${pos.x + 10}" y="${pos.y + 4}" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600">${escapeHtml(p.id)}</text>
+          <text x="${pos.x + packW - 10}" y="${pos.y + 4}" text-anchor="end" fill="var(--accent)" font-family="IBM Plex Mono, monospace" font-size="10">${p.skills.length}</text>
+        </g>`;
+      }).join('');
+
+      const skillsSvg = model.skills.map((s) => {
+        const pos = skillPos.get(s.slug);
+        const stroke = s.tier === 'core' ? 'var(--ok)' : 'var(--border-strong)';
+        return `<g class="graph-node" data-gskill="${escapeHtml(s.slug)}">
+          <rect x="${pos.x}" y="${pos.y - 12}" width="${skillW}" height="24" rx="4" fill="var(--surface)" stroke="${stroke}" stroke-width="1.2" />
+          <circle cx="${pos.x + 12}" cy="${pos.y}" r="3.5" fill="${s.tier === 'core' ? 'var(--ok)' : 'var(--muted)'}" />
+          <text x="${pos.x + 22}" y="${pos.y + 4}" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="10.5">${escapeHtml(s.slug)}</text>
+        </g>`;
+      }).join('');
+
+      visualWrap.innerHTML = `<svg class="graph-svg" viewBox="0 0 ${w} ${colH}" role="img" aria-label="Interactive skill and pack capability graph">${pathsSvg}${packsSvg}${skillsSvg}</svg>`;
+
+      const inspector = $('graphInspector');
+      const highlight = (packId, skillSlug) => {
+        visualWrap.querySelectorAll('.graph-edge').forEach((edge) => {
+          const hit = (packId && edge.dataset.epack === packId) || (skillSlug && edge.dataset.eskill === skillSlug);
+          edge.setAttribute('stroke', hit ? 'var(--accent)' : 'var(--border-strong)');
+          edge.setAttribute('stroke-width', hit ? '2.1' : '1.1');
+          edge.setAttribute('opacity', (!packId && !skillSlug) ? '0.55' : (hit ? '1' : '0.14'));
+        });
+      };
+
+      visualWrap.querySelectorAll('[data-gpack]').forEach((node) => {
+        const pid = node.dataset.gpack;
+        const p = PACKS.find((x) => x.id === pid);
+        node.addEventListener('mouseenter', () => {
+          highlight(pid, '');
+          inspector.firstElementChild.textContent = `pack:${pid} — ${p.skills.length} member skills (${p.label})`;
+        });
+        node.addEventListener('mouseleave', () => highlight('', ''));
+        node.addEventListener('click', () => {
+          state.graphPack = state.graphPack === pid ? '' : pid;
+          $('graphPackSel').value = state.graphPack;
+          renderGraphSim();
+        });
+      });
+
+      visualWrap.querySelectorAll('[data-gskill]').forEach((node) => {
+        const slug = node.dataset.gskill;
+        const memberPacks = PACKS.filter((p) => p.skills.includes(slug)).map((p) => p.id);
+        node.addEventListener('mouseenter', () => {
+          highlight('', slug);
+          inspector.firstElementChild.textContent = `${slug} — in ${memberPacks.length} pack(s): ${memberPacks.join(', ')}`;
+        });
+        node.addEventListener('mouseleave', () => highlight('', ''));
+        node.addEventListener('click', () => openDrawer(slug));
+      });
+    }
+
     /* Skill Catalog */
     function filteredSkills() {
       const q = state.query.trim().toLowerCase();
-      return SKILLS.filter((s) => {
+      const rows = SKILLS.filter((s) => {
         if (state.filter === 'core' && s.tier !== 'core') return false;
         if (state.filter === 'extended' && s.tier !== 'extended') return false;
         if (state.filter === 'scripts' && !s.script) return false;
@@ -4130,6 +4529,37 @@
           s.tags.some((t) => t.toLowerCase().includes(q))
         );
       });
+      const dir = state.sortDir === 'desc' ? -1 : 1;
+      return rows.sort((a, b) => {
+        const av = state.sortBy === 'tier' ? a.tier : state.sortBy === 'script' ? (a.script || '') : a.slug;
+        const bv = state.sortBy === 'tier' ? b.tier : state.sortBy === 'script' ? (b.script || '') : b.slug;
+        return dir * av.localeCompare(bv) || a.slug.localeCompare(b.slug);
+      });
+    }
+
+    function syncSortIndicators() {
+      const arrow = state.sortDir === 'desc' ? '↓' : '↑';
+      document.querySelectorAll('[data-sort]').forEach((btn) => {
+        const on = btn.dataset.sort === state.sortBy;
+        btn.classList.toggle('active', on);
+      });
+      $('sortIndSlug').textContent = state.sortBy === 'slug' ? arrow : '';
+      $('sortIndTier').textContent = state.sortBy === 'tier' ? arrow : '';
+      $('sortIndScript').textContent = state.sortBy === 'script' ? arrow : '';
+    }
+
+    function updateSelBar() {
+      const bar = $('selBar');
+      const count = state.selected.size;
+      if (count === 0) {
+        bar.classList.remove('show');
+        return;
+      }
+      const matched = matchingPack(state.selected);
+      $('selBarText').innerHTML = matched
+        ? `<strong>${count} skills</strong> staged (pack <code>${escapeHtml(matched.id)}</code>)`
+        : `<strong>${count} skill${count === 1 ? '' : 's'}</strong> staged for install builder`;
+      bar.classList.add('show');
     }
 
     function renderTagStrip() {
@@ -4141,6 +4571,8 @@
     function renderCatalog() {
       const rows = filteredSkills();
       $('countLabel').textContent = `${rows.length} of ${SKILLS.length} shown`;
+      syncSortIndicators();
+      updateSelBar();
 
       if (state.view === 'table') {
         $('tableViewWrap').style.display = '';
@@ -4229,16 +4661,22 @@
       const s = SKILLS.find((x) => x.slug === slug);
       if (!s) return;
       state.inspectSlug = slug;
+      try { history.replaceState(null, '', '#skill=' + encodeURIComponent(slug)); } catch (e) {}
       $('dTier').textContent = s.tier;
       $('dTier').className = 'tier' + (s.tier === 'core' ? ' core' : '');
       $('dSlug').textContent = s.slug;
 
       const installCmd = buildCommand(state.target, state.shell, [s.slug]);
+      const verifierCmd = s.script ? `python3 ${s.dir}/${s.slug}/${s.script} . --json` : '';
+      const memberPacks = PACKS.filter((p) => p.skills.includes(s.slug));
       const rawUrl = `https://github.com/JovianOps/cortex/blob/main/${encodeURIComponent(s.dir)}/${encodeURIComponent(s.slug)}/SKILL.md`;
       const zipUrl = `https://raw.githubusercontent.com/JovianOps/cortex/main/${encodeURIComponent(s.zipDir)}/${encodeURIComponent(s.slug)}.zip`;
-      const compiledCursor = buildCompiledRule(s.slug, 'cursor');
+      const compiledPreview = buildCompiledRule(s.slug, state.drawerCompileFmt || 'cursor');
       const scriptRow = s.script
         ? `<div class="kv"><span class="kv-k">script</span><span class="kv-v"><a href="https://github.com/JovianOps/cortex/blob/main/${encodeURIComponent(s.dir)}/${encodeURIComponent(s.slug)}/${s.script.split('/').map(encodeURIComponent).join('/')}" target="_blank" rel="noreferrer" style="color:var(--accent);">${escapeHtml(s.dir)}/${escapeHtml(s.slug)}/${escapeHtml(s.script)}</a></span></div>`
+        : '';
+      const packsRow = memberPacks.length
+        ? `<div class="kv"><span class="kv-k">packs</span><span class="kv-v" style="display:flex;flex-wrap:wrap;gap:4px;">${memberPacks.map((p) => `<button type="button" class="pack-skill-btn" data-drawer-pack="${escapeHtml(p.id)}">${escapeHtml(p.id)}</button>`).join('')}</span></div>`
         : '';
 
       $('drawerBody').innerHTML = `
@@ -4247,6 +4685,7 @@
           <div class="kv"><span class="kv-k">path</span><span class="kv-v">${escapeHtml(s.dir)}/${escapeHtml(s.slug)}/SKILL.md</span></div>
           <div class="kv"><span class="kv-k">version</span><span class="kv-v">3.0.0</span></div>
           ${scriptRow}
+          ${packsRow}
           <div class="kv"><span class="kv-k">tags</span><span class="kv-v">${escapeHtml(s.tags.join(', '))}</span></div>
           <div class="kv"><span class="kv-k">SKILL.md SHA</span><span class="kv-v">${escapeHtml(s.sha256)}</span></div>
           <div class="kv"><span class="kv-k">.zip SHA-256</span><span class="kv-v">${escapeHtml(s.zipSha256)}</span></div>
@@ -4260,35 +4699,87 @@
           </div>
         </div>
 
+        ${verifierCmd ? `<div>
+          <div class="mono" style="font-size:11.5px;color:var(--muted);margin-bottom:6px;">run bundled verifier</div>
+          <div class="cmd-row" style="border:1px solid var(--border);">
+            <pre><span class="prompt">$</span>${escapeHtml(verifierCmd)}</pre>
+            <button type="button" class="copy-btn" id="drawerCopyVerifier">copy</button>
+          </div>
+        </div>` : ''}
+
         <div class="drawer-links">
           <a class="btn-sm primary" href="${escapeHtml(rawUrl)}" target="_blank" rel="noreferrer">read SKILL.md</a>
           <a class="btn-sm" href="${escapeHtml(zipUrl)}" target="_blank" rel="noreferrer">download .zip</a>
           <button type="button" class="btn-sm" id="drawerCopySha">copy SHA-256</button>
+          <button type="button" class="btn-sm" id="drawerCopyLink">copy link</button>
           <button type="button" class="btn-sm" id="drawerToggleSel">${state.selected.has(s.slug) ? 'remove from builder' : 'add to builder'}</button>
         </div>
 
-        <div class="drawer-box">
+        <div id="drawerDropZone" class="drawer-box">
           <h3>Live Browser SHA-256 Verifier (WebCrypto)</h3>
-          <p style="margin:0 0 8px;font-size:12px;color:var(--muted);">Choose a local <code>SKILL.md</code> file or paste its contents to verify LF-normalized SHA-256 against <code>checksums.json</code>.</p>
+          <p style="margin:0 0 8px;font-size:12px;color:var(--muted);">Drop or choose a local <code>SKILL.md</code> file, or paste its contents below, to verify LF-normalized SHA-256 against <code>checksums.json</code>.</p>
           <input type="file" id="drawerFileVerify" class="ctrl" style="width:100%;margin-bottom:8px;" accept=".md,.txt" aria-label="Choose SKILL.md file to verify SHA-256" />
-          <textarea id="drawerTextVerify" class="ctrl" rows="3" style="width:100%;resize:vertical;" placeholder="Or paste SKILL.md contents here to compute SHA-256..." aria-label="Paste SKILL.md contents to verify SHA-256"></textarea>
+          <textarea id="drawerTextVerify" class="ctrl" rows="3" style="width:100%;resize:vertical;" placeholder="Or paste or drop SKILL.md contents here to compute SHA-256..." aria-label="Paste SKILL.md contents to verify SHA-256"></textarea>
           <div id="drawerHashResult" class="hash-status">Waiting for file or text input...</div>
         </div>
 
         <div class="drawer-box">
-          <h3>Compiled Cursor Rule Preview (${compiledCursor.path})</h3>
-          <pre class="raw-out" style="max-height:170px;border:1px solid var(--border);">${escapeHtml(compiledCursor.text)}</pre>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+            <h3 style="margin:0;">Compiled Rule Preview (<span id="drawerCompiledPath">${escapeHtml(compiledPreview.path)}</span>)</h3>
+            <div class="quick-controls">
+              <select id="drawerCompileSel" class="ctrl" aria-label="Choose rule compiler format in inspector">
+                <option value="cursor">Cursor (.mdc)</option>
+                <option value="vscode">VS Code (.instructions.md)</option>
+                <option value="windsurf">Windsurf (.md)</option>
+                <option value="cline">Cline (.md)</option>
+                <option value="claude">CLAUDE.md</option>
+                <option value="agents">AGENTS.md</option>
+                <option value="opencode">OpenCode</option>
+                <option value="gemini">GEMINI.md</option>
+              </select>
+              <button type="button" id="drawerCopyCompiled" class="btn-sm">copy</button>
+            </div>
+          </div>
+          <pre id="drawerCompiledOut" class="raw-out" style="max-height:170px;border:1px solid var(--border);">${escapeHtml(compiledPreview.text)}</pre>
         </div>
       `;
 
+      $('drawerCompileSel').value = state.drawerCompileFmt || 'cursor';
+      $('drawerCompileSel').addEventListener('change', (e) => {
+        state.drawerCompileFmt = e.target.value;
+        const upd = buildCompiledRule(s.slug, state.drawerCompileFmt);
+        $('drawerCompiledPath').textContent = upd.path;
+        $('drawerCompiledOut').textContent = upd.text;
+      });
+      $('drawerCopyCompiled').addEventListener('click', (e) => copyText($('drawerCompiledOut').textContent, e.currentTarget, 'Copied compiled rule'));
+
       $('drawerCopyCmd').addEventListener('click', (e) => copyText(installCmd, e.currentTarget));
+      if (verifierCmd) {
+        $('drawerCopyVerifier').addEventListener('click', (e) => copyText(verifierCmd, e.currentTarget, 'Copied verifier command'));
+      }
       $('drawerCopySha').addEventListener('click', (e) => copyText(s.sha256, e.currentTarget));
+      $('drawerCopyLink').addEventListener('click', (e) => {
+        const shareUrl = `${location.origin}${location.pathname}#skill=${encodeURIComponent(s.slug)}`;
+        copyText(shareUrl, e.currentTarget, `Copied link to ${s.slug}`);
+      });
       $('drawerToggleSel').addEventListener('click', () => {
         if (state.selected.has(s.slug)) state.selected.delete(s.slug);
         else state.selected.add(s.slug);
         renderCatalog();
         renderCommands();
         openDrawer(s.slug);
+      });
+      $('drawerBody').querySelectorAll('[data-drawer-pack]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const p = PACKS.find((x) => x.id === btn.dataset.drawerPack);
+          if (!p) return;
+          state.selected = new Set(p.skills);
+          renderCatalog();
+          renderCommands();
+          closeDrawer();
+          $('builder').scrollIntoView({ behavior: 'smooth' });
+          showToast(`Loaded pack: ${p.id} (${p.skills.length} skills)`);
+        });
       });
 
       const verifyText = async (txt) => {
@@ -4311,9 +4802,7 @@
           : `<strong>MISMATCH</strong><br/>actual:   ${actual}<br/>expected: ${s.sha256}`;
       };
 
-      $('drawerTextVerify').addEventListener('input', (e) => verifyText(e.target.value));
-      $('drawerFileVerify').addEventListener('change', (e) => {
-        const file = e.target.files && e.target.files[0];
+      const readVerifiedFile = (file) => {
         if (!file) return;
         const reader = new FileReader();
         reader.onload = () => {
@@ -4322,6 +4811,18 @@
           verifyText(content);
         };
         reader.readAsText(file);
+      };
+
+      $('drawerTextVerify').addEventListener('input', (e) => verifyText(e.target.value));
+      $('drawerFileVerify').addEventListener('change', (e) => readVerifiedFile(e.target.files && e.target.files[0]));
+      const dropZone = $('drawerDropZone');
+      dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        readVerifiedFile(file);
       });
 
       $('backdrop').classList.add('open');
@@ -4332,6 +4833,9 @@
 
     function closeDrawer() {
       state.inspectSlug = null;
+      if (location.hash.startsWith('#skill=')) {
+        try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+      }
       $('backdrop').classList.remove('open');
       $('drawer').classList.remove('open');
       $('backdrop').setAttribute('aria-hidden', 'true');
@@ -4357,13 +4861,21 @@
         { kind: 'runtime', title: 'Open cortex mcp inspector', sub: '11 tools, 39 resources, 36 prompts', run: () => {
           document.querySelector('[data-rt="mcp"]').click();
           $('runtime').scrollIntoView({ behavior: 'smooth' });
+        }},
+        { kind: 'runtime', title: 'Open cortex graph explorer', sub: 'Interactive pack/skill graph, Mermaid & DOT', run: () => {
+          document.querySelector('[data-rt="graph"]').click();
+          $('runtime').scrollIntoView({ behavior: 'smooth' });
+        }},
+        { kind: 'runtime', title: 'Open cortex studio, bundle & guard', sub: '7-engine architecture & air-gapped bundles', run: () => {
+          document.querySelector('[data-rt="studio"]').click();
+          $('runtime').scrollIntoView({ behavior: 'smooth' });
         }}
       ];
       for (const [id, title, sub] of [
-        ['runtime', 'Runtime engine', 'scan, compile, MCP and studio'],
-        ['platforms', 'Platforms', '16 agent install targets'],
-        ['skills', 'Skill index', '36 SKILL.md playbooks'],
-        ['packs', 'Role packs', '10 curated bundles'],
+        ['runtime', 'Runtime engine', 'scan, compile, MCP, graph and studio'],
+        ['platforms', 'Platforms', `${TARGETS.length} install & bundle targets`],
+        ['skills', 'Skill index', `${SKILLS.length} SKILL.md playbooks`],
+        ['packs', 'Role packs', `${PACKS.length} curated bundles`],
         ['builder', 'Command builder', 'compose an install command'],
         ['verify', 'Verify authenticity', 'SHA-256 and SLSA provenance']
       ]) {
@@ -4489,12 +5001,16 @@
       animateKpis();
       syncShellButtons();
 
-      // Compile dropdown
+      // Compile & Graph dropdowns
       $('compileSkillSel').innerHTML = SKILLS.map((s) => `<option value="${s.slug}">${s.slug} (${s.tier})</option>`).join('');
       $('compileSkillSel').value = 'kubernetes-architect';
+      $('graphPackSel').innerHTML = `<option value="">All role packs (${PACKS.length})</option>` +
+        PACKS.map((p) => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.id)} — ${escapeHtml(p.label)} (${p.skills.length})</option>`).join('');
+      $('paletteMeta').textContent = `${SKILLS.length} skills · ${PACKS.length} packs · ${TARGETS.length} targets`;
       renderScannerSim();
       renderCompileSim();
       renderMcpSim();
+      renderGraphSim();
 
       // Theme toggle
       const applyTheme = (mode) => {
@@ -4585,6 +5101,79 @@
           document.querySelectorAll('[data-scan-fmt]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
           renderScannerSim();
         });
+      });
+      $('scanDownloadBtn').addEventListener('click', () => {
+        const fx = SCAN_FIXTURES[state.scanFixture];
+        const activeFindings = state.scanFixed ? [] : fx.findings;
+        let mime = 'application/sarif+json';
+        let filename = `cortex-${fx.scanner}.sarif`;
+        let payload = '';
+        if (state.scanFmt === 'junit') {
+          mime = 'application/xml';
+          filename = `cortex-${fx.scanner}-junit.xml`;
+          const cases = activeFindings.length
+            ? activeFindings.map((f) => `  <testcase classname="${fx.scanner}" name="${f.rule} (${fx.file}:${f.line})">\n    <failure message="${f.msg.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')}" type="${f.severity}"/>\n  </testcase>`).join('\n')
+            : `  <testcase classname="${fx.scanner}" name="${fx.file} policy gate"/>`;
+          payload = `<?xml version="1.0" encoding="UTF-8"?>\n<testsuite name="cortex-scan" tests="${Math.max(1, activeFindings.length)}" failures="${activeFindings.length}">\n${cases}\n</testsuite>\n`;
+        } else {
+          payload = JSON.stringify({
+            $schema: 'https://raw.githubusercontent.com/oasis-tcs/sarif-spec/main/sarif-2.1/schema/sarif-schema-2.1.0.json',
+            version: '2.1.0',
+            runs: [{
+              tool: { driver: { name: 'cortex-scan', version: '3.0.0' } },
+              results: activeFindings.map((f) => ({
+                ruleId: f.rule,
+                level: f.severity === 'MEDIUM' ? 'warning' : 'error',
+                message: { text: f.msg },
+                locations: [{ physicalLocation: { artifactLocation: { uri: fx.file }, region: { startLine: f.line } } }]
+              }))
+            }]
+          }, null, 2) + '\n';
+        }
+        const blob = new Blob([payload], { type: mime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast(`Downloaded ${filename}`);
+      });
+
+      // Graph controls
+      $('graphPackSel').addEventListener('change', (e) => {
+        state.graphPack = e.target.value;
+        renderGraphSim();
+      });
+      document.querySelectorAll('[data-graph-fmt]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.graphFmt = btn.dataset.graphFmt;
+          document.querySelectorAll('[data-graph-fmt]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+          renderGraphSim();
+        });
+      });
+      $('graphCopyBtn').addEventListener('click', (e) => {
+        const model = buildGraphModel(state.graphPack);
+        const fmt = state.graphFmt === 'visual' ? 'mermaid' : state.graphFmt;
+        copyText(renderGraphRawText(model, fmt), e.currentTarget, `Copied ${fmt.toUpperCase()} graph`);
+      });
+
+      // Sort & Selection Action Bar controls
+      document.querySelectorAll('[data-sort]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const col = btn.dataset.sort;
+          if (state.sortBy === col) state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+          else { state.sortBy = col; state.sortDir = 'asc'; }
+          renderCatalog();
+        });
+      });
+      $('selBarJump').addEventListener('click', () => $('builder').scrollIntoView({ behavior: 'smooth' }));
+      $('selBarCopy').addEventListener('click', (e) => copyText($('builderCmd').textContent, e.currentTarget, 'Copied staged CLI command'));
+      $('selBarClear').addEventListener('click', () => {
+        state.selected.clear();
+        renderCatalog();
+        renderCommands();
+        showToast('Cleared skill selection (defaulting to full catalog)');
       });
 
       // Compiler controls
@@ -4685,6 +5274,10 @@
         if (e.key === '/' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
           e.preventDefault();
           $('searchInput').focus();
+        } else if (e.key.toLowerCase() === 't' && !e.ctrlKey && !e.metaKey && !e.altKey && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+          const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+          applyTheme(next);
+          showToast(`Theme: ${next}`);
         } else if (e.key === 'Escape') {
           closeDrawer();
         }
@@ -4770,6 +5363,22 @@
 
       $('backdrop').addEventListener('click', closeDrawer);
       $('drawerClose').addEventListener('click', closeDrawer);
+
+      // Deep-link hydration (#skill=... or #pack=...)
+      const h = location.hash || '';
+      if (h.startsWith('#skill=')) {
+        const slug = decodeURIComponent(h.slice(7));
+        if (SKILLS.some((s) => s.slug === slug)) openDrawer(slug);
+      } else if (h.startsWith('#pack=')) {
+        const pid = decodeURIComponent(h.slice(6));
+        const p = PACKS.find((x) => x.id === pid);
+        if (p) {
+          state.selected = new Set(p.skills);
+          renderCatalog();
+          renderCommands();
+          $('builder').scrollIntoView({ behavior: 'smooth' });
+        }
+      }
     }
 
     init();
